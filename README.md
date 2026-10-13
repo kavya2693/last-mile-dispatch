@@ -60,10 +60,10 @@ because the simulator ran both arms everywhere):
 |---|---|---|---|---|---|---|
 | Fleet cost per delivered order (AED) | 9.79 | 8.75 | **−1.04 (−10.6%)** | −1.47 to −0.62 | −1.41 to −0.65 | −1.04 |
 | Delivered orders per rider-hour | 2.59 | 2.89 | +0.30 (+11.6%) | +0.18 to +0.42 | +0.19 to +0.41 | +0.28 |
-| Rider utilisation (busy / paid time) | 0.667 | 0.650 | **−0.017 (−2.5%)** | −0.041 to +0.007 | −0.039 to +0.004 | −0.026 |
+| Rider utilisation (busy / paid time) | 0.667 | 0.650 | **−0.017 (−2.5%)** | −0.040 to +0.007 | −0.039 to +0.004 | −0.026 |
 | Fake attempts accepted per 1,000 orders | 11.7 | 3.2 | −8.5 (−72%) | −15.0 to −2.0 | −14.4 to −2.9 | −12.2 |
 | Orders delivered within 30 min (share of all orders) | 58.0% | 86.2% | +28.3 pts | +23.5 to +33.0 | +24.1 to +32.6 | +30.1 |
-| Cancellation rate | 11.6% | 3.8% | −7.9 pts | −9.7 to −6.1 | −9.6 to −6.4 | −7.9 |
+| Cancellation rate | 11.6% | 3.7% | −7.9 pts | −9.7 to −6.1 | −9.6 to −6.4 | −7.9 |
 | P90 order-to-door minutes | 41.2 | 27.2 | −14.0 | −16.4 to −11.6 | −16.2 to −11.9 | −15.1 |
 
 The metric that disagrees is **utilisation**. With the same paid roster, bagging means fewer
@@ -77,8 +77,8 @@ this experiment did not test.
 
 | Day type | Orders | Cost per delivered order | Cancellation rate | Km per delivered order |
 |---|---|---|---|---|
-| Ordinary weekday | 125,715 | 9.72 → 9.36 (−3.7%) | 1.5% → 0.8% | 4.51 → 4.11 |
-| Weekend or Ramadan | 184,449 | 9.66 → 8.30 (−14.0%) | 15.4% → 4.2% | 4.52 → 3.69 |
+| Ordinary weekday | 125,715 | 9.71 → 9.36 (−3.7%) | 1.5% → 0.8% | 4.51 → 4.10 |
+| Weekend or Ramadan | 184,449 | 9.65 → 8.30 (−14.0%) | 15.4% → 4.2% | 4.52 → 3.69 |
 | Rain day | 16,817 | 10.42 → 6.84 (−34.4%) | 42.5% → 14.0% | 4.45 → 2.74 |
 
 Most of the 10.6% comes from stressed days, when bagging turns a queue of cancellations into
@@ -92,7 +92,7 @@ would overpromise for a hub that rarely runs short.
 |---|---|---|---|---|---|---|
 | FIFO, one order per trip (baseline) | 9.71 | 2.62 | 0.677 | 11.5% | 56.5% | 15.1 |
 | + bagging | 8.95 | 2.83 | 0.650 | 4.5% | 78.1% | 16.0 |
-| + matching | 9.32 | 2.71 | 0.665 | 8.6% | 68.9% | 16.0 |
+| + matching | 9.31 | 2.71 | 0.665 | 8.6% | 68.9% | 16.0 |
 | bagging + matching | 8.77 | 2.87 | 0.645 | 3.3% | 86.8% | 16.5 |
 | bagging + matching + geofence | 8.65 | 2.91 | 0.649 | 3.4% | 87.8% | 2.7 |
 
