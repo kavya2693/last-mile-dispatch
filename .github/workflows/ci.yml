@@ -1,0 +1,37 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - run: uv sync --locked
+
+      - name: lint
+        run: uv run ruff check .
+
+      - name: format
+        run: uv run ruff format --check .
+
+      - name: types
+        run: uv run mypy
+
+      - name: tests
+        run: uv run pytest -q
+
+      # Nothing here calls a model or a network service: the dataset is generated from a seed
+      # and the dispatcher is plain Python, so the whole pipeline runs on a CI runner.
+      - name: end-to-end run on a slice (8 hubs, 7 experiment days)
+        run: |
+          uv run python scripts/generate_data.py
+          uv run dispatch --quick --out outputs-ci

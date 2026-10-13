@@ -45,3 +45,4 @@ models/*.joblib
 # generated dataset (rebuild with make data)
 data/*.csv
 data/*.csv.gz
+outputs-ci/
