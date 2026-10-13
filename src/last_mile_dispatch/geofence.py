@@ -23,7 +23,9 @@ def ping_distances_m(
     cust_lon: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """Distances (m) from each ping to its event's customer. Pings are (events, k); NaN = dropout."""
-    return 1000.0 * haversine_km(ping_lat, ping_lon, np.asarray(cust_lat)[:, None], np.asarray(cust_lon)[:, None])
+    return 1000.0 * haversine_km(
+        ping_lat, ping_lon, np.asarray(cust_lat)[:, None], np.asarray(cust_lon)[:, None]
+    )
 
 
 def flag_attempts(
@@ -69,7 +71,11 @@ def evaluate(events: pd.DataFrame, dist_cols: list[str], radius_m: float = GEOFE
         if m.any():
             rows.append({"slice": f"building={b}", **confusion(flagged[m], fake[m])})
     true_d = events["true_mark_dist_m"].to_numpy(dtype=float)
-    for lo, hi, label in ((0, 300, "fake marked <300 m"), (300, 1000, "fake marked 300-1000 m"), (1000, 1e9, "fake marked >1 km")):
+    for lo, hi, label in (
+        (0, 300, "fake marked <300 m"),
+        (300, 1000, "fake marked 300-1000 m"),
+        (1000, 1e9, "fake marked >1 km"),
+    ):
         m = fake & (true_d >= lo) & (true_d < hi)
         if m.any():
             rows.append({"slice": label, **confusion(flagged[m], fake[m])})

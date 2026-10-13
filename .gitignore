@@ -43,4 +43,5 @@ models/*.joblib
 .vscode/
 
 # generated dataset (rebuild with make data)
+data/*.csv
 data/*.csv.gz
