@@ -1,0 +1,8 @@
+metric,true_effect,welch_coverage,bootstrap_coverage,welch_power,aa_false_positive_welch,aa_false_positive_bootstrap,draws
+cost_per_delivered,-1.038694199476645,0.984,0.972,1.0,0.026,0.042,500
+orders_per_rider_hour,0.2759484058821461,0.972,0.964,1.0,0.038,0.052,500
+utilization,-0.02644828389311869,0.976,0.964,0.618,0.02,0.038,500
+fake_accepted_per_1k,-12.19880265267083,0.978,0.972,1.0,0.038,0.048,500
+on_time_share_of_orders,0.3008852594436614,0.986,0.978,1.0,0.05,0.09,500
+cancel_rate,-0.07881240622202597,0.992,0.988,1.0,0.02,0.038,500
+lead_p90,-15.080955286843711,0.988,0.968,1.0,0.072,0.078,500
