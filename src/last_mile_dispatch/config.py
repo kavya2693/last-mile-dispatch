@@ -35,7 +35,6 @@ HOURLY_PAY = {"bike": 22.0, "car": 26.0}
 COST_PER_KM = {"bike": 0.18, "car": 0.45}
 SPEED_KMH = {"bike": 24.0, "car": 22.0}
 BAG_CAPACITY = 3
-FAILED_ORDER_COST = 12.0  # refund handling and a lost basket margin on a fake or cancelled order
 
 # Fake attempts
 GAMER_SHARE = 0.08  # riders who sometimes mark "customer unavailable" without reaching the door
@@ -67,10 +66,13 @@ BAG_MAX_DROP_GAP_KM = 1.0  # straight-line distance between two drops in one bag
 BAG_MAX_CREATED_GAP_MIN = 12.0
 BAG_MAX_EXTRA_MIN = 9.0  # extra minutes the first customer may wait because of the bag
 
-# Matching weights (AED). Lateness is priced so the matcher protects the promise,
-# and each dispatched order earns a credit so larger bags are not starved by their km.
+# Matching weights (AED). Lateness is priced so the matcher protects the promise, and each
+# dispatched order earns a credit so larger bags are not starved by their km. The waiting
+# credit must exceed the lateness price: otherwise an order that is already late only ever
+# looks more expensive to send, the matcher keeps choosing fresher orders, and the old one
+# is left until the customer cancels (the first version did exactly that).
 LATE_COST_PER_MIN = 1.0
-WAIT_COST_PER_MIN = 0.4
+WAIT_COST_PER_MIN = 1.4
 ORDER_DISPATCH_CREDIT = 9.0
 
 # Geofence rule

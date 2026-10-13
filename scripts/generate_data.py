@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pandas as pd
@@ -34,6 +35,10 @@ COAST_BEARING_DEG = 40.0
 RAMADAN_START = pd.Timestamp("2026-02-18")
 RAIN_DAY = pd.Timestamp("2026-02-07")
 HUB_OUTAGES = {(3, "2026-02-11"), (17, "2026-02-24")}  # (hub, date): hub closed from 15:00
+
+
+def _rows(df: pd.DataFrame) -> list[SimpleNamespace]:
+    return [SimpleNamespace(**{str(k): v for k, v in r.items()}) for r in df.to_dict("records")]
 
 
 def hourly_profile(ramadan: bool) -> np.ndarray:
@@ -75,7 +80,7 @@ def make_hubs(rng: np.random.Generator) -> pd.DataFrame:
 def make_riders(hubs: pd.DataFrame, rng: np.random.Generator) -> pd.DataFrame:
     rows = []
     rid = 0
-    for hub in hubs.itertuples():
+    for hub in _rows(hubs):
         # Rostered for an ordinary weekday evening peak, so weekends, iftar and rain run tight.
         n = int(np.ceil(hub.base_daily_orders * 0.105 / 2.3 * rng.uniform(0.9, 1.1)))
         n = max(n, 5)
@@ -108,14 +113,14 @@ def make_days() -> pd.DataFrame:
 def make_orders(hubs: pd.DataFrame, days: pd.DataFrame, rng: np.random.Generator) -> pd.DataFrame:
     frames = []
     trend = np.linspace(1.0, 1.06, len(days))  # a growing business
-    for d_idx, day in enumerate(days.itertuples()):
+    for d_idx, day in enumerate(_rows(days)):
         day_mult = trend[d_idx] * (1.18 if day.weekend else 1.0)
         if day.ramadan:
             day_mult *= 1.08
         if day.rain:
             day_mult *= 1.35
         profile = hourly_profile(bool(day.ramadan))
-        for hub in hubs.itertuples():
+        for hub in _rows(hubs):
             hub_noise = rng.lognormal(0, 0.08)  # day-to-day noise per hub
             n = rng.poisson(hub.base_daily_orders * day_mult * hub_noise)
             hours = rng.choice(24, size=n, p=profile)

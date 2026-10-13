@@ -6,6 +6,8 @@ routing engine: dispatch decisions only need relative travel times, not turn-by-
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
@@ -44,8 +46,9 @@ def travel_min(km: float, vehicle: str, minute_of_day: float, rain: bool = False
     return 60.0 * km / speed
 
 
-def offset_latlon(lat: float, lon: float, dx_m: float, dy_m: float) -> tuple[float, float]:
-    """Move a point by metres east (dx) and north (dy)."""
+def offset_latlon(lat: float, lon: float, dx_m: ArrayLike, dy_m: ArrayLike) -> tuple[Any, Any]:
+    """Move a point by metres east (dx) and north (dy). Works on scalars and arrays."""
+    dx_m, dy_m = np.asarray(dx_m, dtype=float), np.asarray(dy_m, dtype=float)
     dlat = dy_m / 111_320.0
     dlon = dx_m / (111_320.0 * np.cos(np.radians(lat)))
     return lat + dlat, lon + dlon
