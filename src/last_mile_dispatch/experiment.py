@@ -140,7 +140,7 @@ def rerandomisation_check(
     true_effect = float((treatment_outcome - control_outcome).mean())
     cover_w = cover_b = aa_w = aa_b = detect_w = 0
     for _ in range(n_draws):
-        arm = paired_stratified_assignment(hubs, pre_metric.loc[hubs].to_numpy(), rng)
+        arm = paired_stratified_assignment(list(hubs), list(pre_metric.loc[hubs].to_numpy()), rng)
         is_t = np.array([arm[h] == "treatment" for h in hubs])
         t = treatment_outcome.loc[hubs].to_numpy()[is_t]
         c = control_outcome.loc[hubs].to_numpy()[~is_t]
