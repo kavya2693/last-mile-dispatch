@@ -5,7 +5,7 @@
 ![license](https://img.shields.io/badge/license-MIT-green)
 
 Quick-commerce dispatch for 26 dark-store hubs in a Gulf city: order bagging, rider matching,
-a geofence on fake "customer unavailable" marks, and a hub-level A/B test that says what it
+a geofence on "customer unavailable" marks made away from the door, and a hub-level A/B test that says what it
 can and cannot detect.
 
 ## The problem
