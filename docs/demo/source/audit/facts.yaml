@@ -17,7 +17,7 @@ project:
   demo_display: docs/demo/source
   out_dir: ../..
   video: docs/demo/demo.mp4
-  video_duration_s: 84.6
+  video_duration_s: 87.0
   outputs_dir: outputs
   venv_python: .venv/bin/python
   version_packages: [numpy, pandas, scipy]
@@ -44,7 +44,7 @@ assumptions:
   - id: A-02
     statement: "The rider roster is fixed and sized for an ordinary weekday evening; every policy pays for the same riders. Cost savings therefore come mostly from cancelled orders turned into deliveries, and utilisation falls."
     source: "scripts/generate_data.py:84-85 (make_riders); README 'Known limitations' (the biggest gap)"
-    figures: [F-04, F-33, F-34, F-35, F-36, F-37, F-44, F-45, F-53, F-54, F-55, F-56]
+    figures: [F-04, F-33, F-34, F-35, F-36, F-37, F-44, F-45, F-53, F-54, F-55, F-56, F-62, F-63, F-69]
     edit: ["scripts/generate_data.py:84-85"]
     rerun: ["make data", "make run"]
   - id: A-03
@@ -86,7 +86,7 @@ assumptions:
   - id: A-09
     statement: "Experiment design: hubs sorted by pre-period orders per day, paired, one coin flip per pair (seed 2026); one number per hub over four weeks; Welch t and hub-bootstrap 95% intervals; power from the pre-period between-hub spread."
     source: "src/last_mile_dispatch/cli.py:22, :58-98; experiment.py:20-124"
-    figures: [F-27, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-52, F-53, F-54, F-55, F-56, F-57]
+    figures: [F-27, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-52, F-53, F-54, F-55, F-56, F-57, F-62, F-63, F-64, F-65, F-66, F-67, F-68]
     edit: ["src/last_mile_dispatch/cli.py:22", "src/last_mile_dispatch/experiment.py"]
     rerun: ["make run"]
   - id: A-10
@@ -104,7 +104,7 @@ assumptions:
   - id: A-12
     statement: "Video rounding: percentages to 1 decimal, AED to 2 decimals, utilisation and CI bounds to 3 decimals, counts with thousands separators; '~3 min' and '180 s' are rounded run times."
     source: "this audit (display convention)"
-    figures: [F-16, F-17, F-23, F-32, F-34, F-35, F-36, F-37, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-53, F-54, F-55, F-59]
+    figures: [F-16, F-17, F-23, F-32, F-34, F-35, F-36, F-37, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-53, F-54, F-55, F-59, F-62, F-63, F-66]
     edit: ["the composition file named on each slide"]
     rerun: ["hyperframes render"]
   - id: A-13
@@ -130,7 +130,7 @@ figures:
      check: {expr: "len(R('data/days.csv'))", fmt: "{:d} days", expect: "42 days"}}
   - {id: F-07, slides: ["02", "07"], label: "Delivery promise", shown: "30 minutes to each door / 30-minute promise", type: direct, source: "src/last_mile_dispatch/config.py:27", key: "SLA_MIN = 30", formula: "-",
      check: {expr: "grep('src/last_mile_dispatch/config.py', r'^SLA_MIN = 30\\b')", fmt: bool}}
-  - {id: F-08, slides: ["02", "03", "05"], label: "Dispatch wave interval", shown: "a wave every 2 min / EVERY 2 MINUTES / dispatch wave 2 min", type: direct, source: "src/last_mile_dispatch/config.py:23", key: "WAVE_MIN = 2", formula: "-",
+  - {id: F-08, slides: ["02", "03", "05"], label: "Dispatch wave interval", shown: "riders sent out every 2 min / EVERY 2 MINUTES / dispatch wave 2 min", type: direct, source: "src/last_mile_dispatch/config.py:23", key: "WAVE_MIN = 2", formula: "-",
      check: {expr: "grep('src/last_mile_dispatch/config.py', r'^WAVE_MIN = 2\\b')", fmt: bool}}
   - {id: F-09, slides: ["02"], label: "Ramadan, weekends and a rain day are in the calendar", shown: "Ramadan · weekends · rain", type: direct, source: "data/days.csv", key: "ramadan, weekend, rain columns", formula: "any ramadan, any weekend, exactly one rain day",
      check: {expr: "(lambda d: bool(d['ramadan'].any()) and bool(d['weekend'].any()) and int(d['rain'].sum()) == 1)(R('data/days.csv'))", fmt: bool}}
@@ -141,7 +141,7 @@ figures:
   # ---- slide 03
   - {id: F-12, slides: ["03"], label: "Each flow block exists in the code (bag, match, door check, A/B test)", shown: "ORDERS → BAG → MATCH → DOOR CHECK → A/B TEST → VERDICT", type: direct, source: "src/last_mile_dispatch/", key: "functions", formula: "-",
      check: {expr: "all(grep('src/last_mile_dispatch/' + f, p) for f, p in [('bagging.py', r'def make_bags'), ('assignment.py', r'def min_cost'), ('geofence.py', r'def flag_attempts'), ('experiment.py', r'def readout')])", fmt: bool}}
-  - {id: F-13, slides: ["03"], label: "The A/B test runs four weeks", shown: "4 WEEKS", type: derived, source: "outputs/summary.json", key: "experiment_days = 28", formula: "28 / 7 = 4",
+  - {id: F-13, slides: ["03", "08", "09"], label: "The A/B test runs four weeks", shown: "4 WEEKS / over 4 weeks / 4 weeks", type: derived, source: "outputs/summary.json", key: "experiment_days = 28", formula: "28 / 7 = 4",
      check: {expr: "J('outputs/summary.json')['experiment_days'] // 7", fmt: "{:d} weeks", expect: "4 weeks"}}
   - {id: F-14, slides: ["03"], label: "Verdict badges: cheaper orders, fewer cancels, fewer fake marks (treatment vs control, Welch 95% CI below zero)", shown: "cheaper orders / fewer cancels / fewer fake marks", type: derived, source: "outputs/ab_readout.csv", key: "welch_hi for cost_per_delivered, cancel_rate, fake_accepted_per_1k", formula: "welch_hi < 0 for all three",
      check: {expr: "all(row('outputs/ab_readout.csv', metric=m)['welch_hi'] < 0 for m in ['cost_per_delivered', 'cancel_rate', 'fake_accepted_per_1k'])", fmt: bool}}
@@ -165,11 +165,11 @@ figures:
      check: {expr: "grep('outputs/run_log.txt', r'simulated 4,004 hub-day-policy runs') and 26 * 14 + 26 * 28 * 5 == 4004", fmt: bool}}
   - {id: F-23, slides: ["05"], label: "Full run time", shown: "full run, laptop 180 s", type: derived, source: "outputs/summary.json", key: "runtime_s = 179.8", formula: "rounded to whole seconds",
      check: {expr: "round(J('outputs/summary.json')['runtime_s'])", fmt: "{:d} s", expect: "180 s"}}
-  - {id: F-24, slides: ["05"], label: "Cancel if nothing has left the hub", shown: "cancel if not out 45 min", type: direct, source: "src/last_mile_dispatch/config.py:28", key: "CANCEL_AFTER_MIN = 45", formula: "-",
+  - {id: F-24, slides: ["05"], label: "Cancel if nothing has left the hub", shown: "cancel after 45 min", type: direct, source: "src/last_mile_dispatch/config.py:28", key: "CANCEL_AFTER_MIN = 45", formula: "-",
      check: {expr: "grep('src/last_mile_dispatch/config.py', r'^CANCEL_AFTER_MIN = 45\\b')", fmt: bool}}
   - {id: F-25, slides: ["05"], label: "Geofence radius", shown: "150 m geofence", type: direct, source: "src/last_mile_dispatch/config.py:79", key: "GEOFENCE_RADIUS_M = 150.0", formula: "-",
      check: {expr: "grep('src/last_mile_dispatch/config.py', r'^GEOFENCE_RADIUS_M = 150.0')", fmt: bool}}
-  - {id: F-26, slides: ["05"], label: "Re-randomisation draws", shown: "500 re-draws", type: direct, source: "outputs/rerandomisation.csv", key: "draws", formula: "-",
+  - {id: F-26, slides: ["05", "09"], label: "Re-randomisation draws", shown: "500 re-draws / Test re-run 500 times", type: direct, source: "outputs/rerandomisation.csv", key: "draws", formula: "-",
      check: {expr: "int(R('outputs/rerandomisation.csv')['draws'].unique()[0]) if R('outputs/rerandomisation.csv')['draws'].nunique() == 1 else -1", fmt: "{:d}", expect: "500"}}
   - {id: F-27, slides: ["05", "08", "09"], label: "Hubs per arm", shown: "13 vs 13 hubs", type: direct, source: "outputs/summary.json", key: "arms.treatment, arms.control", formula: "len of each list",
      check: {expr: "'{} vs {}'.format(len(J('outputs/summary.json')['arms']['treatment']), len(J('outputs/summary.json')['arms']['control']))", fmt: "{}", expect: "13 vs 13"}}
@@ -199,7 +199,7 @@ figures:
   # ---- slide 07
   - {id: F-39, slides: ["07"], label: "Five rider-board rows (orders, km, waited, leaves, first/last ETA, due, back) for hub 18, 2026-02-14, 21:46 wave", shown: "Rider 01-05 rows", type: direct, source: "demo assets/rider_board.json (re-run of the repo's simulator), injected into compositions/value.html", key: "rows", formula: "km = sum of road legs; waited = wave time - oldest order's creation; due = earliest creation + 30 min",
      check: {expr: "sheet_rows_match()", fmt: bool}}
-  - {id: F-40, slides: ["07"], label: "Hub 18 on 2026-02-14: delivered / orders / cancelled under the treatment, and cancellations under FIFO", shown: "795 of 821 delivered, 7 cancelled · FIFO would cancel 59", type: direct, source: "outputs/hub_day_metrics.csv", key: "hub_id=18, date=2026-02-14, policy in {bagging+matching+geofence, baseline}", formula: "-",
+  - {id: F-40, slides: ["07"], label: "Hub 18 on 2026-02-14: delivered / orders / cancelled under the treatment, and cancellations under FIFO", shown: "795 of 821 delivered, 7 cancelled · old way: 59 cancelled (old way = FIFO, one order per trip)", type: direct, source: "outputs/hub_day_metrics.csv", key: "hub_id=18, date=2026-02-14, policy in {bagging+matching+geofence, baseline}", formula: "-",
      check: {expr: "(lambda t, b: '{} of {} delivered, {} cancelled · FIFO {}'.format(int(t['delivered']), int(t['orders']), int(t['cancelled']), int(b['cancelled'])))(row('outputs/hub_day_metrics.csv', hub_id=18, date='2026-02-14', policy='bagging+matching+geofence'), row('outputs/hub_day_metrics.csv', hub_id=18, date='2026-02-14', policy='baseline'))", fmt: "{}", expect: "795 of 821 delivered, 7 cancelled · FIFO 59"}}
   - {id: F-41, slides: ["07"], label: "Wave context: bags held, free riders, bags waiting", shown: "+ 3 bags held for the next wave · 5 free riders, 8 bags waiting", type: direct, source: "demo assets/rider_board.json", key: "bags_held, free_riders, bags_waiting_before", formula: "held = bags waiting - riders matched",
      check: {expr: "(lambda d: '{} held · {} riders, {} bags'.format(d['bags_held'], d['free_riders'], d['bags_waiting_before']))(J('demo:assets/rider_board.json'))", fmt: "{}", expect: "3 held · 5 riders, 8 bags"}}
@@ -224,19 +224,35 @@ figures:
      check: {expr: "(lambda r: '{:.1f} → {:.1f}'.format(r['control'], r['treatment']))(row('outputs/ab_readout.csv', metric='fake_accepted_per_1k'))", fmt: "{}", expect: "11.7 → 3.2"}}
   - {id: F-51, slides: ["08"], label: "Orders in the four experiment weeks", shown: "326,981 orders", type: direct, source: "outputs/summary.json", key: "orders_in_experiment", formula: "-",
      check: {expr: "J('outputs/summary.json')['orders_in_experiment']", fmt: "{:,d}", expect: "326,981"}}
-  - {id: F-52, slides: ["08"], label: "Welch 95% CIs exclude zero on all four headline metrics", shown: "Welch 95% CIs exclude zero on all four", type: derived, source: "outputs/ab_readout.csv", key: "welch_lo, welch_hi", formula: "lo > 0 or hi < 0 for cost, on-time, cancel, fake",
+  - {id: F-52, slides: ["08"], label: "Welch 95% CIs exclude zero on all four headline metrics", shown: "on all four, the 95% confidence range of the difference stays clear of zero (Welch t-test)", type: derived, source: "outputs/ab_readout.csv", key: "welch_lo, welch_hi", formula: "lo > 0 or hi < 0 for cost, on-time, cancel, fake",
      check: {expr: "all((lambda r: r['welch_lo'] > 0 or r['welch_hi'] < 0)(row('outputs/ab_readout.csv', metric=m)) for m in ['cost_per_delivered', 'on_time_share_of_orders', 'cancel_rate', 'fake_accepted_per_1k'])", fmt: bool}}
   # ---- slide 09
-  - {id: F-53, slides: ["09"], label: "Rider utilisation, control vs treated hubs", shown: "0.667 / 0.650", type: direct, source: "outputs/ab_readout.csv", key: "metric=utilization, control, treatment", formula: "-",
-     check: {expr: "(lambda r: '{:.3f} / {:.3f}'.format(r['control'], r['treatment']))(row('outputs/ab_readout.csv', metric='utilization'))", fmt: "{}", expect: "0.667 / 0.650"}}
-  - {id: F-54, slides: ["09"], label: "Welch 95% CI of the utilisation difference", shown: "−0.040 to +0.007", type: direct, source: "outputs/ab_readout.csv", key: "metric=utilization, welch_lo, welch_hi", formula: "-",
+  - {id: F-53, slides: ["09"], label: "Rider utilisation, control vs treated hubs (bars: 1.0 = 260 px, so 173 px / 169 px)", shown: "0.667 / 0.650", type: direct, source: "outputs/ab_readout.csv", key: "metric=utilization, control, treatment", formula: "-",
+     check: {expr: "(lambda r: '{:.3f} / {:.3f}'.format(r['control'], r['treatment']))(row('outputs/ab_readout.csv', metric='utilization')) if grep('demo:compositions/s06-twist.html', r'id=\"twist-lb1\" style=\"width: 173px\"') and grep('demo:compositions/s06-twist.html', r'id=\"twist-lb2\" style=\"width: 169px\"') else 'bars off scale'", fmt: "{}", expect: "0.667 / 0.650"}}
+  - {id: F-54, slides: ["09"], label: "Welch 95% CI of the utilisation gap (drawn, not printed)", shown: "gap strip from -0.040 to +0.007, crossing zero", type: direct, source: "outputs/ab_readout.csv", key: "metric=utilization, welch_lo, welch_hi", formula: "-",
      check: {expr: "(lambda r: '{:+.3f} to {:+.3f}'.format(r['welch_lo'], r['welch_hi']))(row('outputs/ab_readout.csv', metric='utilization'))", fmt: "{}", expect: "-0.040 to +0.007"}}
-  - {id: F-55, slides: ["09"], label: "Welch p-value for utilisation", shown: "p = 0.16", type: direct, source: "outputs/ab_readout.csv", key: "metric=utilization, welch_p", formula: "-",
+  - {id: F-55, slides: ["09"], label: "Welch p-value for utilisation", shown: "95% range, p = 0.16", type: direct, source: "outputs/ab_readout.csv", key: "metric=utilization, welch_p", formula: "-",
      check: {expr: "row('outputs/ab_readout.csv', metric='utilization')['welch_p']", fmt: "{:.2f}", expect: "0.16"}}
-  - {id: F-56, slides: ["09"], label: "Hubs per arm needed to detect the utilisation effect at 80% power", shown: "27 hubs per arm", type: direct, source: "outputs/power.csv", key: "metric=utilization, hubs_per_arm_needed", formula: "-",
+  - {id: F-56, slides: ["09"], label: "Hubs per arm needed to detect the utilisation effect at 80% power", shown: "27 · TOO FEW / utilisation needs 27, the test had 13", type: direct, source: "outputs/power.csv", key: "metric=utilization, hubs_per_arm_needed", formula: "-",
      check: {expr: "int(row('outputs/power.csv', metric='utilization')['hubs_per_arm_needed'])", fmt: "{:d}", expect: "27"}}
-  - {id: F-57, slides: ["09"], label: "CI bar drawn to scale", shown: "axis −0.05..+0.05 = 1,000 px; bar 95 → 571 px, estimate at 333 px", type: derived, source: "compositions/s06-twist.html; outputs/ab_readout.csv", key: "welch_lo, welch_hi, diff", formula: "px = (v + 0.05) x 10,000",
-     check: {expr: "(lambda r: [round((r[k] + 0.05) * 10000) for k in ('welch_lo', 'welch_hi', 'diff')] == [95, 571, 333])(row('outputs/ab_readout.csv', metric='utilization')) and grep('demo:compositions/s06-twist.html', r'left: 95px; top: -9px; width: 476px')", fmt: bool}}
+  - {id: F-57, slides: ["09"], label: "Gap strip drawn to scale", shown: "track -0.05..+0.05 = 260 px; range 25 -> 148 px (left 25, width 123), estimate dot centred at 87 px (left 75), zero at 130 px", type: derived, source: "compositions/s06-twist.html; outputs/ab_readout.csv", key: "welch_lo, welch_hi, diff", formula: "px = (v + 0.05) x 2,600",
+     check: {expr: "(lambda r: [round((r[k] + 0.05) * 2600) for k in ('welch_lo', 'welch_hi', 'diff')] == [25, 148, 87])(row('outputs/ab_readout.csv', metric='utilization')) and grep('demo:compositions/s06-twist.html', r'id=\"twist-ci\" style=\"left: 25px; width: 123px\"') and grep('demo:compositions/s06-twist.html', r'id=\"twist-dot\" style=\"left: 75px\"')", fmt: bool}}
+  - {id: F-62, slides: ["09"], label: "Utilisation gap, treated minus control (Welch estimate)", shown: "-0.017", type: direct, source: "outputs/ab_readout.csv", key: "metric=utilization, diff", formula: "-",
+     check: {expr: "row('outputs/ab_readout.csv', metric='utilization')['diff']", fmt: "{:+.3f}", expect: "-0.017"}}
+  - {id: F-63, slides: ["09"], label: "True utilisation effect over all 26 hubs (every policy simulated on every hub-day)", shown: "The simulator's true drop, all 26 hubs: -0.026", type: direct, source: "outputs/ab_readout.csv", key: "metric=utilization, true_effect_all_hubs", formula: "-",
+     check: {expr: "row('outputs/ab_readout.csv', metric='utilization')['true_effect_all_hubs']", fmt: "{:+.3f}", expect: "-0.026"}}
+  - {id: F-64, slides: ["09"], label: "Hubs per arm needed: cancellations and cost per delivered order (bars: 30 hubs = 260 px; dashed line at 13 = 349 px incl. the 236 px label column)", shown: "Cancellations 2 · Cost per order 5 · ENOUGH", type: direct, source: "outputs/power.csv", key: "metric in {cancel_rate, cost_per_delivered}, hubs_per_arm_needed", formula: "ENOUGH = needed <= 13",
+     check: {expr: "(lambda c, k: '{} / {}'.format(c, k) if c <= 13 and k <= 13 and all(grep('demo:compositions/s06-twist.html', p) for p in [r'twist-rb1\" style=\"width: 17px', r'twist-rb2\" style=\"width: 43px', r'twist-rb3\" style=\"width: 234px', r'\\.line13 \\{ position: absolute; left: 349px']) else 'off')(int(row('outputs/power.csv', metric='cancel_rate')['hubs_per_arm_needed']), int(row('outputs/power.csv', metric='cost_per_delivered')['hubs_per_arm_needed']))", fmt: "{}", expect: "2 / 5"}}
+  - {id: F-65, slides: ["09"], label: "'Catch the effect 4 times in 5' = 80% power, the default in experiment.mde / hubs_needed", shown: "to catch the effect 4 times in 5", type: direct, source: "src/last_mile_dispatch/experiment.py:77, :85", key: "power: float = 0.8", formula: "-",
+     check: {expr: "grep('src/last_mile_dispatch/experiment.py', r'def mde\\(sd: float, n_per_arm: int, alpha: float = 0.05, power: float = 0.8\\)') and grep('src/last_mile_dispatch/experiment.py', r'def hubs_needed\\(sd: float, effect: float, alpha: float = 0.05, power: float = 0.8\\)')", fmt: bool}}
+  - {id: F-66, slides: ["09"], label: "Payoff: Welch interval coverage of the true effect and A/A false-alarm rate over 500 re-randomisations (range over the 7 A/B metrics)", shown: "97-99% of the time · false alarms 2-7%", type: derived, source: "outputs/rerandomisation.csv", key: "welch_coverage, aa_false_positive_welch", formula: "min and max over metrics, x 100, rounded",
+     check: {expr: "(lambda r: '{:.0f}-{:.0f}% · {:.0f}-{:.0f}%'.format(100 * r['welch_coverage'].min(), 100 * r['welch_coverage'].max(), 100 * r['aa_false_positive_welch'].min(), 100 * r['aa_false_positive_welch'].max()))(R('outputs/rerandomisation.csv'))", fmt: "{}", expect: "97-99% · 2-7%"}}
+  - {id: F-67, slides: ["09"], label: "The fix is in the repo: power from the pre-period (experiment.mde, experiment.hubs_needed -> outputs/power.csv, printed in run_report.md after the A/B readout), the re-randomisation check, and their tests", shown: "THE FIX, IN THE REPO · Size the test before trusting it · The run report prints this table next to the A/B results", type: direct, source: "src/last_mile_dispatch/experiment.py:77-90, :127; cli.py:78-98; tests/test_experiment.py:47, :53, :66; outputs/run_report.md", key: "functions, tests, report sections", formula: "-",
+     check: {expr: "all(grep(f, p) for f, p in [('src/last_mile_dispatch/experiment.py', r'def hubs_needed'), ('src/last_mile_dispatch/experiment.py', r'def rerandomisation_check'), ('src/last_mile_dispatch/cli.py', r'hubs_per_arm_needed'), ('tests/test_experiment.py', r'def test_power_round_trip'), ('tests/test_experiment.py', r'def test_mde_falls_with_more_hubs'), ('tests/test_experiment.py', r'def test_rerandomisation_recovers_a_known_effect'), ('outputs/run_report.md', r'## A/B readout'), ('outputs/run_report.md', r'## Power \\(from the pre-period\\)')])", fmt: bool}}
+  - {id: F-68, slides: ["09"], label: "Hubs per arm in this test (the dashed line)", shown: "Dashed line = 13, what this test had", type: direct, source: "outputs/summary.json", key: "len(arms.treatment)", formula: "-",
+     check: {expr: "len(J('outputs/summary.json')['arms']['treatment'])", fmt: "{:d}", expect: "13"}}
+  - {id: F-69, slides: ["09"], label: "NEXT step is the README's own: let the roster vary by policy (smallest roster that holds the on-time share); not implemented", shown: "NEXT · Let the roster shrink with the new dispatch: the fewest riders that still keep orders on time.", type: direct, source: "README 'Insights and learning' (last paragraph) and 'Known limitations' (the biggest gap: the roster is fixed)", key: "README text", formula: "-",
+     check: {expr: "grep('README.md', r'Next I would let the roster vary by policy') and grep('README.md', r'The biggest gap: the roster is fixed')", fmt: bool}}
   # ---- slide 10
   - {id: F-58, slides: ["10"], label: "Licence", shown: "MIT", type: direct, source: "LICENSE line 1", key: "-", formula: "-",
      check: {expr: "T('LICENSE').startswith('MIT License')", fmt: bool}}
@@ -256,6 +272,7 @@ slides:
     text:
       - "01 · THE INDUSTRY"
       - "Every few minutes, a hub decides who carries what."
+      - "Who sends riders out from a local hub, and the four problems they run into every day."
       - "WHO LIVES WITH THIS · Quick-commerce grocery · Food & restaurant delivery · Parcel & pharmacy couriers"
       - "01 One order per trip, dispatched by hand — Two orders to one building leave with two riders"
       - "02 Peaks outrun the riders — Weekends, holidays and bad weather turn queues into cancellations"
@@ -272,8 +289,10 @@ slides:
     composition: "compositions/s02-hook.html (SERIES block injected by tools/inject_sheet.py)"
     text:
       - "02 · THIS PROJECT"
+      - "The project in one line: a city's delivery hubs, its riders and a 30-minute promise."
       - "26 hubs, 473 riders. 477,868 orders in 6 weeks. 30 minutes to each door."
-      - "a wave every 2 min · Ramadan · weekends · rain · 36 riders sometimes skip doors"
+      - "riders sent out every 2 min · Ramadan · weekends · rain · 36 riders sometimes skip doors"
+      - "Skip doors = mark \"customer not home\" without reaching the door. Every order is simulated from a seeded generator."
     assumptions: [A-01, A-07, A-08, A-10]
     illustrative: ["The background is the 26 real hub positions with a 4 km service circle each (decoration, low opacity)."]
     change: "Headline spans #hook-l1..l3 and chips #hook-f1..f3 in compositions/s02-hook.html; counts come from data/*.csv."
@@ -285,6 +304,7 @@ slides:
     text:
       - "03 · HOW IT WORKS"
       - "From orders to riders"
+      - "Read left to right: every 2 minutes orders are grouped and handed to riders; half the hubs then test it for 4 weeks."
       - "ORDERS picked, waiting at the hub → [EVERY 2 MINUTES: BAG close drops ride together → MATCH best rider for each bag] → DOOR CHECK was the rider really there? → [4 WEEKS: A/B TEST half the hubs try it first] → VERDICT ✓ cheaper orders ✓ fewer cancels ✓ fewer fake marks"
       - "again, every wave (loop over MATCH)"
     assumptions: [A-05, A-06, A-08, A-09]
@@ -298,11 +318,12 @@ slides:
     text:
       - "04 · THE KEY IDEA"
       - "One trip, three doors"
+      - "Bagging = one rider carries up to three nearby orders. Fewer trips for the same orders is better."
       - "The oldest waiting order starts a bag — so no customer is left at the back of the queue"
       - "Close drops, ordered around the same time, join it — up to three stops on one trip"
       - "Only if the first customer barely waits longer — the bag must not break their promise"
       - "ONE ORDER PER TRIP · 3 RIDERS → BAGGED · 1 RIDER (HUB, A, B, C). One rider, three doors. Two riders stay free."
-      - "Ablation, all hubs: bagging alone cuts cost per delivered order from 9.71 to 8.95 AED."
+      - "Bagging switched on alone, all hubs: cost per delivered order falls from 9.71 to 8.95 AED."
     assumptions: [A-02, A-05, A-12]
     illustrative: ["The HUB/A/B/C demo is schematic: it shows the rule in bagging.make_bags, not a real bag."]
     change: "Markup under #ex-b in compositions/explainer.html; the footnote figures are F-16 and F-17."
@@ -315,15 +336,16 @@ slides:
     text:
       - "05 · ARCHITECTURE"
       - "A two-minute dispatch loop, scored by a hub-level A/B test."
-      - "Legend: data · simulator · dispatch · door check · evaluation · per wave (solid) · batch (dashed) · fallback (dotted)"
+      - "Each box is a file in the repo. Top: the loop that runs every 2 minutes in each hub. Bottom: the scoring, run once after."
+      - "Legend (on the lane borders): data · simulator · dispatch · door check · evaluation; per wave (solid) · batch (dashed) · fallback (dotted)"
       - "DISPATCH LOOP · EVERY 2 MIN · PER HUB-DAY — generate_data.py · seed 7: hubs.csv 26 hubs, riders.csv 473 riders, days.csv 42 days, orders.csv.gz 477,868 orders"
       - "runner.py run_all(): 4 parallel workers, 5 policies, 1 seed → orders, riders →"
       - "simulate.py · simulate_hub_day(): bagging.py Bag orders (≤ 3 stops · 1 km) → bags → matching? → on → assignment.py Min-cost match (Hungarian · SciPy); off → fifo() FIFO · baseline → rider + bag → geo.py Play each trip (traffic · rain · GPS) → not home → geofence.py Door check (150 m geofence · enforce | log) → trip done: rider free, next wave"
-      - "metrics → hub_day_metrics.csv 3,640 rows · BUDGETS & FACTS: dispatch wave 2 min, delivery promise 30 min, cancel if not out 45 min, hub-day runs 4,004, full run, laptop 180 s, CI slice 8 hubs × 7 d"
+      - "metrics → hub_day_metrics.csv 3,640 rows · BUDGETS & FACTS: dispatch wave 2 min, delivery promise 30 min, cancel if not out 45 min, hub-day runs 4,004, full run, laptop 180 s, CI slice 8 hubs × 7 d (cancel row reads 'cancel after 45 min')"
       - "EVALUATION · BATCH: experiment.py Pair hubs (pre-period size, coin flip / pair) → arm → experiment.py A/B readout (13 vs 13 hubs, Welch + bootstrap) → ab_readout.csv; geofence.py Geofence eval (precision, recall, radius sweep) ← 11,566 marks → geofence_eval.csv; report.py Ablation (5 policies, by day type) → ablation.csv; experiment.py CI check (500 re-draws, coverage, A/A) → rerandomisation.csv; → power.csv; GROUND TRUTH: true effect known: every policy runs on every hub-day"
-      - "CRITICAL PATH · orders → bag → match → trip → metrics → A/B readout"
+      - "MAIN PATH · orders → bag → match → trip → metrics → A/B readout"
     assumptions: [A-01, A-03, A-04, A-05, A-06, A-08, A-09]
-    illustrative: ["Packets moving along the wires are decoration in execution order (the dispatch loop turns twice).", "'per wave' (solid) vs 'batch' (dashed) marks what runs inside each 2-minute wave and what runs after all hub-days.", "The '?' diamond is the decision point Policy.matching (config.py); the dotted path is the FIFO fallback used by the baseline.", "The critical-path highlight is the chain that produces the headline A/B numbers."]
+    illustrative: ["Packets moving along the wires are decoration in execution order (the dispatch loop turns twice).", "'per wave' (solid) vs 'batch' (dashed) marks what runs inside each 2-minute wave and what runs after all hub-days.", "The '?' diamond is the decision point Policy.matching (config.py); the dotted path is the FIFO fallback used by the baseline.", "The main-path highlight is the chain that produces the headline A/B numbers; other boxes dim to 75% opacity, which keeps their text above 4.5:1."]
     change: "Node boxes (#n-*), cylinders (CYL) and the W wires object in compositions/s03-architecture.html."
   - id: "06"
     title: "The system running"
@@ -334,8 +356,10 @@ slides:
     text:
       - "06 · THE SYSTEM RUNNING"
       - "Four weeks, 26 hubs, same orders, two dispatchers."
-      - "Share of orders cancelled, per day, all hubs · FIFO, one order per trip vs bag + match + geofence · RAMADAN band · RAIN DAY · 42.5% → 14.0%"
-      - "CANCELLED · 4 WEEKS: FIFO 37,530 · bag+match+geofence 11,063 · −70.5%"
+      - "Share of each day's orders that were cancelled, all 26 hubs. Lower is better."
+      - "today: one order per trip vs bag + match + door check · RAMADAN band · RAIN DAY · 42.5% → 14.0%"
+      - "Orders cancelled in 4 weeks: one order per trip 37,530 · bag + match + check 11,063 · −70.5%"
+      - "(phase B) Fleet cost per delivered order in AED, by type of day. Lower is better: grey = today, green = new dispatch."
       - "WHERE THE SAVING COMES FROM · COST PER DELIVERED ORDER, AED: Ordinary weekday (125,715 orders) 9.71 → 9.36 −3.7% · Weekend or Ramadan (184,449 orders) 9.65 → 8.30 −14.0% · Rain day (16,817 orders) 10.42 → 6.84 −34.4%"
     assumptions: [A-02, A-03, A-08, A-10]
     illustrative: ["Chart and bars are drawn from the injected numbers (no hand-typed data points); bars are to scale from zero."]
@@ -348,6 +372,7 @@ slides:
     text:
       - "07 · END-USER VALUE"
       - "What the hub lead gets"
+      - "One row per rider leaving now. DUE = the bag's earliest 30-minute deadline; a green tick means every door is on time."
       - "RIDER BOARD · HUB 18 · SAT 2026-02-14 · 21:46 WAVE — columns RIDER, ORDERS, KM, WAITED, LEAVES, FIRST, LAST, DUE, BACK"
       - "Rider 01 2 5.1 13 min 21:46 21:50 21:55 22:03 22:02 ✓"
       - "Rider 02 1 1.9 8 min 21:46 21:48 21:48 22:08 21:52 ✓"
@@ -355,7 +380,7 @@ slides:
       - "Rider 04 1 10.8 14 min 21:46 21:59 21:59 22:02 22:15 ✓"
       - "Rider 05 2 5.4 15 min 21:46 21:50 21:54 22:01 22:03 ✓"
       - "+ 3 bags held for the next wave · 5 free riders, 8 bags waiting"
-      - "✓ Hub 18 today: 795 of 821 delivered, 7 cancelled · FIFO would cancel 59"
+      - "✓ Hub 18 today: 795 of 821 delivered, 7 cancelled · old way: 59 cancelled"
       - "HUB · RIDER BAY · THIS WAVE'S DROPS · held"
       - "Who rides, with which orders, and when each door gets them. All 9 inside the 30-minute promise."
     assumptions: [A-03, A-04, A-05, A-08, A-11]
@@ -369,34 +394,39 @@ slides:
     text:
       - "08 · RESULTS · HUB-LEVEL A/B, 4 WEEKS"
       - "13 treated hubs vs 13 control hubs: cheaper and faster."
+      - "Treated hubs vs control hubs over 4 weeks. Cost, cancellations and fake marks: lower is better; on time: higher."
       - "COST −10.6% fleet cost per delivered order · AED 9.79 → 8.75"
       - "PROMISE +28.3 points more orders inside 30 min · 58.0% → 86.2%"
       - "CANCELLATIONS 3.7% cancellation rate, treated hubs · control 11.6%"
       - "DOOR CHECK −72.4% fake \"not home\" marks accepted · 11.7 → 3.2 per 1,000"
-      - "326,981 orders · Welch 95% CIs exclude zero on all four · true effect known from the simulator"
+      - "326,981 orders · on all four, the 95% confidence range of the difference stays clear of zero (Welch t-test)"
     assumptions: [A-02, A-03, A-04, A-06, A-09, A-12]
-    illustrative: ["Mini bars under each number are drawn to the same ratio (treatment / control)."]
+    illustrative: ["Mini bars under each number are drawn to the same ratio (treatment / control).", "All four cards are mint because all four moved the good way; the door-check card was coral before this revision."]
     change: "The stats array and card text in compositions/s05-results.html."
   - id: "09"
-    title: "What didn't win"
+    title: "Lesson and fix"
     image: slides/slide-09.jpg
-    time: "74.0-80.6 s"
+    time: "74.0-83.0 s"
     composition: "compositions/s06-twist.html"
     text:
-      - "09 · WHAT DIDN'T WIN"
-      - "Riders got less busy, and the A/B test can't even see it."
-      - "Rider utilisation (busy ÷ paid time), the one metric that moved the wrong way"
-      - "Control hubs (FIFO, one order per trip) 0.667 · Treated hubs (bag + match + geofence) 0.650"
-      - "Welch 95% CI of the difference · p = 0.16 · −0.040 to +0.007 (axis −0.05 … 0 … +0.05)"
-      - "To see a change this size: 27 hubs per arm. The test had 13."
-      - "Why: bagging makes fewer trips on the same paid roster. Raising utilisation needs a smaller roster, which this test did not try."
+      - "09 · LESSON AND FIX"
+      - "13 hubs can't see a small drop. So I report the hubs it would need."
+      - "Utilisation = share of paid rider time spent delivering; higher is better. 13 treated vs 13 control hubs, 4 weeks."
+      - "THE LESSON · Riders got less busy. The test can't tell. · Utilisation per arm, then the gap with its 95% range"
+      - "Control hubs (one order per trip) 0.667 · Treated hubs (bag + match + check) 0.650 · Gap (95% range, p = 0.16) −0.017 TRAP"
+      - "The range crosses zero, so it reads as \"no change\". The simulator's true drop, all 26 hubs: −0.026."
+      - "THE FIX, IN THE REPO · Size the test before trusting it · Hubs needed per arm to catch the effect 4 times in 5. Dashed line = 13, what this test had."
+      - "Cancellations 2 ENOUGH · Cost per order 5 ENOUGH · Utilisation 27 TOO FEW"
+      - "The run report prints this table next to the A/B results: utilisation needs 27, the test had 13."
+      - "PAYOFF · Test re-run 500 times: the 95% range held the true effect 97–99% of the time · false alarms 2–7%"
+      - "NEXT · Let the roster shrink with the new dispatch: the fewest riders that still keep orders on time."
     assumptions: [A-02, A-09, A-12]
-    illustrative: ["Utilisation bars: 1,000 px track = 1.0 (from zero)."]
-    change: "Rows #twist-r1..r2 and the CI strip (#twist-ci) in compositions/s06-twist.html."
+    illustrative: ["Left panel: utilisation bars 1.0 = 260 px from zero; the gap strip spans -0.05..+0.05 over the same 260 px with zero marked.", "Right panel: hubs-per-arm bars 30 hubs = 260 px; the two panels show different units, so they do not share one scale.", "Bars are neutral grey; coral marks only the TRAP (a range that crosses zero read as 'no change'), mint marks the fix."]
+    change: "Panels #twist-left / #twist-right, the payoff and next strips in compositions/s06-twist.html; numbers from outputs/ab_readout.csv, power.csv, rerandomisation.csv."
   - id: "10"
     title: "End card"
     image: slides/slide-10.jpg
-    time: "80.2-84.6 s"
+    time: "82.6-87.0 s"
     composition: "compositions/s07-end.html"
     text:
       - "10 · OPEN SOURCE · MIT · RUNS ON A LAPTOP"
@@ -404,6 +434,7 @@ slides:
       - "github.com/kavya2693/last-mile-dispatch"
       - "SciPy · pandas · NumPy · Python"
       - "$ make run   # 26 hubs, 4 weeks, ~3 min"
+      - "One command rebuilds every table the numbers in this video come from."
     assumptions: [A-12]
     illustrative: ["Faded background: the 26 real hub positions with 4 km circles."]
     change: "Text in compositions/s07-end.html."
@@ -416,11 +447,14 @@ caveats:
   - "'36 riders sometimes skip doors' is a generator setting (8% of riders, 22% of their stops), not an observed behaviour (A-07)."
   - "Slide 01 statements are general industry knowledge (A-13)."
   - "Rider names on slide 07 are placeholders."
+  - "Slide 09 shows the one disappointing result the repo can do something about in code (an underpowered metric), and the fix it implements (pre-period power, hubs-per-arm table, re-randomisation check). The fix does not raise utilisation itself; that needs a smaller roster, shown as NEXT and listed in README 'Known limitations'."
+  - "Other non-wins the slide drops are still reported in the README 'What didn't win' row and 'The result': the 3.7% weekday saving (also on slide 06), matching alone adding about half what bagging does, and the geofence missing 31.9% of kerb marks while flagging 5.3% of honest riders in towers."
+  - "The payoff range (97-99% coverage, 2-7% false alarms) spans the seven A/B metrics in outputs/rerandomisation.csv; utilisation itself had 97.6% coverage and only 62% power at 13 hubs per arm."
 
 stills:
   master: renders/last-mile-dispatch-master.mp4   # relative to demo_dir
   width: 1600
-  times: {"01": 6.4, "02": 11.1, "03": 18.9, "04": 25.5, "05a": 38.4, "05b": 40.2, "06a": 46.2, "06b": 52.4, "07": 64.9, "08": 73.8, "09": 79.9, "10": 84.4}
+  times: {"01": 6.2, "02": 10.6, "03": 18.7, "04": 25.1, "05a": 38.4, "05b": 39.9, "06a": 46.2, "06b": 51.9, "07": 64.6, "08": 73.3, "09": 81.8, "10": 86.8}
 
 # Extra check helpers (Python), available to check expressions.
 helpers: |

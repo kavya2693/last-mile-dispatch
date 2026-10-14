@@ -15,7 +15,7 @@ Everything needed to rebuild the silent walkthrough (`docs/demo/demo.mp4`) and t
 | `compositions/s03-architecture.html` | Slide 05, the architecture diagram (nodes, cylinders and the `W` wires object) |
 | `compositions/s04-routes.html` | Slide 06, daily cancellations for four weeks and the cost split by day type |
 | `compositions/value.html` | Slide 07, the rider board and hub-lead scene (data injected by `tools/inject_sheet.py`) |
-| `compositions/s05-results.html`, `s06-twist.html`, `s07-end.html` | Slides 08-10, A/B results, what didn't win, end card |
+| `compositions/s05-results.html`, `s06-twist.html`, `s07-end.html` | Slides 08-10, A/B results, lesson and fix, end card |
 | `assets/run_series.json` | Daily cancellation rates, the stress split, run totals and hub positions, exported by `tools/export_series.py` |
 | `assets/rider_board.json` | Hub 18, 2026-02-14, 21:46 dispatch wave, exported by `tools/export_rider_board.py` |
 | `audit/facts.yaml` | Every figure (F-xx), assumption (A-xx), slide text and check expression used by the report |
@@ -54,7 +54,7 @@ for f in s02-hook s04-routes s07-end; do
     docs/demo/source/compositions/$f.html --name SERIES
 done
 
-# 3. render (84.6 s, 1920x1080, 30 fps, silent) and compress
+# 3. render (87.0 s, 1920x1080, 30 fps, silent) and compress
 cd docs/demo/source
 npx --yes hyperframes@0.8.156 check
 npx --yes hyperframes@0.8.156 render -f 30 -q looks -o renders/last-mile-dispatch-master.mp4

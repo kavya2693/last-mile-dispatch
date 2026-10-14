@@ -5,19 +5,18 @@
     <template>
       <style>
         #routes-root { position: absolute; inset: 0; }
-        #routes-root .sub { position: absolute; left: 120px; top: 196px; font-family: var(--mono); font-size: 22px; color: var(--ink-soft); }
         #routes-root .legend {
-          position: absolute; right: 120px; top: 196px; display: flex; gap: 30px; font-family: var(--mono); font-size: 22px; color: var(--ink-soft);
+          position: absolute; right: 120px; top: 238px; display: flex; gap: 30px; font-family: var(--mono); font-size: 22px; color: var(--ink-soft);
         }
         #routes-root .legend span { display: flex; align-items: center; gap: 10px; }
         #routes-root .legend i { display: block; width: 34px; height: 5px; border-radius: 3px; }
         #routes-root svg.chart { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
         #routes-root .counter {
-          position: absolute; left: 1520px; top: 300px; width: 280px; padding: 26px 26px; border-radius: 14px;
+          position: absolute; left: 1500px; top: 300px; width: 300px; padding: 26px 26px; border-radius: 14px;
           border: 2px solid rgba(63, 216, 168, 0.6); background: rgba(12, 22, 32, 0.92);
         }
-        #routes-root .counter .h { font-family: var(--mono); font-size: 20px; letter-spacing: 0.1em; color: var(--ink-mute); }
-        #routes-root .counter .who { margin-top: 18px; font-family: var(--mono); font-size: 20px; color: var(--ink-soft); }
+        #routes-root .counter .h { font-size: 24px; font-weight: 700; line-height: 1.25; color: var(--ink); }
+        #routes-root .counter .who { margin-top: 18px; font-size: 24px; font-weight: 500; color: var(--ink-soft); }
         #routes-root .counter .v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 52px; font-weight: 700; letter-spacing: -0.03em; }
         #routes-root .counter .v.base { color: var(--ink-soft); }
         #routes-root .counter .v.treat { color: var(--c-opt); }
@@ -38,7 +37,7 @@
         #routes-root .st-row { position: relative; display: flex; align-items: center; height: 136px; margin-top: 8px; border-bottom: 2px solid var(--line); }
         #routes-root .st-row:last-child { border-bottom: none; }
         #routes-root .st-who { width: 330px; font-size: 32px; font-weight: 700; color: var(--ink); }
-        #routes-root .st-who small { display: block; margin-top: 4px; font-family: var(--mono); font-size: 20px; font-weight: 400; color: var(--ink-mute); }
+        #routes-root .st-who small { display: block; margin-top: 4px; font-family: var(--mono); font-size: 22px; font-weight: 400; color: var(--ink-soft); }
         #routes-root .st-bars { width: 820px; }
         #routes-root .st-bar { position: relative; display: flex; align-items: center; gap: 16px; height: 40px; margin: 6px 0; }
         #routes-root .st-fill { height: 30px; border-radius: 6px; transform-origin: left center; }
@@ -57,20 +56,21 @@
         <div class="scene" id="routes-in">
           <div class="eyebrow" data-layout-allow-overlap id="routes-eyebrow">06 · The system running</div>
           <div class="scene-title" data-layout-allow-overlap id="routes-title">Four weeks, 26 hubs, same orders, two dispatchers.</div>
-          <div class="sub" id="routes-sub">Share of orders cancelled, per day, all hubs</div>
+          <div class="scene-sub" id="routes-sub">Share of each day's orders that were cancelled, all 26 hubs. Lower is better.</div>
+          <div class="scene-sub" id="routes-sub-b">Fleet cost per delivered order in AED, by type of day. Lower is better: grey = today, green = new dispatch.</div>
           <div class="legend" id="routes-legend">
-            <span><i style="background: var(--ink-mute)"></i>FIFO, one order per trip</span>
-            <span><i style="background: var(--c-opt)"></i>bag + match + geofence</span>
+            <span><i style="background: var(--ink-mute)"></i>today: one order per trip</span>
+            <span><i style="background: var(--c-opt)"></i>bag + match + door check</span>
           </div>
           <div id="routes-chartwrap" data-layout-allow-occlusion>
             <svg class="chart" id="routes-svg" viewBox="0 0 1920 1080"></svg>
             <div class="rain" id="routes-rain">RAIN DAY · 42.5% → <span>14.0%</span></div>
           </div>
           <div class="counter" id="routes-counter" data-layout-allow-occlusion>
-            <div class="h">CANCELLED · 4 WEEKS</div>
-            <div class="who">FIFO</div>
+            <div class="h">Orders cancelled in 4 weeks</div>
+            <div class="who">one order per trip</div>
             <div class="v base" id="routes-c-base">0</div>
-            <div class="who">bag+match+geofence</div>
+            <div class="who">bag + match + check</div>
             <div class="v treat" id="routes-c-treat">0</div>
             <div class="badge" id="routes-c-badge">−70.5%</div>
           </div>
@@ -108,13 +108,13 @@
           if (r0 >= 0) {
             const band = el("g", { id: "routes-ramadan" }, chart);
             el("rect", { x: xs(r0) - 20, y: Y1 - 10, width: xs(days.length - 1) - xs(r0) + 40, height: Y0 - Y1 + 10, rx: 10, fill: "rgba(185,162,255,0.08)" }, band);
-            const t = el("text", { x: xs(r0) + 4, y: Y1 + 22, "font-family": "JetBrains Mono, monospace", "font-size": 20, "font-weight": 700, fill: "#b9a2ff", "letter-spacing": "2" }, band);
+            const t = el("text", { x: xs(r0) + 4, y: Y1 + 22, "font-family": "JetBrains Mono, monospace", "font-size": 22, "font-weight": 700, fill: "#b9a2ff", "letter-spacing": "2" }, band);
             t.textContent = "RAMADAN";
           }
           // grid + y labels
           [0, 0.1, 0.2, 0.3, 0.4].forEach((v) => {
             el("line", { x1: X0 - 10, x2: X1 + 10, y1: ys(v), y2: ys(v), stroke: "rgba(178,191,204,0.14)", "stroke-width": 2 }, chart);
-            const t = el("text", { x: X0 - 26, y: ys(v) + 7, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": 20, fill: "#8494a6" }, chart);
+            const t = el("text", { x: X0 - 26, y: ys(v) + 7, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": 22, fill: "#9fb0c2" }, chart);
             t.textContent = Math.round(v * 100) + "%";
           });
           // x labels: every Monday and the last day
@@ -122,7 +122,7 @@
           days.forEach((d, i) => {
             if (i % 7 !== 0 && i !== days.length - 1) return;
             const [, mm, dd] = d.date.split("-");
-            const t = el("text", { x: xs(i), y: Y0 + 38, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 20, fill: "#8494a6" }, chart);
+            const t = el("text", { x: xs(i), y: Y0 + 38, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 22, fill: "#9fb0c2" }, chart);
             t.textContent = MON[Number(mm) - 2] + " " + Number(dd);
           });
           // lines
@@ -134,7 +134,7 @@
             const dots = pts.map((q) => el("circle", { cx: q[0], cy: q[1], r: 5, fill: col, opacity: 0 }, chart));
             return { p, L, dots };
           };
-          const lb = line("base", "#8494a6", 4);
+          const lb = line("base", "#9fb0c2", 4);
           const lt = line("treat", "#3fd8a8", 5);
           const rainIdx = days.findIndex((d) => d.rain);
           const rainEl = document.getElementById("routes-rain");
@@ -143,7 +143,8 @@
           tl.fromTo("#routes-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
           tl.fromTo("#routes-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
           tl.fromTo("#routes-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
-          tl.fromTo(["#routes-sub", "#routes-legend"], { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.6);
+          tl.fromTo(["#routes-sub", "#routes-legend"], { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.5);
+          tl.set("#routes-sub-b", { opacity: 0 }, 0);
           tl.fromTo("#routes-chart", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.6);
           const DRAW = 3.0, L0 = 0.9;
           tl.to(lb.p, { attr: { "stroke-dashoffset": 0 }, duration: DRAW, ease: "none" }, L0);
@@ -173,16 +174,18 @@
               `<div class="st-chg${Math.abs(chg) < 5 ? " small" : ""}" id="routes-sc${i}">${chg.toFixed(1).replace("-", "−")}%</div></div>`);
           });
           const P2 = 6.4;
-          tl.to(["#routes-chartwrap", "#routes-counter", "#routes-sub", "#routes-legend"], { opacity: 0.12, duration: 0.5, ease: "power2.inOut" }, P2);
-          tl.fromTo("#routes-stress", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, P2 + 0.2);
+          // phase A fades fully out before phase B comes in: no two layers of text at once
+          tl.to(["#routes-chartwrap", "#routes-counter", "#routes-sub", "#routes-legend"], { opacity: 0, duration: 0.45, ease: "power2.in" }, P2);
+          tl.fromTo("#routes-sub-b", { opacity: 0 }, { opacity: 1, duration: 0.5 }, P2 + 0.5);
+          tl.fromTo("#routes-stress", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, P2 + 0.5);
           (SERIES.stress || []).forEach((_, i) => {
-            const at = P2 + 0.7 + i * 0.5;
+            const at = P2 + 0.9 + i * 0.5;
             tl.fromTo("#routes-st" + i, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }, at);
             tl.fromTo("#routes-sb" + i, { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power3.out" }, at + 0.1);
             tl.fromTo("#routes-stt" + i, { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power3.out" }, at + 0.3);
             tl.fromTo("#routes-sc" + i, { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power3.out" }, at + 0.8);
           });
-          tl.to("#routes-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          tl.to("#routes-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.8); // dip: fully out before the next scene starts
           window.__timelines["routes"] = tl;
         })();
       </script>

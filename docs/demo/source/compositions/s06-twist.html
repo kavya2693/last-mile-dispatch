@@ -4,83 +4,148 @@
   <body>
     <template>
       <style>
+        /* 09 LESSON AND FIX: left = the finding with its evidence, right = what the repo does about it, then the measured
+           payoff and the concrete next step. Colour meaning: neutral grey bars, coral only for the "trap", mint for the fix. */
         #twist-root { position: absolute; inset: 0; }
-        #twist-root .eyebrow { color: var(--c-risk); }
-        #twist-root .sub { position: absolute; left: 120px; top: 200px; font-size: 32px; color: var(--ink-soft); }
-        #twist-root .bars { position: absolute; left: 120px; top: 290px; width: 1680px; }
-        #twist-root .row { display: flex; align-items: center; height: 112px; }
-        #twist-root .who { width: 470px; font-size: 36px; font-weight: 700; color: var(--ink); }
-        #twist-root .who small { display: block; font-family: var(--mono); font-size: 22px; font-weight: 400; color: var(--ink-mute); }
-        #twist-root .track { position: relative; width: 1000px; height: 44px; border-radius: 8px; background: rgba(178, 191, 204, 0.08); }
-        #twist-root .fill { position: absolute; left: 0; top: 0; height: 44px; border-radius: 8px; background: var(--ink-mute); transform-origin: left center; }
-        #twist-root .val { width: 210px; text-align: right; font-family: var(--mono); font-size: 44px; font-weight: 700; color: var(--ink-soft); }
-        #twist-root .rule .fill { background: var(--c-eval); }
-        #twist-root .rule .val { color: var(--c-eval); }
-        #twist-root .xgb .fill { background: var(--c-model); }
-        #twist-root .xgb .val { color: var(--c-model); }
-        #twist-root .lr .fill { background: rgba(185, 162, 255, 0.55); }
-        #twist-root .ci { position: absolute; left: 120px; top: 560px; width: 1680px; }
-        #twist-root .ci-lab { font-family: var(--mono); font-size: 24px; color: var(--ink-soft); }
-        #twist-root .ci-axis { position: relative; margin: 26px 0 0 470px; width: 1000px; height: 70px; border-top: 2px solid rgba(178, 191, 204, 0.3); }
-        #twist-root .ci-zero { position: absolute; left: 499px; top: -22px; width: 3px; height: 44px; background: var(--ink); }
-        #twist-root .ci-zl { position: absolute; left: 488px; top: 26px; font-family: var(--mono); font-size: 22px; color: var(--ink); }
-        #twist-root .ci-tl { position: absolute; top: 26px; font-family: var(--mono); font-size: 20px; color: var(--ink-mute); transform: translateX(-50%); }
-        #twist-root .ci-bar { position: absolute; left: 95px; top: -9px; width: 476px; height: 16px; border-radius: 8px; background: var(--c-risk); opacity: 0.85; transform-origin: 238px center; }
-        #twist-root .ci-dot { position: absolute; left: 321px; top: -13px; width: 24px; height: 24px; border-radius: 50%; background: var(--ink); border: 4px solid var(--c-risk); }
-        #twist-root .ci-v { position: absolute; left: 600px; top: -17px; font-family: var(--mono); font-size: 24px; font-weight: 700; color: var(--c-risk); }
-        #twist-root .ci-need { margin-top: 16px; font-size: 30px; color: var(--ink); }
-        #twist-root .ci-need b { color: var(--c-risk); }
-        #twist-root .verdict {
-          position: absolute; left: 120px; top: 800px; width: 1680px; padding: 22px 28px; border-radius: 12px;
-          border: 2px solid rgba(255, 138, 115, 0.45); background: rgba(255, 138, 115, 0.07);
-          font-size: 30px; line-height: 1.4; color: var(--ink);
+        #twist-root .eyebrow { color: var(--c-opt); }
+        #twist-root .panel {
+          position: absolute; top: 262px; width: 820px; height: 540px; border-radius: 16px; border: 2px solid var(--line);
+          background: var(--panel); padding: 28px 36px 0;
         }
-        #twist-root .verdict b { color: var(--c-risk); }
+        #twist-root .panel.fix { border: 3px solid var(--c-opt); background: #0f2629; }
+        #twist-root .tag {
+          display: inline-block; font-family: var(--mono); font-size: 24px; font-weight: 700; letter-spacing: 0.12em;
+          padding: 4px 14px; border-radius: 6px; color: #0a1119;
+        }
+        #twist-root .lesson .tag { background: var(--c-risk); }
+        #twist-root .fix .tag { background: var(--c-opt); }
+        #twist-root .head { margin-top: 16px; font-size: 34px; font-weight: 700; line-height: 1.2; color: var(--ink); }
+        #twist-root .metric { margin-top: 10px; font-size: 24px; font-weight: 500; line-height: 1.3; color: var(--ink-soft); }
+        #twist-root .metric b { color: var(--ink); font-weight: 700; }
+        #twist-root .rows { position: relative; margin-top: 18px; }
+        #twist-root .row { display: flex; align-items: center; height: 70px; }
+        #twist-root .who { flex: 0 0 236px; width: 236px; font-size: 28px; font-weight: 700; color: var(--ink); line-height: 1.1; }
+        #twist-root .who small { display: block; margin-top: 4px; font-size: 22px; font-weight: 500; color: var(--ink-soft); }
+        #twist-root .track { flex: 0 0 260px; position: relative; width: 260px; height: 30px; border-radius: 6px; background: rgba(200, 211, 222, 0.1); }
+        #twist-root .fill { position: absolute; left: 0; top: 0; height: 30px; border-radius: 6px; background: #6b7b8e; transform-origin: left center; }
+        #twist-root .val { flex: 0 0 120px; width: 120px; text-align: right; font-family: var(--mono); font-size: 32px; font-weight: 700; color: var(--ink); }
+        #twist-root .chip {
+          flex: 0 0 auto; margin-left: 14px; height: 34px; padding: 0 10px; border-radius: 6px; display: flex; align-items: center;
+          font-family: var(--mono); font-size: 22px; font-weight: 700; letter-spacing: 0.04em;
+        }
+        #twist-root .chip.trap { color: var(--c-risk); border: 2px solid var(--c-risk); }
+        #twist-root .chip.ok { color: #0a1119; background: var(--c-opt); }
+        #twist-root .chip.more { color: var(--ink); border: 2px solid var(--ink-soft); }
+        /* gap strip: -0.05 .. +0.05 over the same 260 px track, zero in the middle */
+        #twist-root .ci { position: absolute; top: 0; height: 30px; border-radius: 6px; background: #6b7b8e; transform-origin: center center; }
+        #twist-root .zero { position: absolute; left: 129px; top: -8px; width: 3px; height: 46px; background: var(--ink); }
+        #twist-root .dot { position: absolute; top: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--ink); border: 4px solid #6b7b8e; }
+        /* the 13-hubs line on the fix panel's track: 30 hubs = 260 px, so 13 hubs = 113 px after the 236 px label column */
+        #twist-root .line13 { position: absolute; left: 349px; top: 6px; width: 0; height: 198px; border-left: 3px dashed var(--c-opt); }
+        #twist-root .note {
+          position: absolute; left: 36px; right: 36px; bottom: 24px; padding-top: 14px; border-top: 2px solid var(--line);
+          font-size: 26px; line-height: 1.3; color: var(--ink-soft);
+        }
+        #twist-root .lesson .note em { font-style: normal; font-weight: 700; color: var(--c-risk); }
+        #twist-root .fix .val { flex-basis: 100px; width: 100px; }
+        #twist-root .fix .note em { font-style: normal; font-weight: 700; color: var(--c-opt); }
+        #twist-root .arrow { position: absolute; left: 943px; top: 504px; width: 34px; height: 56px; }
+        #twist-root .strip {
+          position: absolute; left: 120px; width: 1680px; padding: 0 28px; border-radius: 14px;
+          display: flex; align-items: center; gap: 22px; color: var(--ink); white-space: nowrap;
+        }
+        #twist-root .payoff { top: 822px; height: 76px; font-size: 27px; border: 2px solid rgba(63, 216, 168, 0.6); background: rgba(63, 216, 168, 0.08); }
+        #twist-root .payoff .tag { background: var(--c-opt); flex: 0 0 auto; }
+        #twist-root .payoff b { color: var(--c-opt); font-family: var(--mono); }
+        #twist-root .next { top: 912px; height: 66px; font-size: 26px; border: 2px solid var(--line); background: var(--panel); }
+        #twist-root .next .tag { background: var(--ink-soft); flex: 0 0 auto; }
+        #twist-root .next .soft { color: var(--ink-soft); }
       </style>
       <div id="twist-root" data-composition-id="twist" data-width="1920" data-height="1080">
         <div class="scene" id="twist-in">
-          <div class="eyebrow" data-layout-allow-overlap id="twist-eyebrow">09 · What didn't win</div>
-          <div class="scene-title" data-layout-allow-overlap id="twist-title">Riders got less busy, and the A/B test can't even see it.</div>
-          <div class="sub" id="twist-sub">Rider utilisation (busy ÷ paid time), the one metric that moved the wrong way</div>
-          <div class="bars">
-            <div class="row" id="twist-r1"><div class="who">Control hubs<small>FIFO, one order per trip</small></div>
-              <div class="track"><div class="fill" id="twist-b1" style="width: 667px"></div></div><div class="val">0.667</div></div>
-            <div class="row xgb" id="twist-r2"><div class="who">Treated hubs<small>bag + match + geofence</small></div>
-              <div class="track"><div class="fill" id="twist-b2" style="width: 650px"></div></div><div class="val">0.650</div></div>
-          </div>
-          <div class="ci" id="twist-ci">
-            <div class="ci-lab">Welch 95% CI of the difference · p = 0.16</div>
-            <div class="ci-axis" id="twist-axis" data-layout-allow-overflow>
-              <div class="ci-zero"></div><div class="ci-zl">0</div>
-              <div class="ci-bar" id="twist-cibar"></div><div class="ci-dot" id="twist-cidot"></div>
-              <div class="ci-tl" style="left: 0px">−0.05</div><div class="ci-tl" style="left: 1000px">+0.05</div>
-              <div class="ci-v" id="twist-civ">−0.040 to +0.007</div>
+          <div class="eyebrow" data-layout-allow-overlap id="twist-eyebrow">09 · Lesson and fix</div>
+          <div class="scene-title" data-layout-allow-overlap id="twist-title">13 hubs can't see a small drop. So I report the hubs it would need.</div>
+          <div class="scene-sub" id="twist-sub">Utilisation = share of paid rider time spent delivering; higher is better. 13 treated vs 13 control hubs, 4 weeks.</div>
+
+          <!-- left: the lesson. Utilisation bars: 1.0 = 260 px. Gap strip: -0.05..+0.05 = 260 px (outputs/ab_readout.csv) -->
+          <div class="panel lesson" id="twist-left" style="left: 120px">
+            <span class="tag">THE LESSON</span>
+            <div class="head">Riders got less busy. The test can't tell.</div>
+            <div class="metric"><b>Utilisation</b> per arm, then the gap with its 95% range</div>
+            <div class="rows">
+              <div class="row" id="twist-l1"><div class="who">Control hubs<small>one order per trip</small></div>
+                <div class="track"><div class="fill" id="twist-lb1" style="width: 173px"></div></div><div class="val">0.667</div></div>
+              <div class="row" id="twist-l2"><div class="who">Treated hubs<small>bag + match + check</small></div>
+                <div class="track"><div class="fill" id="twist-lb2" style="width: 169px"></div></div><div class="val">0.650</div></div>
+              <div class="row" id="twist-l3"><div class="who">Gap<small>95% range, p = 0.16</small></div>
+                <div class="track" id="twist-ci-track" style="background: rgba(200, 211, 222, 0.06)">
+                  <div class="ci" id="twist-ci" style="left: 25px; width: 123px"></div>
+                  <div class="zero"></div>
+                  <div class="dot" id="twist-dot" style="left: 75px"></div>
+                </div><div class="val">−0.017</div><span class="chip trap">TRAP</span></div>
             </div>
-            <div class="ci-need" id="twist-need">To see a change this size: <b>27 hubs per arm</b>. The test had 13.</div>
+            <div class="note" id="twist-lnote">The range crosses zero, so it reads as <em>"no change".</em> The simulator's true drop, all 26 hubs: −0.026.</div>
           </div>
-          <div class="verdict" id="twist-verdict"><b>Why:</b> bagging makes fewer trips on the same paid roster. Raising utilisation needs a smaller roster, which this test did not try.</div>
+
+          <svg class="arrow" id="twist-arrow" viewBox="0 0 34 56" aria-hidden="true">
+            <path d="M6 6 L27 28 L6 50" fill="none" stroke="#3fd8a8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+
+          <!-- right: what the repo does. Bars: 30 hubs = 260 px; dashed line at 13 hubs (outputs/power.csv) -->
+          <div class="panel fix" id="twist-right" style="left: 980px">
+            <span class="tag">THE FIX, IN THE REPO</span>
+            <div class="head">Size the test before trusting it</div>
+            <div class="metric"><b>Hubs needed per arm</b> to catch the effect 4 times in 5. Dashed line = 13, what this test had.</div>
+            <div class="rows">
+              <div class="line13" id="twist-line13"></div>
+              <div class="row" id="twist-r1"><div class="who">Cancellations</div>
+                <div class="track"><div class="fill" id="twist-rb1" style="width: 17px"></div></div><div class="val">2</div><span class="chip ok">ENOUGH</span></div>
+              <div class="row" id="twist-r2"><div class="who">Cost per order</div>
+                <div class="track"><div class="fill" id="twist-rb2" style="width: 43px"></div></div><div class="val">5</div><span class="chip ok">ENOUGH</span></div>
+              <div class="row" id="twist-r3"><div class="who">Utilisation</div>
+                <div class="track"><div class="fill" id="twist-rb3" style="width: 234px"></div></div><div class="val">27</div><span class="chip more">TOO FEW</span></div>
+            </div>
+            <div class="note" id="twist-rnote">The run report prints this table next to the A/B results: <em>utilisation needs 27, the test had 13.</em></div>
+          </div>
+
+          <div class="strip payoff" id="twist-payoff"><span class="tag">PAYOFF</span>
+            <span>Test re-run 500 times: the 95% range held the true effect <b>97–99%</b> of the time · false alarms <b>2–7%</b></span></div>
+          <div class="strip next" id="twist-next"><span class="tag">NEXT</span>
+            <span>Let the roster shrink with the new dispatch: <span class="soft">the fewest riders that still keep orders on time.</span></span></div>
         </div>
       </div>
       <script>
         (() => {
           const tl = gsap.timeline({ paused: true });
-          const D = 6.6;
+          const D = 9;
           tl.fromTo("#twist-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
           tl.fromTo("#twist-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
           tl.fromTo("#twist-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
           tl.fromTo("#twist-sub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.5);
+          // left: the lesson, with its evidence
+          tl.fromTo("#twist-left", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.8);
           [1, 2].forEach((n, i) => {
-            tl.fromTo("#twist-r" + n, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 0.8 + i * 0.2);
-            tl.fromTo("#twist-b" + n, { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power3.out" }, 1.0 + i * 0.2);
+            tl.fromTo("#twist-l" + n, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 1.2 + i * 0.15);
+            tl.fromTo("#twist-lb" + n, { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.out" }, 1.3 + i * 0.15);
           });
-          // CI: axis -0.05..+0.05 over 1000 px; interval -0.0405..+0.0071, estimate -0.0167 (outputs/ab_readout.csv)
-          tl.fromTo("#twist-ci", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 1.7);
-          tl.fromTo("#twist-cibar", { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.out" }, 2.0);
-          tl.fromTo("#twist-cidot", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power3.out" }, 2.2);
-          tl.fromTo("#twist-civ", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4 }, 2.5);
-          tl.fromTo("#twist-need", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 3.0);
-          tl.fromTo("#twist-verdict", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 3.5);
-          tl.to("#twist-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          tl.fromTo("#twist-l3", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 1.6);
+          tl.fromTo("#twist-ci", { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power3.out" }, 1.75);
+          tl.fromTo("#twist-dot", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.35, ease: "power3.out" }, 2.1);
+          tl.fromTo("#twist-lnote", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 2.4);
+          // right: the fix the repo implements
+          tl.fromTo("#twist-arrow", { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 3.1);
+          tl.fromTo("#twist-right", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 3.3);
+          [1, 2, 3].forEach((n, i) => {
+            tl.fromTo("#twist-r" + n, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 3.7 + i * 0.15);
+            tl.fromTo("#twist-rb" + n, { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.out" }, 3.8 + i * 0.15);
+          });
+          tl.fromTo("#twist-line13", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 4.3);
+          tl.fromTo("#twist-rnote", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 4.8);
+          // measured payoff, then the concrete next step
+          tl.fromTo("#twist-payoff", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 5.4);
+          tl.fromTo("#twist-next", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 5.9);
+          // dip: fully out before the end card starts
+          tl.to("#twist-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.8);
           window.__timelines["twist"] = tl;
         })();
       </script>

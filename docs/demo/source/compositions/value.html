@@ -8,7 +8,7 @@
            riders leaving and the doors ticking off (right). Data is inlined by tools/inject_sheet.py (SHEET block). */
         #value-root {
           position: absolute; inset: 0;
-          --w-bg: #ffffff; --w-ink: #111827; --w-soft: #4b5563; --w-mute: #6b7280; --w-line: #d1d5db; --w-faint: #f3f4f6;
+          --w-bg: #ffffff; --w-ink: #111827; --w-soft: #4b5563; --w-mute: #4b5563; --w-line: #d1d5db; --w-faint: #f3f4f6;
           --w-data: #d97706; --w-model: #6d3cf0; --w-tools: #1f8fa8; --w-risk: #dc2b4a; --w-opt: #0f9f6e;
           color: var(--w-ink); font-family: Inter, "Helvetica Neue", sans-serif;
         }
@@ -27,7 +27,7 @@
 
         /* rider board */
         #value-root .sheet {
-          position: absolute; left: 120px; top: 280px; width: 1050px; height: 600px; border: 3px solid var(--w-line);
+          position: absolute; left: 120px; top: 300px; width: 1050px; height: 580px; border: 3px solid var(--w-line);
           border-radius: 24px; background: #fff; box-shadow: 0 18px 40px rgba(17, 24, 39, 0.08); overflow: hidden;
         }
         #value-root .sheet-head {
@@ -37,14 +37,14 @@
         #value-root .sheet-head span:last-child { color: #c4b5fd; }
         #value-root .row {
           position: relative; display: flex; align-items: center; height: 64px; padding: 0 26px;
-          font-family: "JetBrains Mono", monospace; font-size: 21px; color: var(--w-ink); border-bottom: 2px solid var(--w-faint);
+          font-family: "JetBrains Mono", monospace; font-size: 22px; color: var(--w-ink); border-bottom: 2px solid var(--w-faint);
         }
-        #value-root .row.hdr { height: 54px; font-size: 18px; font-weight: 700; letter-spacing: 0.08em; color: var(--w-mute); background: #fafafa; }
+        #value-root .row.hdr { height: 54px; font-size: 22px; font-weight: 700; letter-spacing: 0.02em; color: var(--w-mute); background: #fafafa; }
         #value-root .row .tint { position: absolute; inset: 0; opacity: 0; }
         #value-root .c { position: relative; white-space: nowrap; }
         #value-root .c1 { width: 140px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
         #value-root .c1 i { display: block; width: 14px; height: 14px; border-radius: 4px; background: var(--w-line); }
-        #value-root .c2 { width: 96px; text-align: right; padding-right: 22px; }
+        #value-root .c2 { width: 112px; text-align: right; padding-right: 22px; }
         #value-root .c3 { width: 80px; text-align: right; padding-right: 16px; }
         #value-root .c4 { width: 104px; text-align: right; padding-right: 18px; color: var(--w-soft); }
         #value-root .c5, #value-root .c6, #value-root .c7, #value-root .c8, #value-root .c9 { width: 92px; padding-left: 8px; }
@@ -53,7 +53,7 @@
         #value-root .c10 { width: 46px; display: flex; justify-content: center; }
         #value-root .c10 b { display: block; width: 28px; height: 28px; border-radius: 50%; background: var(--w-opt); position: relative; }
         #value-root .c10 svg { position: absolute; left: 6px; top: 6px; width: 16px; height: 16px; }
-        #value-root .more { padding: 16px 30px 0; font-family: "JetBrains Mono", monospace; font-size: 20px; color: var(--w-mute); }
+        #value-root .more { padding: 14px 30px 0; font-family: "JetBrains Mono", monospace; font-size: 22px; color: var(--w-mute); }
         #value-root .totals {
           position: absolute; left: 0; bottom: 0; width: 100%; height: 66px; display: flex; align-items: center; gap: 14px; padding: 0 30px;
           background: #ecfdf5; border-top: 2px solid #a7f3d0; font-size: 23px; font-weight: 700; color: #065f46; white-space: nowrap;
@@ -63,17 +63,19 @@
         #value-root .totals span { font-weight: 400; color: #047857; }
 
         /* scene */
-        #value-root .scene-lab { position: absolute; font-family: "JetBrains Mono", monospace; font-size: 20px; font-weight: 700; letter-spacing: 0.14em; color: var(--w-mute); }
-        #value-root .dock { position: absolute; left: 1220px; top: 312px; width: 600px; height: 128px; border-radius: 20px; background: var(--w-faint); }
+        #value-root .scene-lab { position: absolute; font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 700; letter-spacing: 0.14em; color: var(--w-mute); }
+        #value-root .dock { position: absolute; left: 1220px; top: 332px; width: 600px; height: 128px; border-radius: 20px; background: var(--w-faint); }
         #value-root .map {
-          position: absolute; left: 1220px; top: 462px; width: 600px; height: 418px; border-radius: 24px; border: 3px solid var(--w-line);
+          position: absolute; left: 1220px; top: 482px; width: 600px; height: 398px; border-radius: 24px; border: 3px solid var(--w-line);
           background-color: #fbfbfc;
           background-image: linear-gradient(#eef0f3 2px, transparent 2px), linear-gradient(90deg, #eef0f3 2px, transparent 2px);
           background-size: 48px 48px; overflow: hidden;
         }
-        #value-root .held { position: absolute; left: 1600px; top: 476px; display: flex; align-items: center; gap: 8px; font-family: "JetBrains Mono", monospace; font-size: 20px; color: var(--w-mute); }
+        #value-root .held { position: absolute; left: 1600px; top: 494px; display: flex; align-items: center; gap: 8px; font-family: "JetBrains Mono", monospace; font-size: 22px; color: var(--w-mute); }
         #value-root .held i { display: block; width: 14px; height: 14px; border-radius: 50%; border: 3px solid #9ca3af; background: #fff; }
         #value-root svg.layer { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
+        #value-root .subt { position: absolute; left: 120px; top: 248px; width: 1680px; font-size: 26px; font-weight: 500; color: var(--w-soft); }
+        #value-root .subt b { color: var(--w-ink); }
         #value-root .caption {
           position: absolute; left: 120px; top: 920px; width: 1700px; font-size: 30px; font-weight: 700; color: var(--w-ink);
         }
@@ -85,6 +87,7 @@
           <div class="kick" id="va-kick">07 · END-USER VALUE</div>
           <div class="ttl" id="va-ttl">What the <em>hub lead</em> gets</div>
           <div class="uline" id="va-ul"></div>
+          <div class="subt" id="va-sub">One row per rider leaving now. <b>DUE</b> = the bag's earliest 30-minute deadline; a green tick means every door is on time.</div>
 
           <div class="sheet" id="va-sheet">
             <div class="sheet-head"><span id="va-head-l">RIDER BOARD</span><span id="va-head-r"></span></div>
@@ -98,10 +101,10 @@
             <div class="totals" id="va-totals"></div>
           </div>
 
-          <div class="scene-lab" id="va-lab-dock" style="left: 1220px; top: 280px">HUB · RIDER BAY</div>
+          <div class="scene-lab" id="va-lab-dock" style="left: 1220px; top: 298px">HUB · RIDER BAY</div>
           <div class="dock" id="va-dock"></div>
           <div class="map" id="va-map"></div>
-          <div class="scene-lab" id="va-lab-map" style="left: 1244px; top: 476px">THIS WAVE'S DROPS</div>
+          <div class="scene-lab" id="va-lab-map" style="left: 1244px; top: 494px">THIS WAVE'S DROPS</div>
           <div class="held" id="va-held"><i></i>held</div>
           <svg class="layer" id="va-svg" viewBox="0 0 1920 1080"></svg>
 
@@ -117,10 +120,10 @@
           const CONFIG = {
             duration: 13.0,
             colors: ["#6d3cf0", "#d97706", "#1f8fa8", "#2563eb", "#be185d"], // one per rider row
-            map: { left: 1220, top: 462, w: 600, h: 418, pad: 34 },
-            bayY: 384,
+            map: { left: 1220, top: 482, w: 600, h: 398, pad: 34 },
+            bayY: 404,
             bayX: [1420, 1500, 1580, 1660, 1740],
-            person: { x: 1290, y: 384 },
+            person: { x: 1290, y: 404 },
           };
           const NS = "http://www.w3.org/2000/svg";
           const svg = document.getElementById("va-svg");
@@ -156,7 +159,7 @@
           const dayT = (SHEET.day || {})["bagging+matching+geofence"] || {}, dayB = (SHEET.day || {}).baseline || {};
           document.getElementById("va-totals").innerHTML =
             "<b>" + CHECK + "</b>Hub " + SHEET.hub + " today: " + fmt(dayT.delivered) + " of " + fmt(dayT.orders) + " delivered, " +
-            dayT.cancelled + " cancelled <span>· FIFO would cancel " + dayB.cancelled + "</span>";
+            dayT.cancelled + " cancelled <span>· old way: " + dayB.cancelled + " cancelled</span>";
 
           // ---------------- scene: hub lead, rider bay, map ----------------
           const P = CONFIG.person;
@@ -191,8 +194,8 @@
           });
           // hub marker
           const hub = el("g", { id: "va-hub" });
-          el("rect", { x: M.cx - 24, y: M.cy - 24, width: 48, height: 48, rx: 10, fill: "#111827" }, hub);
-          const ht = el("text", { x: M.cx, y: M.cy + 7, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 18, "font-weight": 700, fill: "#fff" }, hub);
+          el("rect", { x: M.cx - 28, y: M.cy - 24, width: 56, height: 48, rx: 10, fill: "#111827" }, hub);
+          const ht = el("text", { x: M.cx, y: M.cy + 8, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 22, "font-weight": 700, fill: "#fff" }, hub);
           ht.textContent = "H" + SHEET.hub;
 
           // trip paths: hub -> stops in bag order (riders return to the hub off-screen)
@@ -256,6 +259,7 @@
           tl.fromTo("#va-kick", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.5);
           tl.fromTo("#va-ttl", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.55);
           tl.fromTo("#va-ul", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power3.out" }, 0.9);
+          tl.fromTo("#va-sub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 1.0);
           tl.fromTo("#va-sheet", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.8);
           rows.forEach((_, i) => tl.fromTo("#va-r" + i, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 1.3 + i * 0.3));
           tl.fromTo("#va-more", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 1.3 + rows.length * 0.3);
@@ -266,6 +270,8 @@
           tl.fromTo("#va-tab", { rotation: 0 }, { rotation: -8, svgOrigin: P.x + 33 + " " + P.y, duration: 0.3, ease: "sine.inOut", yoyo: true, repeat: 7 }, 2.2);
           tl.fromTo("#va-hub", { opacity: 0, scale: 0.8, svgOrigin: M.cx + " " + M.cy }, { opacity: 1, scale: 1, duration: 0.4, ease: "power3.out" }, 1.5);
           tl.fromTo("#va-caption", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 9.4);
+          // all text fades fully out before the wipe, so no two slides' text is ever on screen together
+          tl.to(["#va-kick", "#va-ttl", "#va-ul", "#va-sub", "#va-sheet", "#va-lab-dock", "#va-dock", "#va-map", "#va-lab-map", "#va-held", "#va-svg", "#va-caption"], { opacity: 0, duration: 0.35, ease: "power2.in" }, D - 1.05);
           // wipe out (white -> dark), revealing the next dark scene underneath
           tl.to("#va-page", { clipPath: "inset(0px 0px 0px 100%)", duration: 0.7, ease: "power3.inOut" }, D - 0.7);
           tl.fromTo("#va-edge", { x: 0, opacity: 0 }, { x: 1920, opacity: 1, duration: 0.7, ease: "power3.inOut", immediateRender: false }, D - 0.7);

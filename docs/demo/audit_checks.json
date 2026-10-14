@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-14 14:19",
+ "generated": "2026-10-14 18:37",
  "commit": "c7de8a6ad78ef3961f773e55ae9af197085c3f9c",
  "checks": [
   {
@@ -60,7 +60,7 @@
   },
   {
    "id": "F-08",
-   "shown": "a wave every 2 min / EVERY 2 MINUTES / dispatch wave 2 min",
+   "shown": "riders sent out every 2 min / EVERY 2 MINUTES / dispatch wave 2 min",
    "type": "direct",
    "computed": "true",
    "expect": "true",
@@ -100,7 +100,7 @@
   },
   {
    "id": "F-13",
-   "shown": "4 WEEKS",
+   "shown": "4 WEEKS / over 4 weeks / 4 weeks",
    "type": "derived",
    "computed": "4 weeks",
    "expect": "4 weeks",
@@ -188,7 +188,7 @@
   },
   {
    "id": "F-24",
-   "shown": "cancel if not out 45 min",
+   "shown": "cancel after 45 min",
    "type": "direct",
    "computed": "true",
    "expect": "true",
@@ -204,7 +204,7 @@
   },
   {
    "id": "F-26",
-   "shown": "500 re-draws",
+   "shown": "500 re-draws / Test re-run 500 times",
    "type": "direct",
    "computed": "500",
    "expect": "500",
@@ -316,7 +316,7 @@
   },
   {
    "id": "F-40",
-   "shown": "795 of 821 delivered, 7 cancelled \u00b7 FIFO would cancel 59",
+   "shown": "795 of 821 delivered, 7 cancelled \u00b7 old way: 59 cancelled (old way = FIFO, one order per trip)",
    "type": "direct",
    "computed": "795 of 821 delivered, 7 cancelled \u00b7 FIFO 59",
    "expect": "795 of 821 delivered, 7 cancelled \u00b7 FIFO 59",
@@ -412,7 +412,7 @@
   },
   {
    "id": "F-52",
-   "shown": "Welch 95% CIs exclude zero on all four",
+   "shown": "on all four, the 95% confidence range of the difference stays clear of zero (Welch t-test)",
    "type": "derived",
    "computed": "true",
    "expect": "true",
@@ -428,7 +428,7 @@
   },
   {
    "id": "F-54",
-   "shown": "\u22120.040 to +0.007",
+   "shown": "gap strip from -0.040 to +0.007, crossing zero",
    "type": "direct",
    "computed": "-0.040 to +0.007",
    "expect": "-0.040 to +0.007",
@@ -436,7 +436,7 @@
   },
   {
    "id": "F-55",
-   "shown": "p = 0.16",
+   "shown": "95% range, p = 0.16",
    "type": "direct",
    "computed": "0.16",
    "expect": "0.16",
@@ -444,7 +444,7 @@
   },
   {
    "id": "F-56",
-   "shown": "27 hubs per arm",
+   "shown": "27 \u00b7 TOO FEW / utilisation needs 27, the test had 13",
    "type": "direct",
    "computed": "27",
    "expect": "27",
@@ -452,8 +452,72 @@
   },
   {
    "id": "F-57",
-   "shown": "axis \u22120.05..+0.05 = 1,000 px; bar 95 \u2192 571 px, estimate at 333 px",
+   "shown": "track -0.05..+0.05 = 260 px; range 25 -> 148 px (left 25, width 123), estimate dot centred at 87 px (left 75), zero at 130 px",
    "type": "derived",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-62",
+   "shown": "-0.017",
+   "type": "direct",
+   "computed": "-0.017",
+   "expect": "-0.017",
+   "status": "pass"
+  },
+  {
+   "id": "F-63",
+   "shown": "The simulator's true drop, all 26 hubs: -0.026",
+   "type": "direct",
+   "computed": "-0.026",
+   "expect": "-0.026",
+   "status": "pass"
+  },
+  {
+   "id": "F-64",
+   "shown": "Cancellations 2 \u00b7 Cost per order 5 \u00b7 ENOUGH",
+   "type": "direct",
+   "computed": "2 / 5",
+   "expect": "2 / 5",
+   "status": "pass"
+  },
+  {
+   "id": "F-65",
+   "shown": "to catch the effect 4 times in 5",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-66",
+   "shown": "97-99% of the time \u00b7 false alarms 2-7%",
+   "type": "derived",
+   "computed": "97-99% \u00b7 2-7%",
+   "expect": "97-99% \u00b7 2-7%",
+   "status": "pass"
+  },
+  {
+   "id": "F-67",
+   "shown": "THE FIX, IN THE REPO \u00b7 Size the test before trusting it \u00b7 The run report prints this table next to the A/B results",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-68",
+   "shown": "Dashed line = 13, what this test had",
+   "type": "direct",
+   "computed": "13",
+   "expect": "13",
+   "status": "pass"
+  },
+  {
+   "id": "F-69",
+   "shown": "NEXT \u00b7 Let the roster shrink with the new dispatch: the fewest riders that still keep orders on time.",
+   "type": "direct",
    "computed": "true",
    "expect": "true",
    "status": "pass"

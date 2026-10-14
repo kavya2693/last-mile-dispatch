@@ -12,7 +12,7 @@
           background: var(--panel); padding: 44px 34px 36px; display: flex; flex-direction: column; overflow: hidden;
         }
         #results-root .card .bar { position: absolute; left: 0; top: 0; width: 100%; height: 6px; }
-        #results-root .card .layer { font-family: var(--mono); font-size: 20px; letter-spacing: 0.12em; text-transform: uppercase; }
+        #results-root .card .layer { font-family: var(--mono); font-size: 22px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
         #results-root .card .big {
           margin-top: 18px; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 92px;
           font-weight: 700; letter-spacing: -0.05em; line-height: 1; white-space: nowrap;
@@ -29,12 +29,13 @@
         #results-root .risk .bar, #results-root .risk .mini-fill { background: var(--c-risk); }
         #results-root .risk .big, #results-root .risk .layer { color: var(--c-risk); }
         #results-root .card .big small { font-size: 52px; letter-spacing: -0.02em; }
-        #results-root .footnote { position: absolute; left: 120px; top: 840px; font-family: var(--mono); font-size: 24px; color: var(--ink-mute); }
+        #results-root .footnote { position: absolute; left: 120px; top: 840px; width: 1680px; font-size: 26px; font-weight: 500; color: var(--ink-soft); }
       </style>
       <div id="results-root" data-composition-id="results" data-width="1920" data-height="1080">
         <div class="scene" id="results-in">
           <div class="eyebrow" data-layout-allow-overlap id="results-eyebrow">08 · Results · hub-level A/B, 4 weeks</div>
           <div class="scene-title" data-layout-allow-overlap id="results-title">13 treated hubs vs 13 control hubs: cheaper and faster.</div>
+          <div class="scene-sub" id="results-sub">Treated hubs vs control hubs over 4 weeks. Cost, cancellations and fake marks: lower is better; on time: higher.</div>
           <div class="cards">
             <div class="card opt" id="results-c1"><div class="bar"></div><div class="layer">cost</div>
               <div class="big"><span id="results-v1">0.0</span>%</div><div class="lab">fleet cost per delivered order</div>
@@ -45,11 +46,11 @@
             <div class="card opt" id="results-c3"><div class="bar"></div><div class="layer">cancellations</div>
               <div class="big"><span id="results-v3">0.0</span>%</div><div class="lab">cancellation rate, treated hubs</div>
               <div class="mini"><div class="mini-fill" id="results-m3"></div></div><div class="foot">control 11.6%</div></div>
-            <div class="card risk" id="results-c4"><div class="bar"></div><div class="layer">door check</div>
+            <div class="card opt" id="results-c4"><div class="bar"></div><div class="layer">door check</div>
               <div class="big"><span id="results-v4">0.0</span>%</div><div class="lab">fake "not home" marks accepted</div>
               <div class="mini"><div class="mini-fill" id="results-m4"></div></div><div class="foot">11.7 → 3.2 per 1,000</div></div>
           </div>
-          <div class="footnote" id="results-foot">326,981 orders · Welch 95% CIs exclude zero on all four · true effect known from the simulator</div>
+          <div class="footnote" id="results-foot">326,981 orders · on all four, the 95% confidence range of the difference stays clear of zero (Welch t-test)</div>
         </div>
       </div>
       <script>
@@ -59,6 +60,7 @@
           tl.fromTo("#results-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
           tl.fromTo("#results-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
           tl.fromTo("#results-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          tl.fromTo("#results-sub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.5);
           // A/B readout (outputs/ab_readout.csv): treated vs control hub means; bars = after / before
           const stats = [
             { v: "results-v1", m: "#results-m1", from: 0, to: -10.6, d: 1, r: 8.7496 / 9.791, sign: true },
@@ -79,7 +81,7 @@
             else tl.fromTo(s.m, { scaleX: 1 }, { scaleX: s.r, duration: 1.6, ease: "power3.out" }, at + 0.3);
           });
           tl.fromTo("#results-foot", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 2.8);
-          tl.to("#results-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          tl.to("#results-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.8); // dip: fully out before the next scene starts
           window.__timelines["results"] = tl;
         })();
       </script>

@@ -2,9 +2,9 @@
 
 **Repository:** https://github.com/kavya2693/last-mile-dispatch  
 **Numbers taken from commit:** `c7de8a6` (outputs last changed in `c7de8a6 (2026-10-13 17:55:02 +0400)`)  
-**Video:** `docs/demo/demo.mp4` (84.6 s, 1920x1080, 30 fps, silent)  
-**Generated:** 2026-10-14 14:19  
-**Automated checks:** 60 pass · 0 fail · 1 manual (of 61 figures)
+**Video:** `docs/demo/demo.mp4` (87.0 s, 1920x1080, 30 fps, silent)  
+**Generated:** 2026-10-14 18:37  
+**Automated checks:** 68 pass · 0 fail · 1 manual (of 69 figures)
 
 ## How to use this report
 
@@ -36,12 +36,12 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-05 | 477,868 orders | 02, 05 | `data/orders.csv.gz` | row count | - | direct | ✓ verified |
 | F-06 | 6 weeks / 42 days | 02, 05 | `data/days.csv` | row count = 42 | 42 / 7 = 6 weeks | derived | ✓ verified |
 | F-07 | 30 minutes to each door / 30-minute promise | 02, 07 | `src/last_mile_dispatch/config.py:27` | SLA_MIN = 30 | - | direct | ✓ verified |
-| F-08 | a wave every 2 min / EVERY 2 MINUTES / dispatch wave 2 min | 02, 03, 05 | `src/last_mile_dispatch/config.py:23` | WAVE_MIN = 2 | - | direct | ✓ verified |
+| F-08 | riders sent out every 2 min / EVERY 2 MINUTES / dispatch wave 2 min | 02, 03, 05 | `src/last_mile_dispatch/config.py:23` | WAVE_MIN = 2 | - | direct | ✓ verified |
 | F-09 | Ramadan · weekends · rain | 02 | `data/days.csv` | ramadan, weekend, rain columns | any ramadan, any weekend, exactly one rain day | direct | ✓ verified |
 | F-10 | 36 riders sometimes skip doors | 02 | `data/riders.csv` | remote_marker == True | count | direct | ✓ verified |
 | F-11 | hub dots + circles | 02, 10 | `data/hubs.csv; config.py:12 (SERVICE_RADIUS_KM = 4.0)` | lat/lon -> km from the centroid (demo assets/run_series.json) | - | direct | ✓ verified |
 | F-12 | ORDERS → BAG → MATCH → DOOR CHECK → A/B TEST → VERDICT | 03 | `src/last_mile_dispatch/` | functions | - | direct | ✓ verified |
-| F-13 | 4 WEEKS | 03 | `outputs/summary.json` | experiment_days = 28 | 28 / 7 = 4 | derived | ✓ verified |
+| F-13 | 4 WEEKS / over 4 weeks / 4 weeks | 03, 08, 09 | `outputs/summary.json` | experiment_days = 28 | 28 / 7 = 4 | derived | ✓ verified |
 | F-14 | cheaper orders / fewer cancels / fewer fake marks | 03 | `outputs/ab_readout.csv` | welch_hi for cost_per_delivered, cancel_rate, fake_accepted_per_1k | welch_hi < 0 for all three | derived | ✓ verified |
 | F-15 | 3 steps / ≤ 3 stops · 1 km | 04, 05 | `src/last_mile_dispatch/bagging.py:3-5, :51-87; config.py:37, :65-67` | BAG_CAPACITY = 3, BAG_MAX_DROP_GAP_KM = 1.0, BAG_MAX_CREATED_GAP_MIN = 12.0, BAG_MAX_EXTRA_MIN = 9.0 | - | direct | ✓ verified |
 | F-16 | 9.71 | 04 | `outputs/ablation.csv` | policy=baseline, cost_per_delivered | - | direct | ✓ verified |
@@ -52,9 +52,9 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-21 | 11,566 marks | 05 | `outputs/geofence_eval.csv` | slice=all, events | - | direct | ✓ verified |
 | F-22 | hub-day runs 4,004 | 05 | `outputs/run_log.txt line 2` | 'simulated 4,004 hub-day-policy runs' | 26 x 14 + 26 x 28 x 5 = 4,004 | direct | ✓ verified |
 | F-23 | full run, laptop 180 s | 05 | `outputs/summary.json` | runtime_s = 179.8 | rounded to whole seconds | derived | ✓ verified |
-| F-24 | cancel if not out 45 min | 05 | `src/last_mile_dispatch/config.py:28` | CANCEL_AFTER_MIN = 45 | - | direct | ✓ verified |
+| F-24 | cancel after 45 min | 05 | `src/last_mile_dispatch/config.py:28` | CANCEL_AFTER_MIN = 45 | - | direct | ✓ verified |
 | F-25 | 150 m geofence | 05 | `src/last_mile_dispatch/config.py:79` | GEOFENCE_RADIUS_M = 150.0 | - | direct | ✓ verified |
-| F-26 | 500 re-draws | 05 | `outputs/rerandomisation.csv` | draws | - | direct | ✓ verified |
+| F-26 | 500 re-draws / Test re-run 500 times | 05, 09 | `outputs/rerandomisation.csv` | draws | - | direct | ✓ verified |
 | F-27 | 13 vs 13 hubs | 05, 08, 09 | `outputs/summary.json` | arms.treatment, arms.control | len of each list | direct | ✓ verified |
 | F-28 | 4 parallel workers · 5 policies, 1 seed | 05 | `src/last_mile_dispatch/cli.py:29; runner.py:36-41; config.py:62` | --workers default 4; same seed for every policy; ALL_POLICIES | - | direct | ✓ verified |
 | F-29 | CI slice 8 hubs × 7 d | 05 | `src/last_mile_dispatch/cli.py:38, :40; .github/workflows/ci.yml` | hubs.head(8), experiment days head(7) | - | direct | ✓ verified |
@@ -68,7 +68,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-37 | 16,817 orders · 10.42 → 6.84 · −34.4% | 06 | `outputs/stress_split.csv` | day_type=rain day | cost_treat / cost_base - 1 | derived | ✓ verified |
 | F-38 | RAMADAN band from Feb 18 | 06 | `data/days.csv` | first date with ramadan = True | - | direct | ✓ verified |
 | F-39 | Rider 01-05 rows | 07 | `demo assets/rider_board.json (re-run of the repo's simulator), injected into compositions/value.html` | rows | km = sum of road legs; waited = wave time - oldest order's creation; due = earliest creation + 30 min | direct | ✓ verified |
-| F-40 | 795 of 821 delivered, 7 cancelled · FIFO would cancel 59 | 07 | `outputs/hub_day_metrics.csv` | hub_id=18, date=2026-02-14, policy in {bagging+matching+geofence, baseline} | - | direct | ✓ verified |
+| F-40 | 795 of 821 delivered, 7 cancelled · old way: 59 cancelled (old way = FIFO, one order per trip) | 07 | `outputs/hub_day_metrics.csv` | hub_id=18, date=2026-02-14, policy in {bagging+matching+geofence, baseline} | - | direct | ✓ verified |
 | F-41 | + 3 bags held for the next wave · 5 free riders, 8 bags waiting | 07 | `demo assets/rider_board.json` | bags_held, free_riders, bags_waiting_before | held = bags waiting - riders matched | direct | ✓ verified |
 | F-42 | All 9 inside the 30-minute promise. | 07 | `demo assets/rider_board.json` | orders_dispatched; stops[].on_time | every stop ETA - creation <= 30 min | direct | ✓ verified |
 | F-43 | HUB 18 | 07 | `outputs/summary.json` | arms.treatment | - | direct | ✓ verified |
@@ -80,18 +80,26 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-49 | −72.4% | 08 | `outputs/ab_readout.csv` | metric=fake_accepted_per_1k, rel_diff | x 100 | direct | ✓ verified |
 | F-50 | 11.7 → 3.2 per 1,000 | 08 | `outputs/ab_readout.csv` | metric=fake_accepted_per_1k, control, treatment | - | direct | ✓ verified |
 | F-51 | 326,981 orders | 08 | `outputs/summary.json` | orders_in_experiment | - | direct | ✓ verified |
-| F-52 | Welch 95% CIs exclude zero on all four | 08 | `outputs/ab_readout.csv` | welch_lo, welch_hi | lo > 0 or hi < 0 for cost, on-time, cancel, fake | derived | ✓ verified |
+| F-52 | on all four, the 95% confidence range of the difference stays clear of zero (Welch t-test) | 08 | `outputs/ab_readout.csv` | welch_lo, welch_hi | lo > 0 or hi < 0 for cost, on-time, cancel, fake | derived | ✓ verified |
 | F-53 | 0.667 / 0.650 | 09 | `outputs/ab_readout.csv` | metric=utilization, control, treatment | - | direct | ✓ verified |
-| F-54 | −0.040 to +0.007 | 09 | `outputs/ab_readout.csv` | metric=utilization, welch_lo, welch_hi | - | direct | ✓ verified |
-| F-55 | p = 0.16 | 09 | `outputs/ab_readout.csv` | metric=utilization, welch_p | - | direct | ✓ verified |
-| F-56 | 27 hubs per arm | 09 | `outputs/power.csv` | metric=utilization, hubs_per_arm_needed | - | direct | ✓ verified |
-| F-57 | axis −0.05..+0.05 = 1,000 px; bar 95 → 571 px, estimate at 333 px | 09 | `compositions/s06-twist.html; outputs/ab_readout.csv` | welch_lo, welch_hi, diff | px = (v + 0.05) x 10,000 | derived | ✓ verified |
+| F-54 | gap strip from -0.040 to +0.007, crossing zero | 09 | `outputs/ab_readout.csv` | metric=utilization, welch_lo, welch_hi | - | direct | ✓ verified |
+| F-55 | 95% range, p = 0.16 | 09 | `outputs/ab_readout.csv` | metric=utilization, welch_p | - | direct | ✓ verified |
+| F-56 | 27 · TOO FEW / utilisation needs 27, the test had 13 | 09 | `outputs/power.csv` | metric=utilization, hubs_per_arm_needed | - | direct | ✓ verified |
+| F-57 | track -0.05..+0.05 = 260 px; range 25 -> 148 px (left 25, width 123), estimate dot centred at 87 px (left 75), zero at 130 px | 09 | `compositions/s06-twist.html; outputs/ab_readout.csv` | welch_lo, welch_hi, diff | px = (v + 0.05) x 2,600 | derived | ✓ verified |
+| F-62 | -0.017 | 09 | `outputs/ab_readout.csv` | metric=utilization, diff | - | direct | ✓ verified |
+| F-63 | The simulator's true drop, all 26 hubs: -0.026 | 09 | `outputs/ab_readout.csv` | metric=utilization, true_effect_all_hubs | - | direct | ✓ verified |
+| F-64 | Cancellations 2 · Cost per order 5 · ENOUGH | 09 | `outputs/power.csv` | metric in {cancel_rate, cost_per_delivered}, hubs_per_arm_needed | ENOUGH = needed <= 13 | direct | ✓ verified |
+| F-65 | to catch the effect 4 times in 5 | 09 | `src/last_mile_dispatch/experiment.py:77, :85` | power: float = 0.8 | - | direct | ✓ verified |
+| F-66 | 97-99% of the time · false alarms 2-7% | 09 | `outputs/rerandomisation.csv` | welch_coverage, aa_false_positive_welch | min and max over metrics, x 100, rounded | derived | ✓ verified |
+| F-67 | THE FIX, IN THE REPO · Size the test before trusting it · The run report prints this table next to the A/B results | 09 | `src/last_mile_dispatch/experiment.py:77-90, :127; cli.py:78-98; tests/test_experiment.py:47, :53, :66; outputs/run_report.md` | functions, tests, report sections | - | direct | ✓ verified |
+| F-68 | Dashed line = 13, what this test had | 09 | `outputs/summary.json` | len(arms.treatment) | - | direct | ✓ verified |
+| F-69 | NEXT · Let the roster shrink with the new dispatch: the fewest riders that still keep orders on time. | 09 | `README 'Insights and learning' (last paragraph) and 'Known limitations' (the biggest gap: the roster is fixed)` | README text | - | direct | ✓ verified |
 | F-58 | MIT | 10 | `LICENSE line 1` | - | - | direct | ✓ verified |
 | F-59 | ~3 min | 10 | `outputs/summary.json` | runtime_s = 179.8 | 179.8 / 60 = 3.0 min | derived | ✓ verified |
 | F-60 | SciPy · pandas · NumPy · Python | 10 | `pyproject.toml dependencies` | numpy, pandas, scipy | - | direct | ✓ verified |
 | F-61 | $ make run   # 26 hubs, 4 weeks, ~3 min | 10 | `Makefile; outputs/summary.json` | run target; hubs; experiment_days | - | direct | ✓ verified |
 
-## 2. Automated check run (2026-10-14 14:19)
+## 2. Automated check run (2026-10-14 18:37)
 
 | ID | Expected on slide | Recomputed from repo | Result |
 |---|---|---|---|
@@ -152,6 +160,14 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-55 | 0.16 | 0.16 | ✓ pass |
 | F-56 | 27 | 27 | ✓ pass |
 | F-57 | true | true | ✓ pass |
+| F-62 | -0.017 | -0.017 | ✓ pass |
+| F-63 | -0.026 | -0.026 | ✓ pass |
+| F-64 | 2 / 5 | 2 / 5 | ✓ pass |
+| F-65 | true | true | ✓ pass |
+| F-66 | 97-99% · 2-7% | 97-99% · 2-7% | ✓ pass |
+| F-67 | true | true | ✓ pass |
+| F-68 | 13 | 13 | ✓ pass |
+| F-69 | true | true | ✓ pass |
 | F-58 | true | true | ✓ pass |
 | F-59 | ~3 min | ~3 min | ✓ pass |
 | F-60 | true | true | ✓ pass |
@@ -162,17 +178,17 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | ID | Assumption | Source | Used by | Sensitivity: if this changes |
 |---|---|---|---|---|
 | A-01 | All data is synthetic, produced by a seeded generator sized to the production problem (26 hubs, 473 riders, 42 days, 477,868 orders). Production dispatch data is proprietary. | `scripts/generate_data.py:9, :168 (seed 7); src/last_mile_dispatch/config.py:11-18; README 'The data'` | all figures | figures all figures and slides 01, 02, 03, 04, 05, 06, 07, 08, 09, 10 change |
-| A-02 | The rider roster is fixed and sized for an ordinary weekday evening; every policy pays for the same riders. Cost savings therefore come mostly from cancelled orders turned into deliveries, and utilisation falls. | `scripts/generate_data.py:84-85 (make_riders); README 'Known limitations' (the biggest gap)` | F-04, F-33, F-34, F-35, F-36, F-37, F-44, F-45, F-53, F-54, F-55, F-56 | figures F-04, F-33, F-34, F-35, F-36, F-37, F-44, F-45, F-53, F-54, F-55, F-56 and slides 02, 05, 06, 08, 09 change |
+| A-02 | The rider roster is fixed and sized for an ordinary weekday evening; every policy pays for the same riders. Cost savings therefore come mostly from cancelled orders turned into deliveries, and utilisation falls. | `scripts/generate_data.py:84-85 (make_riders); README 'Known limitations' (the biggest gap)` | F-04, F-33, F-34, F-35, F-36, F-37, F-44, F-45, F-53, F-54, F-55, F-56, F-62, F-63, F-69 | figures F-04, F-33, F-34, F-35, F-36, F-37, F-44, F-45, F-53, F-54, F-55, F-56, F-62, F-63, F-69 and slides 02, 05, 06, 08, 09 change |
 | A-03 | Travel is straight-line distance x 1.35 at an hour-dependent speed (bike 24 km/h, car 22 km/h; peaks x0.68-0.88, rain x0.6), not a road graph; riders return to the hub between trips. | `src/last_mile_dispatch/config.py:13, :36; geo.py:29-46; simulate.py:247-249; README 'Known limitations'` | F-32, F-33, F-34, F-35, F-36, F-37, F-39, F-44, F-45, F-46, F-47 | figures F-32, F-33, F-34, F-35, F-36, F-37, F-39, F-44, F-45, F-46, F-47 and slides 06, 07, 08 change |
 | A-04 | Matching prices each rider-bag pair in AED: km cost of the vehicle, 1.0 per minute late, minus 1.4 per minute already waited, minus a 9.0 credit per order. The matcher is myopic (one 2-minute wave at a time). | `src/last_mile_dispatch/config.py:74-76; assignment.py:46-58; README 'Known limitations'` | F-14, F-33, F-34, F-39, F-44, F-45, F-46, F-47, F-48 | figures F-14, F-33, F-34, F-39, F-44, F-45, F-46, F-47, F-48 and slides 03, 06, 07, 08 change |
 | A-05 | Bagging limits: drops within 1 km and created within 12 minutes of the seed order, at most 3 stops, and the first customer may wait at most 9 extra minutes. | `src/last_mile_dispatch/config.py:37, :65-67; bagging.py:51-87` | F-15, F-16, F-17, F-39, F-41 | figures F-15, F-16, F-17, F-39, F-41 and slides 04, 05, 07 change |
 | A-06 | Geofence rule: a 'customer unavailable' mark is flagged when fewer than 2 of the rider's last 6 GPS pings are within 150 m of the customer; flagged riders are sent back to the door (treatment) or the flag is only logged (baseline). | `src/last_mile_dispatch/config.py:43, :79-80; geofence.py:31-39; simulate.py:218-230` | F-21, F-25, F-49, F-50 | figures F-21, F-25, F-49, F-50 and slides 05, 08 change |
 | A-07 | Fake marks: about 8% of riders (36 of 473 in the data) mark 'customer unavailable' without reaching the door on 22% of their stops; fakes are known by construction and riders do not change habit when flagged. | `src/last_mile_dispatch/config.py:40-41; scripts/generate_data.py:94; README 'Known limitations'` | F-10, F-21, F-49, F-50 | figures F-10, F-21, F-49, F-50 and slides 02, 05, 08 change |
 | A-08 | Service promise 30 minutes from order creation; a customer cancels if nothing has left the hub after 45 minutes; the dispatcher wakes every 2 minutes; 2 minutes handover per stop. | `src/last_mile_dispatch/config.py:23, :27-29` | F-07, F-08, F-24, F-32, F-33, F-34, F-42, F-46, F-47, F-48 | figures F-07, F-08, F-24, F-32, F-33, F-34, F-42, F-46, F-47, F-48 and slides 02, 03, 05, 06, 07, 08 change |
-| A-09 | Experiment design: hubs sorted by pre-period orders per day, paired, one coin flip per pair (seed 2026); one number per hub over four weeks; Welch t and hub-bootstrap 95% intervals; power from the pre-period between-hub spread. | `src/last_mile_dispatch/cli.py:22, :58-98; experiment.py:20-124` | F-27, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-52, F-53, F-54, F-55, F-56, F-57 | figures F-27, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-52, F-53, F-54, F-55, F-56, F-57 and slides 05, 08, 09 change |
-| A-10 | Calendar: two pre-period weeks from 2026-01-19, then four experiment weeks 2026-02-02 to 2026-03-01; weekends are Saturday-Sunday; Ramadan from 2026-02-18; one rain day 2026-02-07 (35% more orders, 40% slower traffic). | `src/last_mile_dispatch/config.py:16-18; scripts/generate_data.py:35-36; README 'The data'` | F-06, F-09, F-13, F-31, F-32, F-35, F-36, F-37, F-38, F-40 | figures F-06, F-09, F-13, F-31, F-32, F-35, F-36, F-37, F-38, F-40 and slides 02, 03, 05, 06, 07 change |
+| A-09 | Experiment design: hubs sorted by pre-period orders per day, paired, one coin flip per pair (seed 2026); one number per hub over four weeks; Welch t and hub-bootstrap 95% intervals; power from the pre-period between-hub spread. | `src/last_mile_dispatch/cli.py:22, :58-98; experiment.py:20-124` | F-27, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-52, F-53, F-54, F-55, F-56, F-57, F-62, F-63, F-64, F-65, F-66, F-67, F-68 | figures F-27, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-52, F-53, F-54, F-55, F-56, F-57, F-62, F-63, F-64, F-65, F-66, F-67, F-68 and slides 05, 08, 09 change |
+| A-10 | Calendar: two pre-period weeks from 2026-01-19, then four experiment weeks 2026-02-02 to 2026-03-01; weekends are Saturday-Sunday; Ramadan from 2026-02-18; one rain day 2026-02-07 (35% more orders, 40% slower traffic). | `src/last_mile_dispatch/config.py:16-18; scripts/generate_data.py:35-36; README 'The data'` | F-06, F-09, F-13, F-31, F-32, F-35, F-36, F-37, F-38, F-40 | figures F-06, F-09, F-13, F-31, F-32, F-35, F-36, F-37, F-38, F-40 and slides 02, 03, 05, 06, 07, 08, 09 change |
 | A-11 | The rider board (slide 07) re-runs the repo's own simulator for hub 18 on 2026-02-14 under the treatment and records the 21:46 wave; drop ETAs replay the simulator's clock with geo.travel_min for riders who are honest and customers who are home. | `docs/demo/source/tools/export_rider_board.py; simulate.py:189-253` | F-39, F-40, F-41, F-42 | figures F-39, F-40, F-41, F-42 and slides 07 change |
-| A-12 | Video rounding: percentages to 1 decimal, AED to 2 decimals, utilisation and CI bounds to 3 decimals, counts with thousands separators; '~3 min' and '180 s' are rounded run times. | `this audit (display convention)` | F-16, F-17, F-23, F-32, F-34, F-35, F-36, F-37, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-53, F-54, F-55, F-59 | figures F-16, F-17, F-23, F-32, F-34, F-35, F-36, F-37, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-53, F-54, F-55, F-59 and slides 04, 05, 06, 08, 09, 10 change |
+| A-12 | Video rounding: percentages to 1 decimal, AED to 2 decimals, utilisation and CI bounds to 3 decimals, counts with thousands separators; '~3 min' and '180 s' are rounded run times. | `this audit (display convention)` | F-16, F-17, F-23, F-32, F-34, F-35, F-36, F-37, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-53, F-54, F-55, F-59, F-62, F-63, F-66 | figures F-16, F-17, F-23, F-32, F-34, F-35, F-36, F-37, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-53, F-54, F-55, F-59, F-62, F-63, F-66 and slides 04, 05, 06, 08, 09, 10 change |
 | A-13 | Slide 01 (industries, everyday problems) is general delivery-operations knowledge used as context. It is not a result of this repo and carries no numbers. | `author's framing; README 'The problem' supports problems 1-4` | F-01, F-02 | figures F-01, F-02 and slides 01 change |
 
 ## 4. Slide by slide
@@ -186,6 +202,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 > 01 · THE INDUSTRY  
 > Every few minutes, a hub decides who carries what.  
+> Who sends riders out from a local hub, and the four problems they run into every day.  
 > WHO LIVES WITH THIS · Quick-commerce grocery · Food & restaurant delivery · Parcel & pharmacy couriers  
 > 01 One order per trip, dispatched by hand — Two orders to one building leave with two riders  
 > 02 Peaks outrun the riders — Weekends, holidays and bad weather turn queues into cancellations  
@@ -216,8 +233,10 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 **On-screen text (verbatim)**
 
 > 02 · THIS PROJECT  
+> The project in one line: a city's delivery hubs, its riders and a 30-minute promise.  
 > 26 hubs, 473 riders. 477,868 orders in 6 weeks. 30 minutes to each door.  
-> a wave every 2 min · Ramadan · weekends · rain · 36 riders sometimes skip doors  
+> riders sent out every 2 min · Ramadan · weekends · rain · 36 riders sometimes skip doors  
+> Skip doors = mark "customer not home" without reaching the door. Every order is simulated from a seeded generator.  
 
 **Figures on this slide**
 
@@ -228,7 +247,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-05 | 477,868 orders | `data/orders.csv.gz` · row count | - | ✓ |
 | F-06 | 6 weeks / 42 days | `data/days.csv` · row count = 42 | 42 / 7 = 6 weeks | ✓ |
 | F-07 | 30 minutes to each door / 30-minute promise | `src/last_mile_dispatch/config.py:27` · SLA_MIN = 30 | - | ✓ |
-| F-08 | a wave every 2 min / EVERY 2 MINUTES / dispatch wave 2 min | `src/last_mile_dispatch/config.py:23` · WAVE_MIN = 2 | - | ✓ |
+| F-08 | riders sent out every 2 min / EVERY 2 MINUTES / dispatch wave 2 min | `src/last_mile_dispatch/config.py:23` · WAVE_MIN = 2 | - | ✓ |
 | F-09 | Ramadan · weekends · rain | `data/days.csv` · ramadan, weekend, rain columns | any ramadan, any weekend, exactly one rain day | ✓ |
 | F-10 | 36 riders sometimes skip doors | `data/riders.csv` · remote_marker == True | count | ✓ |
 | F-11 | hub dots + circles | `data/hubs.csv; config.py:12 (SERVICE_RADIUS_KM = 4.0)` · lat/lon -> km from the centroid (demo assets/run_series.json) | - | ✓ |
@@ -250,6 +269,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 > 03 · HOW IT WORKS  
 > From orders to riders  
+> Read left to right: every 2 minutes orders are grouped and handed to riders; half the hubs then test it for 4 weeks.  
 > ORDERS picked, waiting at the hub → [EVERY 2 MINUTES: BAG close drops ride together → MATCH best rider for each bag] → DOOR CHECK was the rider really there? → [4 WEEKS: A/B TEST half the hubs try it first] → VERDICT ✓ cheaper orders ✓ fewer cancels ✓ fewer fake marks  
 > again, every wave (loop over MATCH)  
 
@@ -257,9 +277,9 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 | ID | Shown | Source · key | Calculation | Check |
 |---|---|---|---|---|
-| F-08 | a wave every 2 min / EVERY 2 MINUTES / dispatch wave 2 min | `src/last_mile_dispatch/config.py:23` · WAVE_MIN = 2 | - | ✓ |
+| F-08 | riders sent out every 2 min / EVERY 2 MINUTES / dispatch wave 2 min | `src/last_mile_dispatch/config.py:23` · WAVE_MIN = 2 | - | ✓ |
 | F-12 | ORDERS → BAG → MATCH → DOOR CHECK → A/B TEST → VERDICT | `src/last_mile_dispatch/` · functions | - | ✓ |
-| F-13 | 4 WEEKS | `outputs/summary.json` · experiment_days = 28 | 28 / 7 = 4 | ✓ |
+| F-13 | 4 WEEKS / over 4 weeks / 4 weeks | `outputs/summary.json` · experiment_days = 28 | 28 / 7 = 4 | ✓ |
 | F-14 | cheaper orders / fewer cancels / fewer fake marks | `outputs/ab_readout.csv` · welch_hi for cost_per_delivered, cancel_rate, fake_accepted_per_1k | welch_hi < 0 for all three | ✓ |
 
 **Assumptions:** A-05, A-06, A-08, A-09
@@ -279,11 +299,12 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 > 04 · THE KEY IDEA  
 > One trip, three doors  
+> Bagging = one rider carries up to three nearby orders. Fewer trips for the same orders is better.  
 > The oldest waiting order starts a bag — so no customer is left at the back of the queue  
 > Close drops, ordered around the same time, join it — up to three stops on one trip  
 > Only if the first customer barely waits longer — the bag must not break their promise  
 > ONE ORDER PER TRIP · 3 RIDERS → BAGGED · 1 RIDER (HUB, A, B, C). One rider, three doors. Two riders stay free.  
-> Ablation, all hubs: bagging alone cuts cost per delivered order from 9.71 to 8.95 AED.  
+> Bagging switched on alone, all hubs: cost per delivered order falls from 9.71 to 8.95 AED.  
 
 **Figures on this slide**
 
@@ -312,13 +333,14 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 > 05 · ARCHITECTURE  
 > A two-minute dispatch loop, scored by a hub-level A/B test.  
-> Legend: data · simulator · dispatch · door check · evaluation · per wave (solid) · batch (dashed) · fallback (dotted)  
+> Each box is a file in the repo. Top: the loop that runs every 2 minutes in each hub. Bottom: the scoring, run once after.  
+> Legend (on the lane borders): data · simulator · dispatch · door check · evaluation; per wave (solid) · batch (dashed) · fallback (dotted)  
 > DISPATCH LOOP · EVERY 2 MIN · PER HUB-DAY — generate_data.py · seed 7: hubs.csv 26 hubs, riders.csv 473 riders, days.csv 42 days, orders.csv.gz 477,868 orders  
 > runner.py run_all(): 4 parallel workers, 5 policies, 1 seed → orders, riders →  
 > simulate.py · simulate_hub_day(): bagging.py Bag orders (≤ 3 stops · 1 km) → bags → matching? → on → assignment.py Min-cost match (Hungarian · SciPy); off → fifo() FIFO · baseline → rider + bag → geo.py Play each trip (traffic · rain · GPS) → not home → geofence.py Door check (150 m geofence · enforce | log) → trip done: rider free, next wave  
-> metrics → hub_day_metrics.csv 3,640 rows · BUDGETS & FACTS: dispatch wave 2 min, delivery promise 30 min, cancel if not out 45 min, hub-day runs 4,004, full run, laptop 180 s, CI slice 8 hubs × 7 d  
+> metrics → hub_day_metrics.csv 3,640 rows · BUDGETS & FACTS: dispatch wave 2 min, delivery promise 30 min, cancel if not out 45 min, hub-day runs 4,004, full run, laptop 180 s, CI slice 8 hubs × 7 d (cancel row reads 'cancel after 45 min')  
 > EVALUATION · BATCH: experiment.py Pair hubs (pre-period size, coin flip / pair) → arm → experiment.py A/B readout (13 vs 13 hubs, Welch + bootstrap) → ab_readout.csv; geofence.py Geofence eval (precision, recall, radius sweep) ← 11,566 marks → geofence_eval.csv; report.py Ablation (5 policies, by day type) → ablation.csv; experiment.py CI check (500 re-draws, coverage, A/A) → rerandomisation.csv; → power.csv; GROUND TRUTH: true effect known: every policy runs on every hub-day  
-> CRITICAL PATH · orders → bag → match → trip → metrics → A/B readout  
+> MAIN PATH · orders → bag → match → trip → metrics → A/B readout  
 
 **Figures on this slide**
 
@@ -328,7 +350,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-04 | 473 riders | `data/riders.csv` · row count | - | ✓ |
 | F-05 | 477,868 orders | `data/orders.csv.gz` · row count | - | ✓ |
 | F-06 | 6 weeks / 42 days | `data/days.csv` · row count = 42 | 42 / 7 = 6 weeks | ✓ |
-| F-08 | a wave every 2 min / EVERY 2 MINUTES / dispatch wave 2 min | `src/last_mile_dispatch/config.py:23` · WAVE_MIN = 2 | - | ✓ |
+| F-08 | riders sent out every 2 min / EVERY 2 MINUTES / dispatch wave 2 min | `src/last_mile_dispatch/config.py:23` · WAVE_MIN = 2 | - | ✓ |
 | F-15 | 3 steps / ≤ 3 stops · 1 km | `src/last_mile_dispatch/bagging.py:3-5, :51-87; config.py:37, :65-67` · BAG_CAPACITY = 3, BAG_MAX_DROP_GAP_KM = 1.0, BAG_MAX_CREATED_GAP_MIN = 12.0, BAG_MAX_EXTRA_MIN = 9.0 | - | ✓ |
 | F-18 | generate_data.py, runner.py run_all(), simulate.py simulate_hub_day(), bagging.py, assignment.py (min_cost, fifo), geo.py, geofence.py, experiment.py, report.py | `src/last_mile_dispatch/, scripts/` · defs | - | ✓ |
 | F-19 | power.csv, ab_readout.csv, geofence_eval.csv, ablation.csv, rerandomisation.csv, hub_day_metrics.csv | `outputs/` · files | - | ✓ |
@@ -336,9 +358,9 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-21 | 11,566 marks | `outputs/geofence_eval.csv` · slice=all, events | - | ✓ |
 | F-22 | hub-day runs 4,004 | `outputs/run_log.txt line 2` · 'simulated 4,004 hub-day-policy runs' | 26 x 14 + 26 x 28 x 5 = 4,004 | ✓ |
 | F-23 | full run, laptop 180 s | `outputs/summary.json` · runtime_s = 179.8 | rounded to whole seconds | ✓ |
-| F-24 | cancel if not out 45 min | `src/last_mile_dispatch/config.py:28` · CANCEL_AFTER_MIN = 45 | - | ✓ |
+| F-24 | cancel after 45 min | `src/last_mile_dispatch/config.py:28` · CANCEL_AFTER_MIN = 45 | - | ✓ |
 | F-25 | 150 m geofence | `src/last_mile_dispatch/config.py:79` · GEOFENCE_RADIUS_M = 150.0 | - | ✓ |
-| F-26 | 500 re-draws | `outputs/rerandomisation.csv` · draws | - | ✓ |
+| F-26 | 500 re-draws / Test re-run 500 times | `outputs/rerandomisation.csv` · draws | - | ✓ |
 | F-27 | 13 vs 13 hubs | `outputs/summary.json` · arms.treatment, arms.control | len of each list | ✓ |
 | F-28 | 4 parallel workers · 5 policies, 1 seed | `src/last_mile_dispatch/cli.py:29; runner.py:36-41; config.py:62` · --workers default 4; same seed for every policy; ALL_POLICIES | - | ✓ |
 | F-29 | CI slice 8 hubs × 7 d | `src/last_mile_dispatch/cli.py:38, :40; .github/workflows/ci.yml` · hubs.head(8), experiment days head(7) | - | ✓ |
@@ -351,7 +373,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 - Packets moving along the wires are decoration in execution order (the dispatch loop turns twice).
 - 'per wave' (solid) vs 'batch' (dashed) marks what runs inside each 2-minute wave and what runs after all hub-days.
 - The '?' diamond is the decision point Policy.matching (config.py); the dotted path is the FIFO fallback used by the baseline.
-- The critical-path highlight is the chain that produces the headline A/B numbers.
+- The main-path highlight is the chain that produces the headline A/B numbers; other boxes dim to 75% opacity, which keeps their text above 4.5:1.
 
 **To change this slide:** Node boxes (#n-*), cylinders (CYL) and the W wires object in compositions/s03-architecture.html. (project folder `docs/demo/source`).
 
@@ -366,8 +388,10 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 > 06 · THE SYSTEM RUNNING  
 > Four weeks, 26 hubs, same orders, two dispatchers.  
-> Share of orders cancelled, per day, all hubs · FIFO, one order per trip vs bag + match + geofence · RAMADAN band · RAIN DAY · 42.5% → 14.0%  
-> CANCELLED · 4 WEEKS: FIFO 37,530 · bag+match+geofence 11,063 · −70.5%  
+> Share of each day's orders that were cancelled, all 26 hubs. Lower is better.  
+> today: one order per trip vs bag + match + door check · RAMADAN band · RAIN DAY · 42.5% → 14.0%  
+> Orders cancelled in 4 weeks: one order per trip 37,530 · bag + match + check 11,063 · −70.5%  
+> (phase B) Fleet cost per delivered order in AED, by type of day. Lower is better: grey = today, green = new dispatch.  
 > WHERE THE SAVING COMES FROM · COST PER DELIVERED ORDER, AED: Ordinary weekday (125,715 orders) 9.71 → 9.36 −3.7% · Weekend or Ramadan (184,449 orders) 9.65 → 8.30 −14.0% · Rain day (16,817 orders) 10.42 → 6.84 −34.4%  
 
 **Figures on this slide**
@@ -400,6 +424,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 > 07 · END-USER VALUE  
 > What the hub lead gets  
+> One row per rider leaving now. DUE = the bag's earliest 30-minute deadline; a green tick means every door is on time.  
 > RIDER BOARD · HUB 18 · SAT 2026-02-14 · 21:46 WAVE — columns RIDER, ORDERS, KM, WAITED, LEAVES, FIRST, LAST, DUE, BACK  
 > Rider 01 2 5.1 13 min 21:46 21:50 21:55 22:03 22:02 ✓  
 > Rider 02 1 1.9 8 min 21:46 21:48 21:48 22:08 21:52 ✓  
@@ -407,7 +432,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 > Rider 04 1 10.8 14 min 21:46 21:59 21:59 22:02 22:15 ✓  
 > Rider 05 2 5.4 15 min 21:46 21:50 21:54 22:01 22:03 ✓  
 > + 3 bags held for the next wave · 5 free riders, 8 bags waiting  
-> ✓ Hub 18 today: 795 of 821 delivered, 7 cancelled · FIFO would cancel 59  
+> ✓ Hub 18 today: 795 of 821 delivered, 7 cancelled · old way: 59 cancelled  
 > HUB · RIDER BAY · THIS WAVE'S DROPS · held  
 > Who rides, with which orders, and when each door gets them. All 9 inside the 30-minute promise.  
 
@@ -418,7 +443,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-03 | 26 hubs | `outputs/summary.json; data/hubs.csv` · hubs; row count | - | ✓ |
 | F-07 | 30 minutes to each door / 30-minute promise | `src/last_mile_dispatch/config.py:27` · SLA_MIN = 30 | - | ✓ |
 | F-39 | Rider 01-05 rows | `demo assets/rider_board.json (re-run of the repo's simulator), injected into compositions/value.html` · rows | km = sum of road legs; waited = wave time - oldest order's creation; due = earliest creation + 30 min | ✓ |
-| F-40 | 795 of 821 delivered, 7 cancelled · FIFO would cancel 59 | `outputs/hub_day_metrics.csv` · hub_id=18, date=2026-02-14, policy in {bagging+matching+geofence, baseline} | - | ✓ |
+| F-40 | 795 of 821 delivered, 7 cancelled · old way: 59 cancelled (old way = FIFO, one order per trip) | `outputs/hub_day_metrics.csv` · hub_id=18, date=2026-02-14, policy in {bagging+matching+geofence, baseline} | - | ✓ |
 | F-41 | + 3 bags held for the next wave · 5 free riders, 8 bags waiting | `demo assets/rider_board.json` · bags_held, free_riders, bags_waiting_before | held = bags waiting - riders matched | ✓ |
 | F-42 | All 9 inside the 30-minute promise. | `demo assets/rider_board.json` · orders_dispatched; stops[].on_time | every stop ETA - creation <= 30 min | ✓ |
 | F-43 | HUB 18 | `outputs/summary.json` · arms.treatment | - | ✓ |
@@ -442,16 +467,18 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 > 08 · RESULTS · HUB-LEVEL A/B, 4 WEEKS  
 > 13 treated hubs vs 13 control hubs: cheaper and faster.  
+> Treated hubs vs control hubs over 4 weeks. Cost, cancellations and fake marks: lower is better; on time: higher.  
 > COST −10.6% fleet cost per delivered order · AED 9.79 → 8.75  
 > PROMISE +28.3 points more orders inside 30 min · 58.0% → 86.2%  
 > CANCELLATIONS 3.7% cancellation rate, treated hubs · control 11.6%  
 > DOOR CHECK −72.4% fake "not home" marks accepted · 11.7 → 3.2 per 1,000  
-> 326,981 orders · Welch 95% CIs exclude zero on all four · true effect known from the simulator  
+> 326,981 orders · on all four, the 95% confidence range of the difference stays clear of zero (Welch t-test)  
 
 **Figures on this slide**
 
 | ID | Shown | Source · key | Calculation | Check |
 |---|---|---|---|---|
+| F-13 | 4 WEEKS / over 4 weeks / 4 weeks | `outputs/summary.json` · experiment_days = 28 | 28 / 7 = 4 | ✓ |
 | F-27 | 13 vs 13 hubs | `outputs/summary.json` · arms.treatment, arms.control | len of each list | ✓ |
 | F-44 | −10.6% | `outputs/ab_readout.csv` · metric=cost_per_delivered, rel_diff | x 100 | ✓ |
 | F-45 | AED 9.79 → 8.75 | `outputs/ab_readout.csv` · metric=cost_per_delivered, control, treatment | - | ✓ |
@@ -461,52 +488,69 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-49 | −72.4% | `outputs/ab_readout.csv` · metric=fake_accepted_per_1k, rel_diff | x 100 | ✓ |
 | F-50 | 11.7 → 3.2 per 1,000 | `outputs/ab_readout.csv` · metric=fake_accepted_per_1k, control, treatment | - | ✓ |
 | F-51 | 326,981 orders | `outputs/summary.json` · orders_in_experiment | - | ✓ |
-| F-52 | Welch 95% CIs exclude zero on all four | `outputs/ab_readout.csv` · welch_lo, welch_hi | lo > 0 or hi < 0 for cost, on-time, cancel, fake | ✓ |
+| F-52 | on all four, the 95% confidence range of the difference stays clear of zero (Welch t-test) | `outputs/ab_readout.csv` · welch_lo, welch_hi | lo > 0 or hi < 0 for cost, on-time, cancel, fake | ✓ |
 
 **Assumptions:** A-02, A-03, A-04, A-06, A-09, A-12
 
 **Illustrative, not data:**
 
 - Mini bars under each number are drawn to the same ratio (treatment / control).
+- All four cards are mint because all four moved the good way; the door-check card was coral before this revision.
 
 **To change this slide:** The stats array and card text in compositions/s05-results.html. (project folder `docs/demo/source`).
 
-### Slide 09: What didn't win  
-*74.0-80.6 s · composition `compositions/s06-twist.html`*
+### Slide 09: Lesson and fix  
+*74.0-83.0 s · composition `compositions/s06-twist.html`*
 
 ![Slide 09](slides/slide-09.jpg)
 
 **On-screen text (verbatim)**
 
-> 09 · WHAT DIDN'T WIN  
-> Riders got less busy, and the A/B test can't even see it.  
-> Rider utilisation (busy ÷ paid time), the one metric that moved the wrong way  
-> Control hubs (FIFO, one order per trip) 0.667 · Treated hubs (bag + match + geofence) 0.650  
-> Welch 95% CI of the difference · p = 0.16 · −0.040 to +0.007 (axis −0.05 … 0 … +0.05)  
-> To see a change this size: 27 hubs per arm. The test had 13.  
-> Why: bagging makes fewer trips on the same paid roster. Raising utilisation needs a smaller roster, which this test did not try.  
+> 09 · LESSON AND FIX  
+> 13 hubs can't see a small drop. So I report the hubs it would need.  
+> Utilisation = share of paid rider time spent delivering; higher is better. 13 treated vs 13 control hubs, 4 weeks.  
+> THE LESSON · Riders got less busy. The test can't tell. · Utilisation per arm, then the gap with its 95% range  
+> Control hubs (one order per trip) 0.667 · Treated hubs (bag + match + check) 0.650 · Gap (95% range, p = 0.16) −0.017 TRAP  
+> The range crosses zero, so it reads as "no change". The simulator's true drop, all 26 hubs: −0.026.  
+> THE FIX, IN THE REPO · Size the test before trusting it · Hubs needed per arm to catch the effect 4 times in 5. Dashed line = 13, what this test had.  
+> Cancellations 2 ENOUGH · Cost per order 5 ENOUGH · Utilisation 27 TOO FEW  
+> The run report prints this table next to the A/B results: utilisation needs 27, the test had 13.  
+> PAYOFF · Test re-run 500 times: the 95% range held the true effect 97–99% of the time · false alarms 2–7%  
+> NEXT · Let the roster shrink with the new dispatch: the fewest riders that still keep orders on time.  
 
 **Figures on this slide**
 
 | ID | Shown | Source · key | Calculation | Check |
 |---|---|---|---|---|
+| F-13 | 4 WEEKS / over 4 weeks / 4 weeks | `outputs/summary.json` · experiment_days = 28 | 28 / 7 = 4 | ✓ |
+| F-26 | 500 re-draws / Test re-run 500 times | `outputs/rerandomisation.csv` · draws | - | ✓ |
 | F-27 | 13 vs 13 hubs | `outputs/summary.json` · arms.treatment, arms.control | len of each list | ✓ |
 | F-53 | 0.667 / 0.650 | `outputs/ab_readout.csv` · metric=utilization, control, treatment | - | ✓ |
-| F-54 | −0.040 to +0.007 | `outputs/ab_readout.csv` · metric=utilization, welch_lo, welch_hi | - | ✓ |
-| F-55 | p = 0.16 | `outputs/ab_readout.csv` · metric=utilization, welch_p | - | ✓ |
-| F-56 | 27 hubs per arm | `outputs/power.csv` · metric=utilization, hubs_per_arm_needed | - | ✓ |
-| F-57 | axis −0.05..+0.05 = 1,000 px; bar 95 → 571 px, estimate at 333 px | `compositions/s06-twist.html; outputs/ab_readout.csv` · welch_lo, welch_hi, diff | px = (v + 0.05) x 10,000 | ✓ |
+| F-54 | gap strip from -0.040 to +0.007, crossing zero | `outputs/ab_readout.csv` · metric=utilization, welch_lo, welch_hi | - | ✓ |
+| F-55 | 95% range, p = 0.16 | `outputs/ab_readout.csv` · metric=utilization, welch_p | - | ✓ |
+| F-56 | 27 · TOO FEW / utilisation needs 27, the test had 13 | `outputs/power.csv` · metric=utilization, hubs_per_arm_needed | - | ✓ |
+| F-57 | track -0.05..+0.05 = 260 px; range 25 -> 148 px (left 25, width 123), estimate dot centred at 87 px (left 75), zero at 130 px | `compositions/s06-twist.html; outputs/ab_readout.csv` · welch_lo, welch_hi, diff | px = (v + 0.05) x 2,600 | ✓ |
+| F-62 | -0.017 | `outputs/ab_readout.csv` · metric=utilization, diff | - | ✓ |
+| F-63 | The simulator's true drop, all 26 hubs: -0.026 | `outputs/ab_readout.csv` · metric=utilization, true_effect_all_hubs | - | ✓ |
+| F-64 | Cancellations 2 · Cost per order 5 · ENOUGH | `outputs/power.csv` · metric in {cancel_rate, cost_per_delivered}, hubs_per_arm_needed | ENOUGH = needed <= 13 | ✓ |
+| F-65 | to catch the effect 4 times in 5 | `src/last_mile_dispatch/experiment.py:77, :85` · power: float = 0.8 | - | ✓ |
+| F-66 | 97-99% of the time · false alarms 2-7% | `outputs/rerandomisation.csv` · welch_coverage, aa_false_positive_welch | min and max over metrics, x 100, rounded | ✓ |
+| F-67 | THE FIX, IN THE REPO · Size the test before trusting it · The run report prints this table next to the A/B results | `src/last_mile_dispatch/experiment.py:77-90, :127; cli.py:78-98; tests/test_experiment.py:47, :53, :66; outputs/run_report.md` · functions, tests, report sections | - | ✓ |
+| F-68 | Dashed line = 13, what this test had | `outputs/summary.json` · len(arms.treatment) | - | ✓ |
+| F-69 | NEXT · Let the roster shrink with the new dispatch: the fewest riders that still keep orders on time. | `README 'Insights and learning' (last paragraph) and 'Known limitations' (the biggest gap: the roster is fixed)` · README text | - | ✓ |
 
 **Assumptions:** A-02, A-09, A-12
 
 **Illustrative, not data:**
 
-- Utilisation bars: 1,000 px track = 1.0 (from zero).
+- Left panel: utilisation bars 1.0 = 260 px from zero; the gap strip spans -0.05..+0.05 over the same 260 px with zero marked.
+- Right panel: hubs-per-arm bars 30 hubs = 260 px; the two panels show different units, so they do not share one scale.
+- Bars are neutral grey; coral marks only the TRAP (a range that crosses zero read as 'no change'), mint marks the fix.
 
-**To change this slide:** Rows #twist-r1..r2 and the CI strip (#twist-ci) in compositions/s06-twist.html. (project folder `docs/demo/source`).
+**To change this slide:** Panels #twist-left / #twist-right, the payoff and next strips in compositions/s06-twist.html; numbers from outputs/ab_readout.csv, power.csv, rerandomisation.csv. (project folder `docs/demo/source`).
 
 ### Slide 10: End card  
-*80.2-84.6 s · composition `compositions/s07-end.html`*
+*82.6-87.0 s · composition `compositions/s07-end.html`*
 
 ![Slide 10](slides/slide-10.jpg)
 
@@ -517,6 +561,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 > github.com/kavya2693/last-mile-dispatch  
 > SciPy · pandas · NumPy · Python  
 > $ make run   # 26 hubs, 4 weeks, ~3 min  
+> One command rebuilds every table the numbers in this video come from.  
 
 **Figures on this slide**
 
@@ -541,17 +586,17 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | Input / assumption | Affected figures | Affected slides | Files to edit | Commands to re-run |
 |---|---|---|---|---|
 | A-01: All data is synthetic, produced by a seeded generator sized to the production problem (26 hubs, 473 riders, 42 days, 477,868 orders) | all figures | 01, 02, 03, 04, 05, 06, 07, 08, 09, 10 | `scripts/generate_data.py; src/last_mile_dispatch/config.py` | `make data; make run` |
-| A-02: The rider roster is fixed and sized for an ordinary weekday evening; every policy pays for the same riders | F-04, F-33, F-34, F-35, F-36, F-37, F-44, F-45, F-53, F-54, F-55, F-56 | 02, 05, 06, 08, 09 | `scripts/generate_data.py:84-85` | `make data; make run` |
+| A-02: The rider roster is fixed and sized for an ordinary weekday evening; every policy pays for the same riders | F-04, F-33, F-34, F-35, F-36, F-37, F-44, F-45, F-53, F-54, F-55, F-56, F-62, F-63, F-69 | 02, 05, 06, 08, 09 | `scripts/generate_data.py:84-85` | `make data; make run` |
 | A-03: Travel is straight-line distance x 1 | F-32, F-33, F-34, F-35, F-36, F-37, F-39, F-44, F-45, F-46, F-47 | 06, 07, 08 | `src/last_mile_dispatch/config.py:13, :36; src/last_mile_dispatch/geo.py:29-41` | `make run; export_rider_board.py + inject_sheet.py` |
 | A-04: Matching prices each rider-bag pair in AED: km cost of the vehicle, 1 | F-14, F-33, F-34, F-39, F-44, F-45, F-46, F-47, F-48 | 03, 06, 07, 08 | `src/last_mile_dispatch/config.py:74-76` | `make run; export_rider_board.py + inject_sheet.py` |
 | A-05: Bagging limits: drops within 1 km and created within 12 minutes of the seed order, at most 3 stops, and the first customer may wait at most 9 extra minutes | F-15, F-16, F-17, F-39, F-41 | 04, 05, 07 | `src/last_mile_dispatch/config.py:37, :65-67` | `make run; export_rider_board.py + inject_sheet.py` |
 | A-06: Geofence rule: a 'customer unavailable' mark is flagged when fewer than 2 of the rider's last 6 GPS pings are within 150 m of the customer; flagged riders are sent back to the door (treatment) or the flag is only logged (baseline) | F-21, F-25, F-49, F-50 | 05, 08 | `src/last_mile_dispatch/config.py:79-80` | `make run` |
 | A-07: Fake marks: about 8% of riders (36 of 473 in the data) mark 'customer unavailable' without reaching the door on 22% of their stops; fakes are known by construction and riders do not change habit when flagged | F-10, F-21, F-49, F-50 | 02, 05, 08 | `src/last_mile_dispatch/config.py:40-41` | `make data; make run` |
 | A-08: Service promise 30 minutes from order creation; a customer cancels if nothing has left the hub after 45 minutes; the dispatcher wakes every 2 minutes; 2 minutes handover per stop | F-07, F-08, F-24, F-32, F-33, F-34, F-42, F-46, F-47, F-48 | 02, 03, 05, 06, 07, 08 | `src/last_mile_dispatch/config.py:23-29` | `make run; export_rider_board.py + inject_sheet.py` |
-| A-09: Experiment design: hubs sorted by pre-period orders per day, paired, one coin flip per pair (seed 2026); one number per hub over four weeks; Welch t and hub-bootstrap 95% intervals; power from the pre-period between-hub spread | F-27, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-52, F-53, F-54, F-55, F-56, F-57 | 05, 08, 09 | `src/last_mile_dispatch/cli.py:22; src/last_mile_dispatch/experiment.py` | `make run` |
-| A-10: Calendar: two pre-period weeks from 2026-01-19, then four experiment weeks 2026-02-02 to 2026-03-01; weekends are Saturday-Sunday; Ramadan from 2026-02-18; one rain day 2026-02-07 (35% more orders, 40% slower traffic) | F-06, F-09, F-13, F-31, F-32, F-35, F-36, F-37, F-38, F-40 | 02, 03, 05, 06, 07 | `src/last_mile_dispatch/config.py:16-18; scripts/generate_data.py:35-36` | `make data; make run` |
+| A-09: Experiment design: hubs sorted by pre-period orders per day, paired, one coin flip per pair (seed 2026); one number per hub over four weeks; Welch t and hub-bootstrap 95% intervals; power from the pre-period between-hub spread | F-27, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-52, F-53, F-54, F-55, F-56, F-57, F-62, F-63, F-64, F-65, F-66, F-67, F-68 | 05, 08, 09 | `src/last_mile_dispatch/cli.py:22; src/last_mile_dispatch/experiment.py` | `make run` |
+| A-10: Calendar: two pre-period weeks from 2026-01-19, then four experiment weeks 2026-02-02 to 2026-03-01; weekends are Saturday-Sunday; Ramadan from 2026-02-18; one rain day 2026-02-07 (35% more orders, 40% slower traffic) | F-06, F-09, F-13, F-31, F-32, F-35, F-36, F-37, F-38, F-40 | 02, 03, 05, 06, 07, 08, 09 | `src/last_mile_dispatch/config.py:16-18; scripts/generate_data.py:35-36` | `make data; make run` |
 | A-11: The rider board (slide 07) re-runs the repo's own simulator for hub 18 on 2026-02-14 under the treatment and records the 21:46 wave; drop ETAs replay the simulator's clock with geo | F-39, F-40, F-41, F-42 | 07 | `docs/demo/source/tools/export_rider_board.py (hub, date, wave arguments)` | `export_rider_board.py + inject_sheet.py; hyperframes render` |
-| A-12: Video rounding: percentages to 1 decimal, AED to 2 decimals, utilisation and CI bounds to 3 decimals, counts with thousands separators; '~3 min' and '180 s' are rounded run times | F-16, F-17, F-23, F-32, F-34, F-35, F-36, F-37, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-53, F-54, F-55, F-59 | 04, 05, 06, 08, 09, 10 | `the composition file named on each slide` | `hyperframes render` |
+| A-12: Video rounding: percentages to 1 decimal, AED to 2 decimals, utilisation and CI bounds to 3 decimals, counts with thousands separators; '~3 min' and '180 s' are rounded run times | F-16, F-17, F-23, F-32, F-34, F-35, F-36, F-37, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-53, F-54, F-55, F-59, F-62, F-63, F-66 | 04, 05, 06, 08, 09, 10 | `the composition file named on each slide` | `hyperframes render` |
 | A-13: Slide 01 (industries, everyday problems) is general delivery-operations knowledge used as context | F-01, F-02 | 01 | `compositions/s01-context.html` | `hyperframes render` |
 
 ## 6. Known differences and caveats
@@ -563,6 +608,9 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 - '36 riders sometimes skip doors' is a generator setting (8% of riders, 22% of their stops), not an observed behaviour (A-07).
 - Slide 01 statements are general industry knowledge (A-13).
 - Rider names on slide 07 are placeholders.
+- Slide 09 shows the one disappointing result the repo can do something about in code (an underpowered metric), and the fix it implements (pre-period power, hubs-per-arm table, re-randomisation check). The fix does not raise utilisation itself; that needs a smaller roster, shown as NEXT and listed in README 'Known limitations'.
+- Other non-wins the slide drops are still reported in the README 'What didn't win' row and 'The result': the 3.7% weekday saving (also on slide 06), matching alone adding about half what bagging does, and the geofence missing 31.9% of kerb marks while flagging 5.3% of honest riders in towers.
+- The payoff range (97-99% coverage, 2-7% false alarms) spans the seven A/B metrics in outputs/rerandomisation.csv; utilisation itself had 97.6% coverage and only 62% power at 13 hubs per arm.
 
 ## Appendix: environment
 
