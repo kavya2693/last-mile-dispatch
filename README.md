@@ -8,9 +8,9 @@ Quick-commerce dispatch for 26 dark-store hubs in a Gulf city: order bagging, ri
 a geofence on "customer unavailable" marks made away from the door, and a hub-level A/B test that says what it
 can and cannot detect.
 
-[![85-second silent walkthrough: the problem, how bagging, matching and the door check work, the architecture, the cost split by day type, the rider board and the A/B results](docs/demo/demo.gif)](docs/demo/demo.mp4)
+[![85-second silent walkthrough: the problem, how bagging, matching and the door check work, the architecture, the cost split by day type, the rider board and the A/B results](docs/demo/demo.gif)](https://kavya2693.github.io/work-demos/last-mile-dispatch.mp4)
 
-*~85-second silent walkthrough. Click for the full video ([MP4, 5.5 MB](docs/demo/demo.mp4)).*
+*~85-second silent walkthrough. [Play the full video](https://kavya2693.github.io/work-demos/last-mile-dispatch.mp4) · [download the MP4, 5.5 MB](docs/demo/demo.mp4).*
 
 📄 **Audit report:** every figure and assumption in the video, traced to its source — [PDF](docs/demo/AUDIT_REPORT.pdf) · [Word](docs/demo/AUDIT_REPORT.docx) · [Markdown](docs/demo/AUDIT_REPORT.md)
 
