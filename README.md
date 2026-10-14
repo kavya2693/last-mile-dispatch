@@ -8,6 +8,181 @@ Quick-commerce dispatch for 26 dark-store hubs in a Gulf city: order bagging, ri
 a geofence on "customer unavailable" marks made away from the door, and a hub-level A/B test that says what it
 can and cannot detect.
 
+[![85-second silent walkthrough: the problem, how bagging, matching and the door check work, the architecture, the cost split by day type, the rider board and the A/B results](docs/demo/demo.gif)](docs/demo/demo.mp4)
+
+*~85-second silent walkthrough. Click for the full video ([MP4, 5.5 MB](docs/demo/demo.mp4)).*
+
+📄 **Audit report:** every figure and assumption in the video, traced to its source — [PDF](docs/demo/AUDIT_REPORT.pdf) · [Word](docs/demo/AUDIT_REPORT.docx) · [Markdown](docs/demo/AUDIT_REPORT.md)
+
+## At a glance
+
+| | |
+|---|---|
+| **Problem** | 26 quick-commerce hubs promise delivery in 30 minutes. Riders are dispatched by hand, one order per trip; on weekends, before iftar and on the rain day orders queue, customers cancel after 45 minutes, and a few riders mark "customer unavailable" from the road. |
+| **Approach** | Every two minutes, bag nearby orders (up to three stops), match bags to riders with a min-cost Hungarian assignment, and geofence remote "unavailable" marks with a two-parameter GPS rule. Roll it out as an A/B test randomised by hub (13 vs 13, paired on pre-period volume), and run every policy on every hub-day so the confidence intervals can be checked against the true effect. |
+| **Result** | Fleet cost per delivered order **9.79 to 8.75 AED (-10.6%)**, cancellations **11.6% to 3.7%**, orders delivered within 30 minutes **58.0% to 86.2%**, fake marks accepted **-72%**. Welch intervals covered the true effect 97 to 99% of the time over 500 re-randomisations. |
+| **What didn't win** | Rider utilisation went *down* (0.667 to 0.650) and the A/B cannot detect it (p = 0.16; 27 hubs per arm needed). On an ordinary weekday the cost saving is only 3.7%; most of it comes from stressed days. Matching on its own adds about half what bagging does. The geofence misses 31.9% of riders who mark from the kerb and flags 5.3% of honest riders in towers. |
+
+## Architecture
+
+![Architecture walkthrough: generated hub, rider and order tables, the two-minute dispatch wave with bagging, matching and the geofence, and the experiment that scores it](docs/demo/architecture.gif)
+
+```mermaid
+flowchart LR
+    subgraph SRC["Sources"]
+        GEN["Seeded generator, seed 7<br/>scripts/generate_data.py"]
+        HUBS[("hubs.csv<br/>26 hubs")]
+        RID[("riders.csv<br/>473 riders")]
+        DAYS[("days.csv<br/>42 days: pre + experiment")]
+        ORD[("orders.csv.gz<br/>477,868 orders")]
+    end
+
+    subgraph FEAT["Data and features"]
+        LOAD["Loader<br/>runner.load"]
+        FAN["Hub fan-out, 4 processes<br/>runner.run_all"]
+        DRAW["Per-order random draws, same for every policy<br/>simulate.Draws"]
+    end
+
+    subgraph MOD["Models"]
+        TRAV["Travel time: km x 1.35, speed by hour, rain<br/>geo.py"]
+        GPS["GPS trail: noise, dropout, tower multipath<br/>simulate._ping_distances"]
+    end
+
+    subgraph DEC["Decision and optimiser"]
+        WAVE["2-minute dispatch wave<br/>simulate.simulate_hub_day"]
+        BAG["Bagging, max 3 stops<br/>bagging.make_bags"]
+        FIFO["FIFO baseline<br/>assignment.fifo"]
+        MC["Min-cost Hungarian<br/>assignment.min_cost"]
+        GF["Geofence: 2 of 6 pings within 150 m<br/>geofence.flag_attempts"]
+    end
+
+    subgraph EVAL["Evaluation"]
+        ABL["Ablation + day-type split<br/>report.pooled_by_policy · report.stress_split"]
+        AB["Paired hub A/B, Welch + bootstrap<br/>experiment.readout"]
+        POW["Power from pre-period<br/>experiment.mde · experiment.hubs_needed"]
+        RR["Re-randomise 500 times<br/>experiment.rerandomisation_check"]
+        GEV["Geofence slices + radius sweep<br/>geofence.evaluate · geofence.radius_sweep"]
+    end
+
+    subgraph OUT["Outputs"]
+        HDM[("hub_day_metrics.csv<br/>hub x day x policy")]
+        REPORT[("outputs/<br/>run_report.md · *.csv")]
+        CLI["One command<br/>cli.main"]
+    end
+
+    GEN --> HUBS & RID & DAYS & ORD
+    HUBS & RID & DAYS & ORD --> LOAD
+    LOAD -->|"one job per hub"| FAN
+    FAN -->|"hub-day x 5 policies"| WAVE
+    ORD -->|"building, pick time"| DRAW
+    DRAW -->|"same customers, noise, temptations"| WAVE
+    WAVE -->|"picked orders"| BAG
+    BAG -->|"bags + legs km"| FIFO
+    BAG -->|"bags + legs km"| MC
+    TRAV -->|"ETA, lateness"| MC
+    TRAV -->|"trip minutes"| WAVE
+    FIFO -->|"rider, bag pairs"| WAVE
+    MC -->|"rider, bag pairs"| WAVE
+    GPS -->|"last 6 ping distances"| GF
+    GF -->|"flag per mark"| WAVE
+    WAVE -->|"metrics per hub-day"| HDM
+    WAVE -->|"mark events"| GEV
+    HDM --> ABL & AB & RR
+    WAVE -->|"pre-period metrics, baseline"| POW
+    ABL & AB & POW & RR & GEV --> REPORT
+    CLI -.->|"orchestrates"| LOAD
+
+    MC -.->|"bags left over wait for the next wave"| WAVE
+    WAVE -.->|"rider free again when back at hub"| WAVE
+    GF -.->|"flagged: back to the door, +3 min"| WAVE
+    ORD -.->|"missing building type read as unknown"| DRAW
+
+    classDef data fill:#7fa8ff,stroke:#3d6fd9,color:#0b1020
+    classDef model fill:#b9a2ff,stroke:#7a5fd6,color:#0b1020
+    classDef decision fill:#3fd8a8,stroke:#1f9c76,color:#0b1020
+    classDef evaluation fill:#f2c46d,stroke:#b8902f,color:#0b1020
+    classDef risk fill:#ff8a73,stroke:#cc5640,color:#0b1020
+
+    class GEN,HUBS,RID,DAYS,ORD,LOAD,FAN,DRAW,HDM,REPORT,CLI data
+    class TRAV,GPS model
+    class WAVE,BAG,FIFO,MC decision
+    class GF risk
+    class ABL,AB,POW,RR,GEV evaluation
+```
+
+Solid edges are the data flow of one run; dotted edges are the loops inside a hub-day and the
+fallback paths. The red node is where fake "customer unavailable" marks are caught.
+
+### Components
+
+| Component | Responsibility | File |
+|---|---|---|
+| Data generator | 26 hubs along a coast, rosters sized for a weekday evening, 42 days with weekends, Ramadan, one rain day and two hub outages, orders with building type and GPS-relevant facts | [`scripts/generate_data.py`](scripts/generate_data.py) |
+| Operating constants | SLA, cancel clock, pay and km cost by vehicle, bagging limits, matching weights (with the reason the waiting credit beats the lateness price), geofence radius, the five policies | [`src/last_mile_dispatch/config.py`](src/last_mile_dispatch/config.py) |
+| Travel model | Haversine distance, road circuity 1.35, hour-of-day and rain traffic factors | [`src/last_mile_dispatch/geo.py`](src/last_mile_dispatch/geo.py) |
+| Bagger | Oldest order seeds a bag; close drops join if the seed customer waits at most 9 extra minutes; nearest-neighbour stop order | [`src/last_mile_dispatch/bagging.py`](src/last_mile_dispatch/bagging.py) |
+| Rider assignment | FIFO baseline and min-cost matching priced on km, lateness, waiting and a per-order credit, solved with `scipy.optimize.linear_sum_assignment` | [`src/last_mile_dispatch/assignment.py`](src/last_mile_dispatch/assignment.py) |
+| Dispatch simulator | The two-minute wave loop for one hub-day under one policy: cancellations, trips, failed attempts, remote marks, GPS trails, cost and metrics | [`src/last_mile_dispatch/simulate.py`](src/last_mile_dispatch/simulate.py) |
+| Geofence | The flag rule, and its evaluation by building type, mark distance and radius | [`src/last_mile_dispatch/geofence.py`](src/last_mile_dispatch/geofence.py) |
+| Runner | Loads the tables and runs every hub-day under every policy in parallel across hubs, with one seed per hub-day | [`src/last_mile_dispatch/runner.py`](src/last_mile_dispatch/runner.py) |
+| Experiment | Paired hub assignment, Welch and bootstrap intervals, MDE and hubs needed, re-randomisation check | [`src/last_mile_dispatch/experiment.py`](src/last_mile_dispatch/experiment.py) |
+| Reporting | Pools hub-days into ratios, per-hub outcomes for the A/B, the day-type split, markdown tables | [`src/last_mile_dispatch/report.py`](src/last_mile_dispatch/report.py) |
+| Orchestrator | `dispatch` and `dispatch --quick`: pre-period, all policies, readout, power, CI check, geofence, report | [`src/last_mile_dispatch/cli.py`](src/last_mile_dispatch/cli.py) |
+
+### Design decisions
+
+| Decision | Options considered | Chosen | Trade-off |
+|---|---|---|---|
+| Unit of randomisation | Orders; riders; time-sliced switchback within a hub; whole hubs | Whole hubs, paired on pre-period volume ([ADR-0001](docs/adr/0001-randomise-hubs-and-measure-every-policy-on-every-hub-day.md)) | No interference through the shared rider pool, but only 13 units per arm: utilisation and fake marks are underpowered and the readout says so |
+| How to know the intervals are right | Trust textbook intervals; check them against a known effect | Run every policy on every hub-day with the same per-order draws, then re-randomise the assignment 500 times | Coverage and A/A false-positive rates are measured, not assumed; the check exists only because this is a simulator, and the ablation is labelled as simulator output |
+| Interval method at 13 hubs per arm | Welch t; hub-resampling percentile bootstrap | Report both, lean on Welch | Welch is conservative here (pairing reduces variance it does not know about); the bootstrap's A/A rate reached 9% on on-time share |
+| Bagging | Vehicle-routing solver (OR-Tools); greedy age-seeded bagger | Greedy, max 3 stops, 1 km and 12 minutes apart, seed customer delayed at most 9 minutes | Explainable to hub staff and fast enough every two minutes; a solver would do better only on larger bags |
+| Rider assignment | FIFO; min-cost matching per wave | Hungarian min-cost per wave | Exact for each wave and cheap, but myopic: it never holds a bag for a rider about to return |
+| Matching weights | Lateness priced above waiting time; waiting credit above lateness price | Waiting 1.4 AED/min, lateness 1.0 AED/min, 9 AED credit per order | The first version starved late orders until they cancelled; only on-time share of *all* orders exposed it |
+| Fake-mark detection | Learned classifier; a two-parameter rule | Fewer than 2 of the last 6 pings within 150 m flags the mark | A lead can explain a flag to a rider and tune the radius; it misses 31.9% of kerb marks and flags 5.3% of honest riders in towers |
+
+### Data contracts
+
+| Stage | Input | Output |
+|---|---|---|
+| Generator | seed 7, constants in `config.py` | `hubs.csv`: `hub_id` (int), `lat, lon, base_daily_orders, highrise_share` (float); `riders.csv`: `rider_id, hub_id` (int), `vehicle` (bike/car), `shift` (early/late), `remote_marker` (bool); `days.csv`: `date` (str), `dow` (int), `weekend, ramadan, rain` (bool), `period` (pre/experiment); `orders.csv.gz`: `order_id, hub_id, items` (int), `date` (str), `created_min, pick_min` (float, minutes after midnight), `cust_lat, cust_lon` (float), `building` (highrise/lowrise/villa/empty), `customer_unavailable` (bool) |
+| Bagger | pending order indices, `created_min`, drop `(x, y)` km from the hub | `list[list[int]]` of orders per bag; each becomes a `BagPlan`: `orders` in stop order, `legs_km` hub to stops and back |
+| Assignment | free riders, their vehicles, `BagPlan`s, `created_min`, wave time, rain | `list[(rider, bag index)]`; at most one bag per rider |
+| Geofence | `(marks, 6)` array of ping distances in metres, NaN for a dropped ping | `bool` flag per mark |
+| Simulator | `HubDay` (hub, date, rain, orders, roster), `Policy`, seed | one metrics row (`orders, delivered, cancelled, failed_genuine, fake_accepted, fake_flagged, false_flags, fleet_cost, km, busy_min, shift_min, riders, on_time, lead_mean, lead_p90, cost_per_delivered, utilization`) and mark events (`order_id, hub_id, date, building, is_fake, true_mark_dist_m, flagged, d0..d5`) |
+| Experiment | per-hub outcomes over the window, arm per hub | `ab_readout.csv`: `metric, control, treatment, diff, rel_diff, welch_lo, welch_hi, welch_p, boot_lo, boot_hi, direction, true_effect_all_hubs`; `power.csv`; `rerandomisation.csv` |
+
+### Failure modes and fallbacks
+
+| Failure | What the code does |
+|---|---|
+| Riders run short (weekend, iftar, rain) | Undispatched orders wait for the next wave. An order cancels 45 minutes after creation if nothing has left the hub; the hub stops dispatching 45 minutes after its midnight close and cancels what is left. Trips past the shift end are paid as overtime. |
+| More bags than free riders | Min-cost matching sends the cheapest set, which the waiting credit tilts towards the oldest orders; the rest wait. FIFO sends the oldest bags. |
+| A GPS ping is dropped (5% of pings) | The ping counts as outside the radius. If every ping is missing the mark is flagged: an attempt that cannot be located is not accepted without a call to the customer. |
+| Address parser gives no building type (1.2% of orders) | Treated as `unknown`, with its own GPS noise and multipath rate, and reported as a separate geofence slice. |
+| Geofence flags a mark | Under enforcement a flagged fake sends the rider back to the door (+3 minutes) and the order is delivered; a flagged honest rider loses 3 minutes re-verifying and the attempt stays failed. With the geofence off, flags are logged only. |
+| Hub outage (two hub-days) | No orders arrive after 15:00; the hub-day still runs and the roster is still paid. |
+| A hub-day delivers nothing | Per-hub-day `cost_per_delivered` and lead times are NaN; pooled ratios are computed from summed counts, so they stay defined. |
+| Metric too noisy for 13 hubs per arm | The readout reports the interval and the pre-period hubs-per-arm needed rather than a win. |
+| Model degrades, solver or LLM times out | Not applicable: there is no trained model, iterative solver, LLM or network call. The Hungarian solve is exact and has no time limit to hit. Riders adapting to the geofence is not modelled (listed in the limitations). |
+
+### Path to production
+
+This is a mapping of each local piece to what would replace it in a deployed system, not a
+description of one that exists.
+
+| Here | Production equivalent |
+|---|---|
+| Seeded generator writing CSVs to `data/` | Order, picking and rider-app events streamed (Kafka or Pub/Sub) into a warehouse (BigQuery, Snowflake or Redshift), partitioned by hub and date |
+| Straight-line km x 1.35 at an hour-dependent speed | Road-network travel times (OSRM or Valhalla self-hosted, or a routing API) with live traffic |
+| Two-minute wave inside a simulator | A stateless dispatch service per city (container on Kubernetes or Cloud Run) called every wave, with hub queues and rider state in Redis |
+| `scipy` Hungarian matching | Unchanged: a wave has tens of riders and bags, well inside a sub-second budget |
+| Geofence on simulated GPS trails | The same rule on the rider app's GPS stream, the flag returned to the app before the mark is accepted, and a dispute queue for riders |
+| Hub assignment and readout in `make run` | Hub-level assignment held in an experiment platform; the readout as a scheduled job (Airflow or Step Functions) with the pre-registered power table |
+| `outputs/run_report.md` | Hub-lead and operations dashboards (Looker or Superset) |
+| Monitoring (not built) | Per hub and hour: cancellation rate, on-time share of all orders, queue depth, orders per trip, utilisation; geofence flag and dispute rates by building type; A/A checks and a sample-ratio check on the experiment |
+| Retuning (not built) | No model to retrain; the geofence radius and matching weights would be re-tuned from dispute outcomes and the on-time share, behind the same hub-level experiment |
+
 ## The problem
 
 A quick-commerce operator promises groceries in 30 minutes from 26 small hubs spread along a
