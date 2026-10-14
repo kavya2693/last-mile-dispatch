@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #results-root { position: absolute; inset: 0; }
+        #results-root .eyebrow { color: var(--c-eval); }
+        #results-root .cards { position: absolute; left: 120px; top: 290px; width: 1680px; display: flex; gap: 30px; }
+        #results-root .card {
+          position: relative; flex: 1 1 0; height: 500px; border-radius: 16px; border: 2px solid var(--line);
+          background: var(--panel); padding: 44px 34px 36px; display: flex; flex-direction: column; overflow: hidden;
+        }
+        #results-root .card .bar { position: absolute; left: 0; top: 0; width: 100%; height: 6px; }
+        #results-root .card .layer { font-family: var(--mono); font-size: 20px; letter-spacing: 0.12em; text-transform: uppercase; }
+        #results-root .card .big {
+          margin-top: 18px; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 92px;
+          font-weight: 700; letter-spacing: -0.05em; line-height: 1; white-space: nowrap;
+        }
+        #results-root .card .lab { margin-top: 22px; font-size: 32px; font-weight: 700; line-height: 1.2; color: var(--ink); }
+        #results-root .mini { position: relative; margin-top: 26px; width: 100%; height: 12px; border-radius: 6px; background: rgba(178, 191, 204, 0.16); }
+        #results-root .mini-fill { position: absolute; left: 0; top: 0; width: 100%; height: 12px; border-radius: 6px; transform-origin: left center; }
+        #results-root .card .foot {
+          margin-top: auto; padding-top: 18px; border-top: 2px solid var(--line);
+          font-family: var(--mono); font-size: 22px; color: var(--ink-soft); white-space: nowrap;
+        }
+        #results-root .opt .bar, #results-root .opt .mini-fill { background: var(--c-opt); }
+        #results-root .opt .big, #results-root .opt .layer { color: var(--c-opt); }
+        #results-root .risk .bar, #results-root .risk .mini-fill { background: var(--c-risk); }
+        #results-root .risk .big, #results-root .risk .layer { color: var(--c-risk); }
+        #results-root .card .big small { font-size: 52px; letter-spacing: -0.02em; }
+        #results-root .footnote { position: absolute; left: 120px; top: 840px; font-family: var(--mono); font-size: 24px; color: var(--ink-mute); }
+      </style>
+      <div id="results-root" data-composition-id="results" data-width="1920" data-height="1080">
+        <div class="scene" id="results-in">
+          <div class="eyebrow" data-layout-allow-overlap id="results-eyebrow">08 · Results · hub-level A/B, 4 weeks</div>
+          <div class="scene-title" data-layout-allow-overlap id="results-title">13 treated hubs vs 13 control hubs: cheaper and faster.</div>
+          <div class="cards">
+            <div class="card opt" id="results-c1"><div class="bar"></div><div class="layer">cost</div>
+              <div class="big"><span id="results-v1">0.0</span>%</div><div class="lab">fleet cost per delivered order</div>
+              <div class="mini"><div class="mini-fill" id="results-m1"></div></div><div class="foot">AED 9.79 → 8.75</div></div>
+            <div class="card opt" id="results-c2"><div class="bar"></div><div class="layer">promise</div>
+              <div class="big"><span id="results-v2">0.0</span></div><div class="lab">points more orders inside 30 min</div>
+              <div class="mini"><div class="mini-fill" id="results-m2"></div></div><div class="foot">58.0% → 86.2%</div></div>
+            <div class="card opt" id="results-c3"><div class="bar"></div><div class="layer">cancellations</div>
+              <div class="big"><span id="results-v3">0.0</span>%</div><div class="lab">cancellation rate, treated hubs</div>
+              <div class="mini"><div class="mini-fill" id="results-m3"></div></div><div class="foot">control 11.6%</div></div>
+            <div class="card risk" id="results-c4"><div class="bar"></div><div class="layer">door check</div>
+              <div class="big"><span id="results-v4">0.0</span>%</div><div class="lab">fake "not home" marks accepted</div>
+              <div class="mini"><div class="mini-fill" id="results-m4"></div></div><div class="foot">11.7 → 3.2 per 1,000</div></div>
+          </div>
+          <div class="footnote" id="results-foot">326,981 orders · Welch 95% CIs exclude zero on all four · true effect known from the simulator</div>
+        </div>
+      </div>
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+          const D = 8.8;
+          tl.fromTo("#results-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
+          tl.fromTo("#results-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+          tl.fromTo("#results-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          // A/B readout (outputs/ab_readout.csv): treated vs control hub means; bars = after / before
+          const stats = [
+            { v: "results-v1", m: "#results-m1", from: 0, to: -10.6, d: 1, r: 8.7496 / 9.791, sign: true },
+            { v: "results-v2", m: "#results-m2", from: 0, to: 28.3, d: 1, r: 0.5798 / 0.8624, sign: true, grow: true },
+            { v: "results-v3", m: "#results-m3", from: 11.6, to: 3.7, d: 1, r: 0.0375 / 0.1164 },
+            { v: "results-v4", m: "#results-m4", from: 0, to: -72.4, d: 1, r: 3.2365 / 11.7444, sign: true },
+          ];
+          stats.forEach((s, i) => {
+            const at = 0.7 + i * 0.16;
+            tl.fromTo("#results-c" + (i + 1), { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, at);
+            const o = { v: s.from };
+            const el = document.getElementById(s.v);
+            tl.to(o, { v: s.to, duration: 1.6, ease: "power3.out", onUpdate: () => {
+              const txt = o.v.toFixed(s.d).replace("-", "−");
+              el.textContent = s.sign && o.v > 0 ? "+" + txt : txt;
+            } }, at + 0.3);
+            if (s.grow) tl.fromTo(s.m, { scaleX: s.r }, { scaleX: 1, duration: 1.6, ease: "power3.out" }, at + 0.3);
+            else tl.fromTo(s.m, { scaleX: 1 }, { scaleX: s.r, duration: 1.6, ease: "power3.out" }, at + 0.3);
+          });
+          tl.fromTo("#results-foot", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 2.8);
+          tl.to("#results-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          window.__timelines["results"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

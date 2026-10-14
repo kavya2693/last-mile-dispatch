@@ -1,0 +1,277 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        /* WHITE "END-USER VALUE" SLIDE: the rider board the hub lead works from (left) + a small 2D scene of the
+           riders leaving and the doors ticking off (right). Data is inlined by tools/inject_sheet.py (SHEET block). */
+        #value-root {
+          position: absolute; inset: 0;
+          --w-bg: #ffffff; --w-ink: #111827; --w-soft: #4b5563; --w-mute: #6b7280; --w-line: #d1d5db; --w-faint: #f3f4f6;
+          --w-data: #d97706; --w-model: #6d3cf0; --w-tools: #1f8fa8; --w-risk: #dc2b4a; --w-opt: #0f9f6e;
+          color: var(--w-ink); font-family: Inter, "Helvetica Neue", sans-serif;
+        }
+        #value-root .page { position: absolute; inset: 0; background: var(--w-bg); }
+        #value-root .edge { position: absolute; top: 0; width: 10px; height: 1080px; background: var(--w-model); }
+        #value-root .kick {
+          position: absolute; left: 120px; top: 84px; font-family: "JetBrains Mono", monospace; font-size: 24px;
+          font-weight: 700; letter-spacing: 0.18em; color: var(--w-mute);
+        }
+        #value-root .ttl {
+          position: absolute; left: 120px; top: 124px; font-family: Montserrat, sans-serif; font-weight: 900;
+          font-size: 68px; letter-spacing: -0.02em; white-space: nowrap;
+        }
+        #value-root .ttl em { font-style: normal; color: var(--w-model); }
+        #value-root .uline { position: absolute; left: 124px; top: 222px; width: 120px; height: 10px; border-radius: 5px; background: var(--w-model); transform-origin: left center; }
+
+        /* rider board */
+        #value-root .sheet {
+          position: absolute; left: 120px; top: 280px; width: 1050px; height: 600px; border: 3px solid var(--w-line);
+          border-radius: 24px; background: #fff; box-shadow: 0 18px 40px rgba(17, 24, 39, 0.08); overflow: hidden;
+        }
+        #value-root .sheet-head {
+          height: 72px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px;
+          background: var(--w-ink); color: #fff; font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 700; letter-spacing: 0.08em;
+        }
+        #value-root .sheet-head span:last-child { color: #c4b5fd; }
+        #value-root .row {
+          position: relative; display: flex; align-items: center; height: 64px; padding: 0 26px;
+          font-family: "JetBrains Mono", monospace; font-size: 21px; color: var(--w-ink); border-bottom: 2px solid var(--w-faint);
+        }
+        #value-root .row.hdr { height: 54px; font-size: 18px; font-weight: 700; letter-spacing: 0.08em; color: var(--w-mute); background: #fafafa; }
+        #value-root .row .tint { position: absolute; inset: 0; opacity: 0; }
+        #value-root .c { position: relative; white-space: nowrap; }
+        #value-root .c1 { width: 140px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
+        #value-root .c1 i { display: block; width: 14px; height: 14px; border-radius: 4px; background: var(--w-line); }
+        #value-root .c2 { width: 96px; text-align: right; padding-right: 22px; }
+        #value-root .c3 { width: 80px; text-align: right; padding-right: 16px; }
+        #value-root .c4 { width: 104px; text-align: right; padding-right: 18px; color: var(--w-soft); }
+        #value-root .c5, #value-root .c6, #value-root .c7, #value-root .c8, #value-root .c9 { width: 92px; padding-left: 8px; }
+        #value-root .c5 { width: 100px; }
+        #value-root .c8 { color: var(--w-soft); }
+        #value-root .c10 { width: 46px; display: flex; justify-content: center; }
+        #value-root .c10 b { display: block; width: 28px; height: 28px; border-radius: 50%; background: var(--w-opt); position: relative; }
+        #value-root .c10 svg { position: absolute; left: 6px; top: 6px; width: 16px; height: 16px; }
+        #value-root .more { padding: 16px 30px 0; font-family: "JetBrains Mono", monospace; font-size: 20px; color: var(--w-mute); }
+        #value-root .totals {
+          position: absolute; left: 0; bottom: 0; width: 100%; height: 66px; display: flex; align-items: center; gap: 14px; padding: 0 30px;
+          background: #ecfdf5; border-top: 2px solid #a7f3d0; font-size: 23px; font-weight: 700; color: #065f46; white-space: nowrap;
+        }
+        #value-root .totals b { display: block; width: 28px; height: 28px; border-radius: 50%; background: var(--w-opt); position: relative; flex: 0 0 auto; }
+        #value-root .totals svg { position: absolute; left: 6px; top: 6px; width: 16px; height: 16px; }
+        #value-root .totals span { font-weight: 400; color: #047857; }
+
+        /* scene */
+        #value-root .scene-lab { position: absolute; font-family: "JetBrains Mono", monospace; font-size: 20px; font-weight: 700; letter-spacing: 0.14em; color: var(--w-mute); }
+        #value-root .dock { position: absolute; left: 1220px; top: 312px; width: 600px; height: 128px; border-radius: 20px; background: var(--w-faint); }
+        #value-root .map {
+          position: absolute; left: 1220px; top: 462px; width: 600px; height: 418px; border-radius: 24px; border: 3px solid var(--w-line);
+          background-color: #fbfbfc;
+          background-image: linear-gradient(#eef0f3 2px, transparent 2px), linear-gradient(90deg, #eef0f3 2px, transparent 2px);
+          background-size: 48px 48px; overflow: hidden;
+        }
+        #value-root .held { position: absolute; left: 1600px; top: 476px; display: flex; align-items: center; gap: 8px; font-family: "JetBrains Mono", monospace; font-size: 20px; color: var(--w-mute); }
+        #value-root .held i { display: block; width: 14px; height: 14px; border-radius: 50%; border: 3px solid #9ca3af; background: #fff; }
+        #value-root svg.layer { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
+        #value-root .caption {
+          position: absolute; left: 120px; top: 920px; width: 1700px; font-size: 30px; font-weight: 700; color: var(--w-ink);
+        }
+        #value-root .caption span { color: var(--w-model); }
+      </style>
+
+      <div id="value-root" data-composition-id="value" data-width="1920" data-height="1080">
+        <div class="page" id="va-page">
+          <div class="kick" id="va-kick">07 · END-USER VALUE</div>
+          <div class="ttl" id="va-ttl">What the <em>hub lead</em> gets</div>
+          <div class="uline" id="va-ul"></div>
+
+          <div class="sheet" id="va-sheet">
+            <div class="sheet-head"><span id="va-head-l">RIDER BOARD</span><span id="va-head-r"></span></div>
+            <div class="row hdr" id="va-hdr">
+              <div class="c c1">RIDER</div><div class="c c2">ORDERS</div><div class="c c3">KM</div><div class="c c4">WAITED</div>
+              <div class="c c5">LEAVES</div><div class="c c6">FIRST</div><div class="c c7">LAST</div><div class="c c8">DUE</div>
+              <div class="c c9">BACK</div><div class="c c10"></div>
+            </div>
+            <div id="va-rows"></div>
+            <div class="more" id="va-more"></div>
+            <div class="totals" id="va-totals"></div>
+          </div>
+
+          <div class="scene-lab" id="va-lab-dock" style="left: 1220px; top: 280px">HUB · RIDER BAY</div>
+          <div class="dock" id="va-dock"></div>
+          <div class="map" id="va-map"></div>
+          <div class="scene-lab" id="va-lab-map" style="left: 1244px; top: 476px">THIS WAVE'S DROPS</div>
+          <div class="held" id="va-held"><i></i>held</div>
+          <svg class="layer" id="va-svg" viewBox="0 0 1920 1080"></svg>
+
+          <div class="caption" id="va-caption">Who rides, with which orders, and when each door gets them. <span>All 9 inside the 30-minute promise.</span></div>
+        </div>
+        <div class="edge" id="va-edge"></div>
+      </div>
+
+      <script>
+        (() => {
+          /* SHEET:BEGIN */ const SHEET = {"hub":18,"date":"2026-02-14","weekday":"Saturday","rain":false,"wave":"21:46","free_riders":5,"bags_waiting_before":8,"bags_held":3,"orders_dispatched":9,"orders_held":3,"roster":28,"day":{"baseline":{"orders":821,"delivered":737,"cancelled":59,"on_time":353},"bagging+matching+geofence":{"orders":821,"delivered":795,"cancelled":7,"on_time":750}},"rows":[{"rider":"Rider 01","vehicle":"bike","orders":2,"km":5.1,"leaves":"21:46","waited_min":12.6,"first_eta":"21:50","last_eta":"21:55","due":"22:03","back":"22:02","stops":[{"order_id":293615,"x":-0.119,"y":-1.475,"eta":"21:50","due":"22:06","on_time":true},{"order_id":293609,"x":0.519,"y":-1.566,"eta":"21:55","due":"22:03","on_time":true}]},{"rider":"Rider 02","vehicle":"bike","orders":1,"km":1.9,"leaves":"21:46","waited_min":7.6,"first_eta":"21:48","last_eta":"21:48","due":"22:08","back":"21:52","stops":[{"order_id":293620,"x":0.287,"y":0.647,"eta":"21:48","due":"22:08","on_time":true}]},{"rider":"Rider 03","vehicle":"bike","orders":3,"km":2.8,"leaves":"21:46","waited_min":9.9,"first_eta":"21:46","last_eta":"21:53","due":"22:06","back":"21:59","stops":[{"order_id":293622,"x":-0.2,"y":0.048,"eta":"21:46","due":"22:11","on_time":true},{"order_id":293617,"x":-0.476,"y":0.213,"eta":"21:49","due":"22:07","on_time":true},{"order_id":293614,"x":-0.771,"y":0.681,"eta":"21:53","due":"22:06","on_time":true}]},{"rider":"Rider 04","vehicle":"bike","orders":1,"km":10.8,"leaves":"21:46","waited_min":13.7,"first_eta":"21:59","last_eta":"21:59","due":"22:02","back":"22:15","stops":[{"order_id":293607,"x":-3.878,"y":-0.981,"eta":"21:59","due":"22:02","on_time":true}]},{"rider":"Rider 05","vehicle":"bike","orders":2,"km":5.4,"leaves":"21:46","waited_min":14.9,"first_eta":"21:50","last_eta":"21:54","due":"22:01","back":"22:03","stops":[{"order_id":293616,"x":-1.127,"y":0.471,"eta":"21:50","due":"22:07","on_time":true},{"order_id":293604,"x":-1.745,"y":0.968,"eta":"21:54","due":"22:01","on_time":true}]}],"waiting_drops":[{"x":3.036,"y":1.946},{"x":0.741,"y":3.376},{"x":-2.215,"y":-1.149}],"max_drop_km":4.0}; /* SHEET:END */
+
+          const CONFIG = {
+            duration: 13.0,
+            colors: ["#6d3cf0", "#d97706", "#1f8fa8", "#2563eb", "#be185d"], // one per rider row
+            map: { left: 1220, top: 462, w: 600, h: 418, pad: 34 },
+            bayY: 384,
+            bayX: [1420, 1500, 1580, 1660, 1740],
+            person: { x: 1290, y: 384 },
+          };
+          const NS = "http://www.w3.org/2000/svg";
+          const svg = document.getElementById("va-svg");
+          const el = (tag, attrs, parent) => {
+            const n = document.createElementNS(NS, tag);
+            Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+            (parent || svg).appendChild(n);
+            return n;
+          };
+          const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+          const fmt = (v) => Math.round(v).toLocaleString("en-US");
+          const tl = gsap.timeline({ paused: true });
+          const D = CONFIG.duration;
+          const rows = SHEET.rows || [];
+
+          // ---------------- rider board ----------------
+          const DOW = { Saturday: "SAT", Sunday: "SUN", Monday: "MON", Tuesday: "TUE", Wednesday: "WED", Thursday: "THU", Friday: "FRI" };
+          document.getElementById("va-head-r").textContent = "HUB " + SHEET.hub + " · " + (DOW[SHEET.weekday] || "") + " " + SHEET.date + " · " + SHEET.wave + " WAVE";
+          const rowsEl = document.getElementById("va-rows");
+          rows.forEach((r, i) => {
+            const col = CONFIG.colors[i];
+            const ok = r.stops.every((s) => s.on_time);
+            rowsEl.insertAdjacentHTML("beforeend",
+              '<div class="row" id="va-r' + i + '"><div class="tint" id="va-t' + i + '" style="background:' + col + '1f"></div>' +
+              '<div class="c c1"><i style="background:' + col + '"></i>' + r.rider + "</div>" +
+              '<div class="c c2">' + r.orders + '</div><div class="c c3">' + r.km.toFixed(1) + '</div><div class="c c4">' + Math.round(r.waited_min) + " min</div>" +
+              '<div class="c c5">' + r.leaves + '</div><div class="c c6">' + r.first_eta + '</div><div class="c c7">' + r.last_eta + "</div>" +
+              '<div class="c c8">' + r.due + '</div><div class="c c9">' + r.back + "</div>" +
+              '<div class="c c10">' + (ok ? '<b id="va-ok' + i + '">' + CHECK + "</b>" : "") + "</div></div>");
+          });
+          document.getElementById("va-more").textContent =
+            "+ " + SHEET.bags_held + " bags held for the next wave · " + SHEET.free_riders + " free riders, " + SHEET.bags_waiting_before + " bags waiting";
+          const dayT = (SHEET.day || {})["bagging+matching+geofence"] || {}, dayB = (SHEET.day || {}).baseline || {};
+          document.getElementById("va-totals").innerHTML =
+            "<b>" + CHECK + "</b>Hub " + SHEET.hub + " today: " + fmt(dayT.delivered) + " of " + fmt(dayT.orders) + " delivered, " +
+            dayT.cancelled + " cancelled <span>· FIFO would cancel " + dayB.cancelled + "</span>";
+
+          // ---------------- scene: hub lead, rider bay, map ----------------
+          const P = CONFIG.person;
+          const person = el("g", { id: "va-person" });
+          el("circle", { cx: P.x, cy: P.y - 34, r: 16, fill: "#111827" }, person);
+          el("path", { d: "M" + (P.x - 26) + " " + (P.y + 40) + "v-26a26 22 0 0 1 52 0v26z", fill: "#6d3cf0" }, person);
+          const tab = el("g", { id: "va-tab" }, person);
+          el("rect", { x: P.x + 16, y: P.y - 12, width: 34, height: 26, rx: 4, fill: "#fff", stroke: "#111827", "stroke-width": 2.5 }, tab);
+          [0, 1, 2].forEach((k) => el("line", { x1: P.x + 21, x2: P.x + 45, y1: P.y - 5 + k * 7, y2: P.y - 5 + k * 7, stroke: "#9ca3af", "stroke-width": 2 }, tab));
+
+          const scooter = (g, col) => {
+            el("rect", { x: -20, y: -16, width: 18, height: 16, rx: 3, fill: col }, g); // delivery box
+            el("path", { d: "M-18 4h26l6-8h6", fill: "none", stroke: "#111827", "stroke-width": 4, "stroke-linecap": "round", "stroke-linejoin": "round" }, g);
+            el("circle", { cx: -14, cy: 9, r: 6, fill: "#111827" }, g);
+            el("circle", { cx: 16, cy: 9, r: 6, fill: "#111827" }, g);
+            el("circle", { cx: 2, cy: -10, r: 6, fill: col }, g); // rider helmet
+          };
+
+          const MB = CONFIG.map;
+          const all = rows.flatMap((r) => r.stops).concat(SHEET.waiting_drops || []);
+          // fit the bounding box of hub + drops to the panel (true geometry, uniform scale)
+          const xsK = all.map((q) => q.x).concat([0]), ysK = all.map((q) => q.y).concat([0]);
+          const bx0 = Math.min(...xsK), bx1 = Math.max(...xsK), by0 = Math.min(...ysK), by1 = Math.max(...ysK);
+          const px = Math.min((MB.w - 2 * MB.pad) / (bx1 - bx0 || 1), (MB.h - 2 * MB.pad - 40) / (by1 - by0 || 1));
+          const ox = MB.left + MB.w / 2 - ((bx0 + bx1) / 2) * px, oy = MB.top + 40 + (MB.h - 40) / 2 + ((by0 + by1) / 2) * px;
+          const toS = (x, y) => [ox + x * px, oy - y * px];
+          const M = { cx: ox, cy: oy };
+          // held drops (next wave)
+          (SHEET.waiting_drops || []).forEach((q, k) => {
+            const [sx, sy] = toS(q.x, q.y);
+            el("circle", { id: "va-w" + k, cx: sx, cy: sy, r: 8, fill: "#fff", stroke: "#9ca3af", "stroke-width": 3 });
+          });
+          // hub marker
+          const hub = el("g", { id: "va-hub" });
+          el("rect", { x: M.cx - 24, y: M.cy - 24, width: 48, height: 48, rx: 10, fill: "#111827" }, hub);
+          const ht = el("text", { x: M.cx, y: M.cy + 7, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 18, "font-weight": 700, fill: "#fff" }, hub);
+          ht.textContent = "H" + SHEET.hub;
+
+          // trip paths: hub -> stops in bag order (riders return to the hub off-screen)
+          const trips = rows.map((r, i) => {
+            const pts = [[M.cx, M.cy], ...r.stops.map((s) => toS(s.x, s.y))];
+            const L = pts.slice(1).reduce((s, p, k) => s + Math.hypot(p[0] - pts[k][0], p[1] - pts[k][1]), 0);
+            return { r, i, pts, L, col: CONFIG.colors[i] };
+          });
+          const LMAX = Math.max(...trips.map((t) => t.L), 1);
+          const LOAD0 = 2.3, DRIVE0 = 4.4, DRIVE_MAX = 4.0;
+          trips.forEach((T) => {
+            const { i, pts, L, col } = T;
+            const d = "M" + pts.map((p) => p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" L");
+            const path = el("path", { d, fill: "none", stroke: col, "stroke-width": 4, "stroke-linecap": "round", "stroke-linejoin": "round",
+              "stroke-dasharray": L + " " + L, "stroke-dashoffset": L, opacity: 0.85 });
+            const stops = pts.slice(1).map((p) => {
+              const g = el("g", {});
+              el("circle", { cx: p[0], cy: p[1], r: 8, fill: "#fff", stroke: col, "stroke-width": 3 }, g);
+              const ok = el("g", { opacity: 0 }, g);
+              el("circle", { cx: p[0], cy: p[1], r: 11, fill: "#0f9f6e" }, ok);
+              el("path", { d: "M" + (p[0] - 5) + " " + (p[1] + 0.5) + "l3.4 3.4 6.6-7", fill: "none", stroke: "#fff", "stroke-width": 2.8, "stroke-linecap": "round", "stroke-linejoin": "round" }, ok);
+              return { g, ok };
+            });
+            const bx = CONFIG.bayX[i], by = CONFIG.bayY;
+            const sc = el("g", { id: "va-sc" + i });
+            scooter(sc, col);
+            const box = el("rect", { x: -7, y: -7, width: 14, height: 14, rx: 3, fill: col, opacity: 0 });
+
+            tl.fromTo(sc, { x: bx, y: by + 30, opacity: 0 }, { x: bx, y: by, opacity: 1, duration: 0.5, ease: "power3.out" }, 1.2 + i * 0.1);
+            stops.forEach((s, k) => tl.fromTo(s.g, { opacity: 0 }, { opacity: 1, duration: 0.3 }, 1.8 + i * 0.1 + k * 0.04));
+            // hand-off: the hub lead assigns the bag (board row lights up)
+            const lt = LOAD0 + i * 0.4;
+            tl.to("#va-t" + i, { opacity: 1, duration: 0.25 }, lt);
+            tl.fromTo(box, { attr: { opacity: 0 } }, { attr: { opacity: 1 }, duration: 0.05 }, lt);
+            tl.fromTo(box, { x: P.x + 33, y: P.y }, { x: bx - 11, y: by - 8, duration: 0.45, ease: "power2.inOut" }, lt);
+            tl.to(box, { attr: { opacity: 0 }, duration: 0.1 }, lt + 0.45);
+            tl.to("#va-t" + i, { opacity: 0.5, duration: 0.4 }, lt + 0.8);
+            // drive: bay -> hub on the map -> stops in board order, speed proportional to real distance
+            const start = DRIVE0 + i * 0.3, LEG = 0.5, DRIVE = Math.max(1.2, (DRIVE_MAX * L) / LMAX);
+            tl.to(sc, { x: M.cx, y: M.cy, scale: 0.8, duration: LEG, ease: "power2.inOut" }, start);
+            let t = start + LEG;
+            tl.to(path, { attr: { "stroke-dashoffset": 0 }, duration: DRIVE, ease: "none" }, t);
+            for (let k = 1; k < pts.length; k++) {
+              const seg = Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]);
+              const dur = (DRIVE * seg) / L;
+              tl.to(sc, { x: pts[k][0], y: pts[k][1], duration: dur, ease: "none" }, t);
+              t += dur;
+              tl.fromTo(stops[k - 1].ok, { attr: { opacity: 0 } }, { attr: { opacity: 1 }, duration: 0.15 }, t);
+            }
+            tl.to(sc, { opacity: 0, duration: 0.35 }, t + 0.15); // rider heads back to the hub
+            if (document.getElementById("va-ok" + i)) tl.fromTo("#va-ok" + i, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power3.out" }, t);
+          });
+          // stacking: route lines < hub marker < scooters
+          svg.appendChild(hub);
+          trips.forEach((T) => svg.appendChild(document.getElementById("va-sc" + T.i)));
+
+          // ---------------- choreography ----------------
+          tl.fromTo("#va-page", { clipPath: "inset(0px 100% 0px 0px)" }, { clipPath: "inset(0px 0% 0px 0px)", duration: 0.7, ease: "power3.inOut" }, 0);
+          tl.fromTo("#va-edge", { x: 0, opacity: 1 }, { x: 1920, duration: 0.7, ease: "power3.inOut" }, 0);
+          tl.to("#va-edge", { opacity: 0, duration: 0.1 }, 0.7);
+          tl.fromTo("#va-kick", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.5);
+          tl.fromTo("#va-ttl", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.55);
+          tl.fromTo("#va-ul", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power3.out" }, 0.9);
+          tl.fromTo("#va-sheet", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.8);
+          rows.forEach((_, i) => tl.fromTo("#va-r" + i, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 1.3 + i * 0.3));
+          tl.fromTo("#va-more", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 1.3 + rows.length * 0.3);
+          tl.fromTo("#va-totals", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 3.4);
+          tl.fromTo(["#va-dock", "#va-lab-dock", "#va-map", "#va-lab-map", "#va-held"], { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.9);
+          (SHEET.waiting_drops || []).forEach((_, k) => tl.fromTo("#va-w" + k, { opacity: 0 }, { opacity: 1, duration: 0.3 }, 2.0 + k * 0.05));
+          tl.fromTo("#va-person", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 1.1);
+          tl.fromTo("#va-tab", { rotation: 0 }, { rotation: -8, svgOrigin: P.x + 33 + " " + P.y, duration: 0.3, ease: "sine.inOut", yoyo: true, repeat: 7 }, 2.2);
+          tl.fromTo("#va-hub", { opacity: 0, scale: 0.8, svgOrigin: M.cx + " " + M.cy }, { opacity: 1, scale: 1, duration: 0.4, ease: "power3.out" }, 1.5);
+          tl.fromTo("#va-caption", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 9.4);
+          // wipe out (white -> dark), revealing the next dark scene underneath
+          tl.to("#va-page", { clipPath: "inset(0px 0px 0px 100%)", duration: 0.7, ease: "power3.inOut" }, D - 0.7);
+          tl.fromTo("#va-edge", { x: 0, opacity: 0 }, { x: 1920, opacity: 1, duration: 0.7, ease: "power3.inOut", immediateRender: false }, D - 0.7);
+          window.__timelines["value"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

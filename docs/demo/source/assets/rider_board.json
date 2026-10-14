@@ -1,0 +1,186 @@
+{
+ "hub": 18,
+ "date": "2026-02-14",
+ "weekday": "Saturday",
+ "rain": false,
+ "wave": "21:46",
+ "free_riders": 5,
+ "bags_waiting_before": 8,
+ "bags_held": 3,
+ "orders_dispatched": 9,
+ "orders_held": 3,
+ "roster": 28,
+ "day": {
+  "baseline": {
+   "orders": 821,
+   "delivered": 737,
+   "cancelled": 59,
+   "on_time": 353
+  },
+  "bagging+matching+geofence": {
+   "orders": 821,
+   "delivered": 795,
+   "cancelled": 7,
+   "on_time": 750
+  }
+ },
+ "rows": [
+  {
+   "rider": "Rider 01",
+   "vehicle": "bike",
+   "orders": 2,
+   "km": 5.1,
+   "leaves": "21:46",
+   "waited_min": 12.6,
+   "first_eta": "21:50",
+   "last_eta": "21:55",
+   "due": "22:03",
+   "back": "22:02",
+   "stops": [
+    {
+     "order_id": 293615,
+     "x": -0.119,
+     "y": -1.475,
+     "eta": "21:50",
+     "due": "22:06",
+     "on_time": true
+    },
+    {
+     "order_id": 293609,
+     "x": 0.519,
+     "y": -1.566,
+     "eta": "21:55",
+     "due": "22:03",
+     "on_time": true
+    }
+   ]
+  },
+  {
+   "rider": "Rider 02",
+   "vehicle": "bike",
+   "orders": 1,
+   "km": 1.9,
+   "leaves": "21:46",
+   "waited_min": 7.6,
+   "first_eta": "21:48",
+   "last_eta": "21:48",
+   "due": "22:08",
+   "back": "21:52",
+   "stops": [
+    {
+     "order_id": 293620,
+     "x": 0.287,
+     "y": 0.647,
+     "eta": "21:48",
+     "due": "22:08",
+     "on_time": true
+    }
+   ]
+  },
+  {
+   "rider": "Rider 03",
+   "vehicle": "bike",
+   "orders": 3,
+   "km": 2.8,
+   "leaves": "21:46",
+   "waited_min": 9.9,
+   "first_eta": "21:46",
+   "last_eta": "21:53",
+   "due": "22:06",
+   "back": "21:59",
+   "stops": [
+    {
+     "order_id": 293622,
+     "x": -0.2,
+     "y": 0.048,
+     "eta": "21:46",
+     "due": "22:11",
+     "on_time": true
+    },
+    {
+     "order_id": 293617,
+     "x": -0.476,
+     "y": 0.213,
+     "eta": "21:49",
+     "due": "22:07",
+     "on_time": true
+    },
+    {
+     "order_id": 293614,
+     "x": -0.771,
+     "y": 0.681,
+     "eta": "21:53",
+     "due": "22:06",
+     "on_time": true
+    }
+   ]
+  },
+  {
+   "rider": "Rider 04",
+   "vehicle": "bike",
+   "orders": 1,
+   "km": 10.8,
+   "leaves": "21:46",
+   "waited_min": 13.7,
+   "first_eta": "21:59",
+   "last_eta": "21:59",
+   "due": "22:02",
+   "back": "22:15",
+   "stops": [
+    {
+     "order_id": 293607,
+     "x": -3.878,
+     "y": -0.981,
+     "eta": "21:59",
+     "due": "22:02",
+     "on_time": true
+    }
+   ]
+  },
+  {
+   "rider": "Rider 05",
+   "vehicle": "bike",
+   "orders": 2,
+   "km": 5.4,
+   "leaves": "21:46",
+   "waited_min": 14.9,
+   "first_eta": "21:50",
+   "last_eta": "21:54",
+   "due": "22:01",
+   "back": "22:03",
+   "stops": [
+    {
+     "order_id": 293616,
+     "x": -1.127,
+     "y": 0.471,
+     "eta": "21:50",
+     "due": "22:07",
+     "on_time": true
+    },
+    {
+     "order_id": 293604,
+     "x": -1.745,
+     "y": 0.968,
+     "eta": "21:54",
+     "due": "22:01",
+     "on_time": true
+    }
+   ]
+  }
+ ],
+ "waiting_drops": [
+  {
+   "x": 3.036,
+   "y": 1.946
+  },
+  {
+   "x": 0.741,
+   "y": 3.376
+  },
+  {
+   "x": -2.215,
+   "y": -1.149
+  }
+ ],
+ "max_drop_km": 4.0
+}

@@ -1,0 +1,191 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #routes-root { position: absolute; inset: 0; }
+        #routes-root .sub { position: absolute; left: 120px; top: 196px; font-family: var(--mono); font-size: 22px; color: var(--ink-soft); }
+        #routes-root .legend {
+          position: absolute; right: 120px; top: 196px; display: flex; gap: 30px; font-family: var(--mono); font-size: 22px; color: var(--ink-soft);
+        }
+        #routes-root .legend span { display: flex; align-items: center; gap: 10px; }
+        #routes-root .legend i { display: block; width: 34px; height: 5px; border-radius: 3px; }
+        #routes-root svg.chart { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
+        #routes-root .counter {
+          position: absolute; left: 1520px; top: 300px; width: 280px; padding: 26px 26px; border-radius: 14px;
+          border: 2px solid rgba(63, 216, 168, 0.6); background: rgba(12, 22, 32, 0.92);
+        }
+        #routes-root .counter .h { font-family: var(--mono); font-size: 20px; letter-spacing: 0.1em; color: var(--ink-mute); }
+        #routes-root .counter .who { margin-top: 18px; font-family: var(--mono); font-size: 20px; color: var(--ink-soft); }
+        #routes-root .counter .v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 52px; font-weight: 700; letter-spacing: -0.03em; }
+        #routes-root .counter .v.base { color: var(--ink-soft); }
+        #routes-root .counter .v.treat { color: var(--c-opt); }
+        #routes-root .counter .badge {
+          display: inline-block; margin-top: 18px; font-family: var(--mono); font-size: 30px; font-weight: 700; color: #fff;
+          background: var(--c-opt-deep); padding: 4px 14px; border-radius: 8px;
+        }
+        #routes-root .rain {
+          position: absolute; font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--c-risk); white-space: nowrap;
+        }
+        #routes-root .rain span { color: var(--c-opt); }
+        #routes-root .stress {
+          position: absolute; left: 220px; top: 262px; width: 1480px; height: 520px; border-radius: 20px;
+          border: 2px solid rgba(63, 216, 168, 0.6); background: rgba(12, 22, 32, 0.97);
+          box-shadow: 0 30px 120px rgba(0, 0, 0, 0.6); padding: 40px 60px;
+        }
+        #routes-root .st-h { font-family: var(--mono); font-size: 24px; letter-spacing: 0.1em; color: var(--c-opt); }
+        #routes-root .st-row { position: relative; display: flex; align-items: center; height: 136px; margin-top: 8px; border-bottom: 2px solid var(--line); }
+        #routes-root .st-row:last-child { border-bottom: none; }
+        #routes-root .st-who { width: 330px; font-size: 32px; font-weight: 700; color: var(--ink); }
+        #routes-root .st-who small { display: block; margin-top: 4px; font-family: var(--mono); font-size: 20px; font-weight: 400; color: var(--ink-mute); }
+        #routes-root .st-bars { width: 820px; }
+        #routes-root .st-bar { position: relative; display: flex; align-items: center; gap: 16px; height: 40px; margin: 6px 0; }
+        #routes-root .st-fill { height: 30px; border-radius: 6px; transform-origin: left center; }
+        #routes-root .st-fill.b { background: var(--ink-mute); }
+        #routes-root .st-fill.t { background: var(--c-opt); }
+        #routes-root .st-val { font-family: var(--mono); font-size: 26px; font-weight: 700; color: var(--ink-soft); }
+        #routes-root .st-bar.t .st-val { color: var(--c-opt); }
+        #routes-root .st-chg {
+          margin-left: auto; font-family: var(--mono); font-size: 40px; font-weight: 700; color: #fff;
+          background: var(--c-opt-deep); padding: 4px 16px; border-radius: 10px;
+        }
+        #routes-root .st-chg.small { background: rgba(132, 148, 166, 0.35); }
+      </style>
+
+      <div id="routes-root" data-composition-id="routes" data-width="1920" data-height="1080">
+        <div class="scene" id="routes-in">
+          <div class="eyebrow" data-layout-allow-overlap id="routes-eyebrow">06 · The system running</div>
+          <div class="scene-title" data-layout-allow-overlap id="routes-title">Four weeks, 26 hubs, same orders, two dispatchers.</div>
+          <div class="sub" id="routes-sub">Share of orders cancelled, per day, all hubs</div>
+          <div class="legend" id="routes-legend">
+            <span><i style="background: var(--ink-mute)"></i>FIFO, one order per trip</span>
+            <span><i style="background: var(--c-opt)"></i>bag + match + geofence</span>
+          </div>
+          <div id="routes-chartwrap" data-layout-allow-occlusion>
+            <svg class="chart" id="routes-svg" viewBox="0 0 1920 1080"></svg>
+            <div class="rain" id="routes-rain">RAIN DAY · 42.5% → <span>14.0%</span></div>
+          </div>
+          <div class="counter" id="routes-counter" data-layout-allow-occlusion>
+            <div class="h">CANCELLED · 4 WEEKS</div>
+            <div class="who">FIFO</div>
+            <div class="v base" id="routes-c-base">0</div>
+            <div class="who">bag+match+geofence</div>
+            <div class="v treat" id="routes-c-treat">0</div>
+            <div class="badge" id="routes-c-badge">−70.5%</div>
+          </div>
+
+          <div class="stress" id="routes-stress">
+            <div class="st-h">WHERE THE SAVING COMES FROM · COST PER DELIVERED ORDER, AED</div>
+            <div id="routes-st-rows"></div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (() => {
+          /* SERIES:BEGIN */ const SERIES = {"daily":[{"date":"2026-02-02","dow":0,"weekend":false,"ramadan":false,"rain":false,"base":0.0175,"treat":0.0094},{"date":"2026-02-03","dow":1,"weekend":false,"ramadan":false,"rain":false,"base":0.0195,"treat":0.0083},{"date":"2026-02-04","dow":2,"weekend":false,"ramadan":false,"rain":false,"base":0.0213,"treat":0.0077},{"date":"2026-02-05","dow":3,"weekend":false,"ramadan":false,"rain":false,"base":0.0163,"treat":0.0075},{"date":"2026-02-06","dow":4,"weekend":false,"ramadan":false,"rain":false,"base":0.0145,"treat":0.0082},{"date":"2026-02-07","dow":5,"weekend":true,"ramadan":false,"rain":true,"base":0.4246,"treat":0.1399},{"date":"2026-02-08","dow":6,"weekend":true,"ramadan":false,"rain":false,"base":0.0412,"treat":0.0127},{"date":"2026-02-09","dow":0,"weekend":false,"ramadan":false,"rain":false,"base":0.0182,"treat":0.0075},{"date":"2026-02-10","dow":1,"weekend":false,"ramadan":false,"rain":false,"base":0.0114,"treat":0.0081},{"date":"2026-02-11","dow":2,"weekend":false,"ramadan":false,"rain":false,"base":0.0143,"treat":0.0075},{"date":"2026-02-12","dow":3,"weekend":false,"ramadan":false,"rain":false,"base":0.0122,"treat":0.0074},{"date":"2026-02-13","dow":4,"weekend":false,"ramadan":false,"rain":false,"base":0.0122,"treat":0.0086},{"date":"2026-02-14","dow":5,"weekend":true,"ramadan":false,"rain":false,"base":0.0517,"treat":0.015},{"date":"2026-02-15","dow":6,"weekend":true,"ramadan":false,"rain":false,"base":0.0524,"treat":0.0113},{"date":"2026-02-16","dow":0,"weekend":false,"ramadan":false,"rain":false,"base":0.013,"treat":0.0085},{"date":"2026-02-17","dow":1,"weekend":false,"ramadan":false,"rain":false,"base":0.0141,"treat":0.0072},{"date":"2026-02-18","dow":2,"weekend":false,"ramadan":true,"rain":false,"base":0.1648,"treat":0.0454},{"date":"2026-02-19","dow":3,"weekend":false,"ramadan":true,"rain":false,"base":0.1496,"treat":0.0442},{"date":"2026-02-20","dow":4,"weekend":false,"ramadan":true,"rain":false,"base":0.1605,"treat":0.0421},{"date":"2026-02-21","dow":5,"weekend":true,"ramadan":true,"rain":false,"base":0.2187,"treat":0.0589},{"date":"2026-02-22","dow":6,"weekend":true,"ramadan":true,"rain":false,"base":0.2265,"treat":0.0601},{"date":"2026-02-23","dow":0,"weekend":false,"ramadan":true,"rain":false,"base":0.1498,"treat":0.0443},{"date":"2026-02-24","dow":1,"weekend":false,"ramadan":true,"rain":false,"base":0.1628,"treat":0.0457},{"date":"2026-02-25","dow":2,"weekend":false,"ramadan":true,"rain":false,"base":0.1442,"treat":0.0384},{"date":"2026-02-26","dow":3,"weekend":false,"ramadan":true,"rain":false,"base":0.1491,"treat":0.037},{"date":"2026-02-27","dow":4,"weekend":false,"ramadan":true,"rain":false,"base":0.1565,"treat":0.0429},{"date":"2026-02-28","dow":5,"weekend":true,"ramadan":true,"rain":false,"base":0.2287,"treat":0.0591},{"date":"2026-03-01","dow":6,"weekend":true,"ramadan":true,"rain":false,"base":0.2265,"treat":0.062}],"stress":[{"day_type":"ordinary weekday","orders":125715,"cost_base":9.71,"cost_treat":9.36,"cost_chg_pct":-3.7,"cancel_base":0.0154,"cancel_treat":0.008},{"day_type":"weekend or Ramadan","orders":184449,"cost_base":9.65,"cost_treat":8.3,"cost_chg_pct":-14.0,"cancel_base":0.1543,"cancel_treat":0.0418},{"day_type":"rain day","orders":16817,"cost_base":10.42,"cost_treat":6.84,"cost_chg_pct":-34.4,"cancel_base":0.4246,"cancel_treat":0.1399}],"hubs":[{"hub":0,"x":-1.53,"y":7.25},{"hub":1,"x":-9.8,"y":-3.19},{"hub":2,"x":7.85,"y":8.58},{"hub":3,"x":-6.18,"y":-8.66},{"hub":4,"x":9.43,"y":17.86},{"hub":5,"x":-4.31,"y":-12.34},{"hub":6,"x":-12.7,"y":-14.91},{"hub":7,"x":2.93,"y":3.73},{"hub":8,"x":-10.55,"y":-8.33},{"hub":9,"x":-17.1,"y":-12.92},{"hub":10,"x":9.58,"y":11.57},{"hub":11,"x":10.18,"y":3.66},{"hub":12,"x":10.93,"y":9.96},{"hub":13,"x":-1.4,"y":-5.57},{"hub":14,"x":-8.96,"y":0.35},{"hub":15,"x":1.35,"y":5.52},{"hub":16,"x":-6.12,"y":-9.52},{"hub":17,"x":-9.72,"y":-7.81},{"hub":18,"x":7.71,"y":1.47},{"hub":19,"x":9.54,"y":12.87},{"hub":20,"x":10.37,"y":13.46},{"hub":21,"x":2.64,"y":4.63},{"hub":22,"x":-2.57,"y":-12.52},{"hub":23,"x":2.82,"y":-0.55},{"hub":24,"x":0.99,"y":-8.4},{"hub":25,"x":4.61,"y":3.84}],"totals":{"base":{"orders":326981,"cancelled":37530,"delivered":277885},"treat":{"orders":326981,"cancelled":11063,"delivered":307814}}}; /* SERIES:END */
+          const tl = gsap.timeline({ paused: true });
+          const D = 12.6;
+          const NS = "http://www.w3.org/2000/svg";
+          const svg = document.getElementById("routes-svg");
+          const el = (tag, at, parent) => {
+            const n = document.createElementNS(NS, tag);
+            Object.entries(at).forEach(([k, v]) => n.setAttribute(k, v));
+            (parent || svg).appendChild(n);
+            return n;
+          };
+          const fmt = (v) => Math.round(v).toLocaleString("en-US");
+          const days = SERIES.daily || [];
+          // plot area
+          const X0 = 220, X1 = 1450, Y0 = 800, Y1 = 290, VMAX = 0.45;
+          const xs = (i) => X0 + (i * (X1 - X0)) / Math.max(1, days.length - 1);
+          const ys = (v) => Y0 - (v / VMAX) * (Y0 - Y1);
+
+          const chart = el("g", { id: "routes-chart" });
+          // Ramadan band
+          const r0 = days.findIndex((d) => d.ramadan);
+          if (r0 >= 0) {
+            const band = el("g", { id: "routes-ramadan" }, chart);
+            el("rect", { x: xs(r0) - 20, y: Y1 - 10, width: xs(days.length - 1) - xs(r0) + 40, height: Y0 - Y1 + 10, rx: 10, fill: "rgba(185,162,255,0.08)" }, band);
+            const t = el("text", { x: xs(r0) + 4, y: Y1 + 22, "font-family": "JetBrains Mono, monospace", "font-size": 20, "font-weight": 700, fill: "#b9a2ff", "letter-spacing": "2" }, band);
+            t.textContent = "RAMADAN";
+          }
+          // grid + y labels
+          [0, 0.1, 0.2, 0.3, 0.4].forEach((v) => {
+            el("line", { x1: X0 - 10, x2: X1 + 10, y1: ys(v), y2: ys(v), stroke: "rgba(178,191,204,0.14)", "stroke-width": 2 }, chart);
+            const t = el("text", { x: X0 - 26, y: ys(v) + 7, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": 20, fill: "#8494a6" }, chart);
+            t.textContent = Math.round(v * 100) + "%";
+          });
+          // x labels: every Monday and the last day
+          const MON = ["Feb", "Mar"];
+          days.forEach((d, i) => {
+            if (i % 7 !== 0 && i !== days.length - 1) return;
+            const [, mm, dd] = d.date.split("-");
+            const t = el("text", { x: xs(i), y: Y0 + 38, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 20, fill: "#8494a6" }, chart);
+            t.textContent = MON[Number(mm) - 2] + " " + Number(dd);
+          });
+          // lines
+          const line = (key, col, w) => {
+            const pts = days.map((d, i) => [xs(i), ys(d[key])]);
+            const L = pts.slice(1).reduce((s, p, i) => s + Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1]), 0);
+            const p = el("path", { d: "M" + pts.map((q) => q[0].toFixed(1) + " " + q[1].toFixed(1)).join(" L"), fill: "none", stroke: col,
+              "stroke-width": w, "stroke-linejoin": "round", "stroke-linecap": "round", "stroke-dasharray": L + " " + L, "stroke-dashoffset": L }, chart);
+            const dots = pts.map((q) => el("circle", { cx: q[0], cy: q[1], r: 5, fill: col, opacity: 0 }, chart));
+            return { p, L, dots };
+          };
+          const lb = line("base", "#8494a6", 4);
+          const lt = line("treat", "#3fd8a8", 5);
+          const rainIdx = days.findIndex((d) => d.rain);
+          const rainEl = document.getElementById("routes-rain");
+          if (rainIdx >= 0) { rainEl.style.left = xs(rainIdx) + 22 + "px"; rainEl.style.top = ys(days[rainIdx].base) - 16 + "px"; }
+
+          tl.fromTo("#routes-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
+          tl.fromTo("#routes-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+          tl.fromTo("#routes-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          tl.fromTo(["#routes-sub", "#routes-legend"], { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.6);
+          tl.fromTo("#routes-chart", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.6);
+          const DRAW = 3.0, L0 = 0.9;
+          tl.to(lb.p, { attr: { "stroke-dashoffset": 0 }, duration: DRAW, ease: "none" }, L0);
+          tl.to(lt.p, { attr: { "stroke-dashoffset": 0 }, duration: DRAW, ease: "none" }, L0 + 0.25);
+          [lb, lt].forEach((l, k) => l.dots.forEach((c, i) =>
+            tl.fromTo(c, { attr: { opacity: 0 } }, { attr: { opacity: 1 }, duration: 0.1 }, L0 + k * 0.25 + (DRAW * i) / Math.max(1, days.length - 1))));
+          tl.fromTo("#routes-rain", { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, L0 + 0.25 + (DRAW * rainIdx) / (days.length - 1) + 0.2);
+          // counter
+          tl.fromTo("#routes-counter", { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 1.4);
+          const T = SERIES.totals || { base: { cancelled: 0 }, treat: { cancelled: 0 } };
+          const cb = { v: 0 }, ct = { v: 0 };
+          const cbe = document.getElementById("routes-c-base"), cte = document.getElementById("routes-c-treat");
+          tl.to(cb, { v: T.base.cancelled, duration: 1.4, ease: "power2.out", onUpdate: () => { cbe.textContent = fmt(cb.v); } }, 1.7);
+          tl.to(ct, { v: T.treat.cancelled, duration: 1.4, ease: "power2.out", onUpdate: () => { cte.textContent = fmt(ct.v); } }, 2.6);
+          tl.fromTo("#routes-c-badge", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 4.1);
+
+          // phase 2: the stress split (outputs/stress_split.csv)
+          const rows = document.getElementById("routes-st-rows");
+          const LABEL = { "ordinary weekday": "Ordinary weekday", "weekend or Ramadan": "Weekend or Ramadan", "rain day": "Rain day" };
+          const SCALE = 600 / 11; // px per AED
+          (SERIES.stress || []).forEach((r, i) => {
+            const chg = r.cost_chg_pct;
+            rows.insertAdjacentHTML("beforeend",
+              `<div class="st-row" id="routes-st${i}"><div class="st-who">${LABEL[r.day_type]}<small>${fmt(r.orders)} orders</small></div>` +
+              `<div class="st-bars"><div class="st-bar"><div class="st-fill b" id="routes-sb${i}" style="width:${(r.cost_base * SCALE).toFixed(0)}px"></div><div class="st-val">${r.cost_base.toFixed(2)}</div></div>` +
+              `<div class="st-bar t"><div class="st-fill t" id="routes-stt${i}" style="width:${(r.cost_treat * SCALE).toFixed(0)}px"></div><div class="st-val">${r.cost_treat.toFixed(2)}</div></div></div>` +
+              `<div class="st-chg${Math.abs(chg) < 5 ? " small" : ""}" id="routes-sc${i}">${chg.toFixed(1).replace("-", "−")}%</div></div>`);
+          });
+          const P2 = 6.4;
+          tl.to(["#routes-chartwrap", "#routes-counter", "#routes-sub", "#routes-legend"], { opacity: 0.12, duration: 0.5, ease: "power2.inOut" }, P2);
+          tl.fromTo("#routes-stress", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, P2 + 0.2);
+          (SERIES.stress || []).forEach((_, i) => {
+            const at = P2 + 0.7 + i * 0.5;
+            tl.fromTo("#routes-st" + i, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }, at);
+            tl.fromTo("#routes-sb" + i, { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power3.out" }, at + 0.1);
+            tl.fromTo("#routes-stt" + i, { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power3.out" }, at + 0.3);
+            tl.fromTo("#routes-sc" + i, { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power3.out" }, at + 0.8);
+          });
+          tl.to("#routes-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          window.__timelines["routes"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

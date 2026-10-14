@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #twist-root { position: absolute; inset: 0; }
+        #twist-root .eyebrow { color: var(--c-risk); }
+        #twist-root .sub { position: absolute; left: 120px; top: 200px; font-size: 32px; color: var(--ink-soft); }
+        #twist-root .bars { position: absolute; left: 120px; top: 290px; width: 1680px; }
+        #twist-root .row { display: flex; align-items: center; height: 112px; }
+        #twist-root .who { width: 470px; font-size: 36px; font-weight: 700; color: var(--ink); }
+        #twist-root .who small { display: block; font-family: var(--mono); font-size: 22px; font-weight: 400; color: var(--ink-mute); }
+        #twist-root .track { position: relative; width: 1000px; height: 44px; border-radius: 8px; background: rgba(178, 191, 204, 0.08); }
+        #twist-root .fill { position: absolute; left: 0; top: 0; height: 44px; border-radius: 8px; background: var(--ink-mute); transform-origin: left center; }
+        #twist-root .val { width: 210px; text-align: right; font-family: var(--mono); font-size: 44px; font-weight: 700; color: var(--ink-soft); }
+        #twist-root .rule .fill { background: var(--c-eval); }
+        #twist-root .rule .val { color: var(--c-eval); }
+        #twist-root .xgb .fill { background: var(--c-model); }
+        #twist-root .xgb .val { color: var(--c-model); }
+        #twist-root .lr .fill { background: rgba(185, 162, 255, 0.55); }
+        #twist-root .ci { position: absolute; left: 120px; top: 560px; width: 1680px; }
+        #twist-root .ci-lab { font-family: var(--mono); font-size: 24px; color: var(--ink-soft); }
+        #twist-root .ci-axis { position: relative; margin: 26px 0 0 470px; width: 1000px; height: 70px; border-top: 2px solid rgba(178, 191, 204, 0.3); }
+        #twist-root .ci-zero { position: absolute; left: 499px; top: -22px; width: 3px; height: 44px; background: var(--ink); }
+        #twist-root .ci-zl { position: absolute; left: 488px; top: 26px; font-family: var(--mono); font-size: 22px; color: var(--ink); }
+        #twist-root .ci-tl { position: absolute; top: 26px; font-family: var(--mono); font-size: 20px; color: var(--ink-mute); transform: translateX(-50%); }
+        #twist-root .ci-bar { position: absolute; left: 95px; top: -9px; width: 476px; height: 16px; border-radius: 8px; background: var(--c-risk); opacity: 0.85; transform-origin: 238px center; }
+        #twist-root .ci-dot { position: absolute; left: 321px; top: -13px; width: 24px; height: 24px; border-radius: 50%; background: var(--ink); border: 4px solid var(--c-risk); }
+        #twist-root .ci-v { position: absolute; left: 600px; top: -17px; font-family: var(--mono); font-size: 24px; font-weight: 700; color: var(--c-risk); }
+        #twist-root .ci-need { margin-top: 16px; font-size: 30px; color: var(--ink); }
+        #twist-root .ci-need b { color: var(--c-risk); }
+        #twist-root .verdict {
+          position: absolute; left: 120px; top: 800px; width: 1680px; padding: 22px 28px; border-radius: 12px;
+          border: 2px solid rgba(255, 138, 115, 0.45); background: rgba(255, 138, 115, 0.07);
+          font-size: 30px; line-height: 1.4; color: var(--ink);
+        }
+        #twist-root .verdict b { color: var(--c-risk); }
+      </style>
+      <div id="twist-root" data-composition-id="twist" data-width="1920" data-height="1080">
+        <div class="scene" id="twist-in">
+          <div class="eyebrow" data-layout-allow-overlap id="twist-eyebrow">09 · What didn't win</div>
+          <div class="scene-title" data-layout-allow-overlap id="twist-title">Riders got less busy, and the A/B test can't even see it.</div>
+          <div class="sub" id="twist-sub">Rider utilisation (busy ÷ paid time), the one metric that moved the wrong way</div>
+          <div class="bars">
+            <div class="row" id="twist-r1"><div class="who">Control hubs<small>FIFO, one order per trip</small></div>
+              <div class="track"><div class="fill" id="twist-b1" style="width: 667px"></div></div><div class="val">0.667</div></div>
+            <div class="row xgb" id="twist-r2"><div class="who">Treated hubs<small>bag + match + geofence</small></div>
+              <div class="track"><div class="fill" id="twist-b2" style="width: 650px"></div></div><div class="val">0.650</div></div>
+          </div>
+          <div class="ci" id="twist-ci">
+            <div class="ci-lab">Welch 95% CI of the difference · p = 0.16</div>
+            <div class="ci-axis" id="twist-axis" data-layout-allow-overflow>
+              <div class="ci-zero"></div><div class="ci-zl">0</div>
+              <div class="ci-bar" id="twist-cibar"></div><div class="ci-dot" id="twist-cidot"></div>
+              <div class="ci-tl" style="left: 0px">−0.05</div><div class="ci-tl" style="left: 1000px">+0.05</div>
+              <div class="ci-v" id="twist-civ">−0.040 to +0.007</div>
+            </div>
+            <div class="ci-need" id="twist-need">To see a change this size: <b>27 hubs per arm</b>. The test had 13.</div>
+          </div>
+          <div class="verdict" id="twist-verdict"><b>Why:</b> bagging makes fewer trips on the same paid roster. Raising utilisation needs a smaller roster, which this test did not try.</div>
+        </div>
+      </div>
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+          const D = 6.6;
+          tl.fromTo("#twist-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
+          tl.fromTo("#twist-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+          tl.fromTo("#twist-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          tl.fromTo("#twist-sub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.5);
+          [1, 2].forEach((n, i) => {
+            tl.fromTo("#twist-r" + n, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 0.8 + i * 0.2);
+            tl.fromTo("#twist-b" + n, { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power3.out" }, 1.0 + i * 0.2);
+          });
+          // CI: axis -0.05..+0.05 over 1000 px; interval -0.0405..+0.0071, estimate -0.0167 (outputs/ab_readout.csv)
+          tl.fromTo("#twist-ci", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 1.7);
+          tl.fromTo("#twist-cibar", { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.out" }, 2.0);
+          tl.fromTo("#twist-cidot", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power3.out" }, 2.2);
+          tl.fromTo("#twist-civ", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4 }, 2.5);
+          tl.fromTo("#twist-need", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 3.0);
+          tl.fromTo("#twist-verdict", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 3.5);
+          tl.to("#twist-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          window.__timelines["twist"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

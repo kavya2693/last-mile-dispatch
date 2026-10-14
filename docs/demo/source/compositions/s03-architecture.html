@@ -1,0 +1,368 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #arch-root { position: absolute; inset: 0; }
+        #arch-root .diagram { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 960px 620px; }
+        #arch-root svg.wires { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
+        #arch-root .lane {
+          position: absolute; border: 2px dashed rgba(132, 148, 166, 0.28); border-radius: 18px; background: rgba(15, 26, 38, 0.35);
+        }
+        #arch-root .lane .pill {
+          position: absolute; left: 22px; top: -16px; padding: 2px 14px; border-radius: 8px; background: var(--bg);
+          font-family: var(--mono); font-size: 20px; font-weight: 700; letter-spacing: 0.12em; color: var(--ink-soft); white-space: nowrap;
+        }
+        #arch-root .node {
+          position: absolute; display: flex; flex-direction: column; justify-content: center; gap: 6px;
+          padding: 0 20px; border: 2px solid var(--line); border-radius: 12px; background: var(--panel);
+        }
+        #arch-root .node .t { font-size: 28px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); white-space: nowrap; }
+        #arch-root .node .s { font-family: var(--mono); font-size: 20px; color: var(--ink-soft); white-space: nowrap; }
+        #arch-root .node .f, #arch-root .region .f {
+          position: absolute; right: 12px; top: -15px; font-family: var(--mono); font-size: 20px; padding: 0 9px;
+          border-radius: 6px; background: var(--bg); border: 2px solid var(--line); white-space: nowrap;
+        }
+        #arch-root .L-data { border-color: rgba(127, 168, 255, 0.6); }
+        #arch-root .L-data .f { color: var(--c-data); }
+        #arch-root .L-sim { border-color: rgba(185, 162, 255, 0.65); }
+        #arch-root .L-sim .f { color: var(--c-model); }
+        #arch-root .L-opt { border-color: rgba(63, 216, 168, 0.7); background: #0f2629; }
+        #arch-root .L-opt .f { color: var(--c-opt); }
+        #arch-root .L-eval { border-color: rgba(242, 196, 109, 0.65); }
+        #arch-root .L-eval .f { color: var(--c-eval); }
+        #arch-root .L-risk { border-color: rgba(255, 138, 115, 0.7); }
+        #arch-root .L-risk .f { color: var(--c-risk); }
+        #arch-root .fallback { border: 2px dashed rgba(132, 148, 166, 0.75); background: rgba(15, 26, 38, 0.6); }
+        #arch-root .fallback .t { font-size: 24px; color: var(--ink-soft); }
+        #arch-root .fallback .f { color: var(--ink-mute); }
+        #arch-root .region {
+          position: absolute; border: 3px solid var(--c-opt); border-radius: 18px; background: rgba(15, 38, 41, 0.55);
+          box-shadow: 0 0 30px rgba(63, 216, 168, 0.1);
+        }
+        #arch-root .region .f { left: 16px; right: auto; top: auto; bottom: -16px; color: var(--c-opt); font-weight: 700; }
+        #arch-root .cyl-lab { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+        #arch-root .cyl-lab .n { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--ink); white-space: nowrap; }
+        #arch-root .cyl-lab .s { font-family: var(--mono); font-size: 20px; color: var(--ink-soft); white-space: nowrap; }
+        #arch-root .group-label { position: absolute; font-family: var(--mono); font-size: 20px; color: var(--c-data); white-space: nowrap; }
+        #arch-root .legend {
+          position: absolute; right: 120px; top: 186px; display: flex; gap: 22px; align-items: center;
+          font-family: var(--mono); font-size: 20px; color: var(--ink-soft); white-space: nowrap;
+        }
+        #arch-root .legend span { display: flex; align-items: center; gap: 8px; }
+        #arch-root .legend i { display: block; width: 14px; height: 14px; border-radius: 4px; }
+        #arch-root .legend svg { display: block; }
+        #arch-root .crit {
+          position: absolute; right: 120px; top: 180px; padding: 4px 16px; border-radius: 8px; opacity: 0;
+          border: 2px solid var(--c-opt); background: rgba(8, 121, 93, 0.25);
+          font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--ink); white-space: nowrap;
+        }
+        #arch-root .crit b { color: var(--c-opt); }
+        #arch-root .wl { position: absolute; font-family: var(--mono); font-size: 20px; white-space: nowrap; color: var(--ink-soft); }
+        #arch-root .wl span { display: block; line-height: 1.25; }
+        #arch-root .card {
+          position: absolute; border: 2px solid rgba(132, 148, 166, 0.45); border-radius: 12px; background: rgba(15, 26, 38, 0.85);
+          padding: 16px 22px; font-family: var(--mono); font-size: 21px; color: var(--ink-soft);
+        }
+        #arch-root .card .h { font-size: 20px; font-weight: 700; letter-spacing: 0.08em; color: var(--ink-mute); margin-bottom: 6px; }
+        #arch-root .card .r { display: flex; justify-content: space-between; line-height: 32px; white-space: nowrap; }
+        #arch-root .card .r b { color: var(--ink); font-weight: 700; }
+        #arch-root .card.truth { border-color: rgba(242, 196, 109, 0.5); line-height: 1.3; font-size: 20px; }
+        #arch-root .card.truth .h { color: var(--c-eval); }
+        #arch-root .file { position: absolute; font-family: var(--mono); font-size: 20px; color: var(--c-eval); white-space: nowrap; }
+      </style>
+
+      <div id="arch-root" data-composition-id="arch" data-width="1920" data-height="1080">
+        <div class="scene" id="arch-in">
+          <div class="eyebrow" data-layout-allow-overlap id="arch-eyebrow">05 · Architecture</div>
+          <div class="scene-title" data-layout-allow-overlap id="arch-title">A two-minute dispatch loop, scored by a hub-level A/B test.</div>
+          <div class="legend" id="arch-legend">
+            <span><i style="background: var(--c-data)"></i>data</span>
+            <span><i style="background: var(--c-model)"></i>simulator</span>
+            <span><i style="background: var(--c-opt)"></i>dispatch</span>
+            <span><i style="background: var(--c-risk)"></i>door check</span>
+            <span><i style="background: var(--c-eval)"></i>evaluation</span>
+            <span><svg width="38" height="8"><path d="M0 4h38" stroke="#b2bfcc" stroke-width="3"/></svg>per wave</span>
+            <span><svg width="38" height="8"><path d="M0 4h38" stroke="#b2bfcc" stroke-width="3" stroke-dasharray="9 6"/></svg>batch</span>
+            <span><svg width="38" height="8"><path d="M0 4h38" stroke="#8494a6" stroke-width="3" stroke-dasharray="2 6" stroke-linecap="round"/></svg>fallback</span>
+          </div>
+          <div class="crit" id="arch-crit"><b>CRITICAL PATH</b> · orders → bag → match → trip → metrics → A/B readout</div>
+
+          <div class="diagram" id="arch-diagram">
+            <div class="lane" id="arch-lane1" style="left: 100px; top: 236px; width: 1720px; height: 428px">
+              <div class="pill">DISPATCH LOOP · EVERY 2 MIN · PER HUB-DAY</div></div>
+            <div class="lane" id="arch-lane2" style="left: 100px; top: 714px; width: 1720px; height: 276px">
+              <div class="pill">EVALUATION · BATCH</div></div>
+
+            <svg class="wires" viewBox="0 0 1920 1080" id="arch-svg"></svg>
+
+            <div class="group-label" id="arch-g1" style="left: 120px; top: 262px">generate_data.py · seed 7</div>
+            <div id="arch-cyl-labels"></div>
+
+            <!-- simulator orchestration -->
+            <div class="node L-sim" id="n-run" style="left: 380px; top: 400px; width: 260px; height: 160px">
+              <div class="f">runner.py</div><div class="t">run_all()</div><div class="s">4 parallel workers</div><div class="s">5 policies, 1 seed</div></div>
+
+            <!-- the dispatch loop -->
+            <div class="region" id="n-loop" style="left: 690px; top: 270px; width: 700px; height: 380px">
+              <div class="f">simulate.py · simulate_hub_day()</div></div>
+            <div class="node L-opt" id="n-bag" style="left: 720px; top: 290px; width: 210px; height: 96px">
+              <div class="f">bagging.py</div><div class="t">Bag orders</div><div class="s">≤ 3 stops · 1 km</div></div>
+            <div class="node L-opt" id="n-match" style="left: 1090px; top: 290px; width: 270px; height: 96px">
+              <div class="f">assignment.py</div><div class="t">Min-cost match</div><div class="s">Hungarian · SciPy</div></div>
+            <div class="node fallback" id="n-fifo" style="left: 1090px; top: 412px; width: 270px; height: 56px">
+              <div class="f">fifo()</div><div class="t">FIFO · baseline</div></div>
+            <div class="node L-sim" id="n-trip" style="left: 1090px; top: 500px; width: 270px; height: 106px; padding-top: 14px">
+              <div class="f">geo.py</div><div class="t">Play each trip</div><div class="s">traffic · rain · GPS</div></div>
+            <div class="node L-risk" id="n-geo" style="left: 720px; top: 498px; width: 240px; height: 124px; padding-top: 16px">
+              <div class="f">geofence.py</div><div class="t">Door check</div><div class="s">150 m geofence</div><div class="s">enforce | log</div></div>
+
+            <div class="card" id="n-nfr" style="left: 1440px; top: 276px; width: 360px; height: 258px">
+              <div class="h">BUDGETS &amp; FACTS</div>
+              <div class="r" id="nfr-1"><span>dispatch wave</span><b>2 min</b></div>
+              <div class="r" id="nfr-2"><span>delivery promise</span><b>30 min</b></div>
+              <div class="r" id="nfr-3"><span>cancel if not out</span><b>45 min</b></div>
+              <div class="r" id="nfr-4"><span>hub-day runs</span><b>4,004</b></div>
+              <div class="r" id="nfr-5"><span>full run, laptop</span><b>180 s</b></div>
+              <div class="r" id="nfr-6"><span>CI slice</span><b>8 hubs × 7 d</b></div>
+            </div>
+
+            <!-- evaluation lane -->
+            <div class="node L-eval" id="n-pair" style="left: 120px; top: 760px; width: 240px; height: 120px">
+              <div class="f">experiment.py</div><div class="t">Pair hubs</div><div class="s">pre-period size</div><div class="s">coin flip / pair</div></div>
+            <div class="node L-eval" id="n-ab" style="left: 400px; top: 760px; width: 260px; height: 120px">
+              <div class="f">experiment.py</div><div class="t">A/B readout</div><div class="s">13 vs 13 hubs</div><div class="s">Welch + bootstrap</div></div>
+            <div class="node L-eval" id="n-geval" style="left: 720px; top: 760px; width: 240px; height: 120px">
+              <div class="f">geofence.py</div><div class="t">Geofence eval</div><div class="s">precision, recall</div><div class="s">radius sweep</div></div>
+            <div class="node L-eval" id="n-abl" style="left: 1010px; top: 760px; width: 240px; height: 120px">
+              <div class="f">report.py</div><div class="t">Ablation</div><div class="s">5 policies</div><div class="s">by day type</div></div>
+            <div class="node L-eval" id="n-ci" style="left: 1300px; top: 760px; width: 240px; height: 120px">
+              <div class="f">experiment.py</div><div class="t">CI check</div><div class="s">500 re-draws</div><div class="s">coverage, A/A</div></div>
+            <div class="card truth" id="n-truth" style="left: 1570px; top: 760px; width: 230px; height: 176px">
+              <div class="h">GROUND TRUTH</div>true effect known: every policy runs on every hub-day</div>
+
+            <div class="file" id="f-pair" style="left: 120px; top: 900px">→ power.csv</div>
+            <div class="file" id="f-ab" style="left: 400px; top: 900px">→ ab_readout.csv</div>
+            <div class="file" id="f-geval" style="left: 720px; top: 900px">→ geofence_eval.csv</div>
+            <div class="file" id="f-abl" style="left: 1010px; top: 900px">→ ablation.csv</div>
+            <div class="file" id="f-ci" style="left: 1300px; top: 900px">→ rerandomisation.csv</div>
+
+            <!-- wire labels: what flows -->
+            <div class="wl" id="wl-in" style="left: 520px; top: 302px">orders, riders</div>
+            <div class="wl" id="wl-bags" style="left: 934px; top: 300px; color: var(--c-opt)">bags</div>
+            <div class="wl" id="wl-pol" style="left: 952px; top: 271px; color: var(--c-opt)">matching?</div>
+            <div class="wl" id="wl-on" style="left: 1054px; top: 304px; color: var(--c-opt)">on</div>
+            <div class="wl" id="wl-off" style="left: 1020px; top: 386px; color: var(--ink-mute)">off</div>
+            <div class="wl" id="wl-pair" style="left: 1100px; top: 474px">rider + bag</div>
+            <div class="wl" id="wl-nh" style="left: 980px; top: 532px; color: var(--c-risk)">not home</div>
+            <div class="wl" id="wl-back" style="left: 800px; top: 404px; color: var(--c-opt)"><span>trip done:</span><span>rider free</span><span>next wave</span></div>
+            <div class="wl" id="wl-met" style="left: 1240px; top: 606px; color: var(--c-data)">metrics</div>
+            <div class="wl" id="wl-pre" style="left: 452px; top: 672px; color: var(--c-model)">pre-period</div>
+            <div class="wl" id="wl-ev" style="left: 852px; top: 676px; color: var(--c-risk)">11,566 marks</div>
+            <div class="wl" id="wl-bus" style="left: 1632px; top: 676px; color: var(--c-data)">by hub</div>
+            <div class="wl" id="wl-arm" style="left: 363px; top: 788px; color: var(--c-eval)">arm</div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+          const D = 15.0;
+          const NS = "http://www.w3.org/2000/svg";
+          const COL = { data: "#7fa8ff", sim: "#b9a2ff", opt: "#3fd8a8", eval: "#f2c46d", risk: "#ff8a73", mute: "#8494a6" };
+          const svg = document.getElementById("arch-svg");
+          const el = (tag, at, parent) => {
+            const n = document.createElementNS(NS, tag);
+            Object.entries(at).forEach(([k, v]) => n.setAttribute(k, v));
+            (parent || svg).appendChild(n);
+            return n;
+          };
+
+          // ---------- data stores (cylinders): every file and count is in data/ or outputs/
+          const CYL = [
+            { id: "c-hubs", x: 120, y: 296, w: 210, h: 84, n: "hubs.csv", s: "26 hubs", c: "data" },
+            { id: "c-riders", x: 120, y: 384, w: 210, h: 84, n: "riders.csv", s: "473 riders", c: "data" },
+            { id: "c-days", x: 120, y: 472, w: 210, h: 84, n: "days.csv", s: "42 days", c: "data" },
+            { id: "c-orders", x: 120, y: 560, w: 210, h: 84, n: "orders.csv.gz", s: "477,868 orders", c: "data" },
+            { id: "c-metrics", x: 1440, y: 562, w: 360, h: 88, n: "hub_day_metrics.csv", s: "3,640 rows", c: "data" },
+          ];
+          const labHost = document.getElementById("arch-cyl-labels");
+          CYL.forEach((c) => {
+            const g = el("g", { id: c.id });
+            const rx = c.w / 2, ry = 9, x2 = c.x + c.w;
+            el("path", { d: `M${c.x} ${c.y + ry} L${c.x} ${c.y + c.h - ry} A${rx} ${ry} 0 0 0 ${x2} ${c.y + c.h - ry} L${x2} ${c.y + ry}`,
+              fill: "#0f1a26", stroke: COL[c.c], "stroke-opacity": 0.75, "stroke-width": 2 }, g);
+            el("ellipse", { cx: c.x + rx, cy: c.y + ry, rx, ry, fill: "#132131", stroke: COL[c.c], "stroke-opacity": 0.75, "stroke-width": 2 }, g);
+            labHost.insertAdjacentHTML("beforeend",
+              `<div class="cyl-lab" id="${c.id}-lab" style="left:${c.x}px;top:${c.y + 18}px;width:${c.w}px"><div class="n">${c.n}</div><div class="s">${c.s}</div></div>`);
+          });
+
+          // ---------- decision point: Policy.matching (config.py), drawn as a diamond
+          const DX = 1010, DY = 338, DR = 40;
+          const diamond = el("g", { id: "arch-diamond" });
+          el("polygon", { points: `${DX},${DY - DR} ${DX + DR},${DY} ${DX},${DY + DR} ${DX - DR},${DY}`, fill: "#0f2629", stroke: COL.opt, "stroke-width": 3 }, diamond);
+          const dt = el("text", { x: DX, y: DY + 9, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 26, "font-weight": 700, fill: "#eef2f6" }, diamond);
+          dt.textContent = "?";
+
+          // ---------- wires: points, colour, style (sync | batch | fallback | feedback), critical-path flag
+          const W = {
+            d1: { pts: [[330, 338], [355, 338], [355, 480], [380, 480]], c: "data", s: "sync" },
+            d2: { pts: [[330, 426], [355, 426], [355, 480], [380, 480]], c: "data", s: "sync" },
+            d3: { pts: [[330, 514], [355, 514], [355, 480], [380, 480]], c: "data", s: "sync" },
+            d4: { pts: [[330, 602], [355, 602], [355, 480], [380, 480]], c: "data", s: "sync", crit: true },
+            run: { pts: [[510, 400], [510, 338], [720, 338]], c: "sim", s: "sync", crit: true },
+            bag: { pts: [[930, 338], [970, 338]], c: "opt", s: "sync", crit: true },
+            on: { pts: [[1050, 338], [1090, 338]], c: "opt", s: "sync", crit: true },
+            off: { pts: [[1010, 378], [1010, 440], [1090, 440]], c: "mute", s: "fallback" },
+            pair: { pts: [[1360, 338], [1376, 338], [1376, 557], [1360, 557]], c: "opt", s: "sync", crit: true },
+            fifo: { pts: [[1360, 440], [1376, 440]], c: "mute", s: "fallback" },
+            nh: { pts: [[1090, 562], [960, 562]], c: "sim", s: "sync" },
+            back: { pts: [[790, 498], [790, 386]], c: "opt", s: "feedback" },
+            met: { pts: [[1225, 606], [1225, 634], [1420, 634], [1420, 606], [1440, 606]], c: "data", s: "sync", crit: true },
+            pre: { pts: [[440, 560], [440, 742], [240, 742], [240, 760]], c: "sim", s: "batch" },
+            bus: { pts: [[1620, 650], [1620, 736], [530, 736], [530, 760]], c: "data", s: "batch", crit: true },
+            bus2: { pts: [[1130, 736], [1130, 760]], c: "data", s: "batch" },
+            bus3: { pts: [[1420, 736], [1420, 760]], c: "data", s: "batch" },
+            ev: { pts: [[840, 622], [840, 760]], c: "risk", s: "batch", hop: true },
+            arm: { pts: [[360, 820], [400, 820]], c: "eval", s: "batch" },
+          };
+          const DASH = { sync: null, batch: "12 8", fallback: "2 8", feedback: "10 7" };
+          const lenOf = (pts) => pts.slice(1).reduce((t, p, i) => t + Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1]), 0);
+          const wireLayer = el("g", {});
+          svg.insertBefore(wireLayer, svg.firstChild);
+          Object.entries(W).forEach(([k, w]) => {
+            const d = "M" + w.pts.map((q) => q.join(" ")).join(" L");
+            w.len = lenOf(w.pts);
+            if (w.hop) el("path", { d, fill: "none", stroke: "#0a1119", "stroke-width": 14 }, wireLayer); // gap where it crosses the bus
+            // draw-on uses a mask so dashed wires keep their dash pattern while they grow
+            const mid = "arch-m-" + k;
+            const mask = el("mask", { id: mid, maskUnits: "userSpaceOnUse", x: 0, y: 0, width: 1920, height: 1080 }, wireLayer);
+            const mp = el("path", { d, fill: "none", stroke: "#fff", "stroke-width": 16, "stroke-linecap": "square",
+              "stroke-dasharray": w.len + " " + w.len, "stroke-dashoffset": w.len }, mask);
+            const p = el("path", { d, id: "arch-w-" + k, fill: "none", stroke: COL[w.c], "stroke-width": 3.5,
+              "stroke-linejoin": "round", "stroke-linecap": w.s === "fallback" ? "round" : "butt", opacity: 0.8, mask: `url(#${mid})` }, wireLayer);
+            if (DASH[w.s]) p.setAttribute("stroke-dasharray", DASH[w.s]);
+            const [a, b] = [w.pts[w.pts.length - 2], w.pts[w.pts.length - 1]];
+            const ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+            const hx = (r, t) => (b[0] + r * Math.cos(ang + t)).toFixed(1) + " " + (b[1] + r * Math.sin(ang + t)).toFixed(1);
+            const head = el("path", { d: `M${hx(12, Math.PI - 0.5)} L${b[0]} ${b[1]} L${hx(12, Math.PI + 0.5)}`, fill: "none", stroke: COL[w.c],
+              "stroke-width": 3.5, "stroke-linecap": "round", "stroke-linejoin": "round", opacity: 0 }, wireLayer);
+            w.path = p; w.maskPath = mp; w.head = head;
+          });
+          svg.appendChild(diamond);
+
+          const draw = (k, at) => {
+            const w = W[k];
+            const dur = Math.max(0.3, w.len / 900);
+            tl.fromTo(w.maskPath, { attr: { "stroke-dashoffset": w.len } }, { attr: { "stroke-dashoffset": 0 }, duration: dur, ease: "power2.inOut" }, at);
+            tl.fromTo(w.head, { attr: { opacity: 0 } }, { attr: { opacity: 0.9 }, duration: 0.15 }, at + dur - 0.1);
+          };
+          const pop = (sel, at, from) =>
+            tl.fromTo(sel, Object.assign({ opacity: 0, x: 0, y: 0 }, from), { opacity: 1, x: 0, y: 0, duration: 0.5, ease: "power3.out" }, at);
+          const fade = (sel, at, d) => tl.fromTo(sel, { opacity: 0 }, { opacity: 1, duration: d || 0.4 }, at);
+
+          // ---------- build, layer by layer
+          tl.fromTo("#arch-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
+          tl.fromTo("#arch-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+          tl.fromTo("#arch-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          tl.fromTo("#arch-diagram", { scale: 0.985 }, { scale: 1, duration: D, ease: "sine.out" }, 0);
+          fade("#arch-legend", 0.5, 0.5);
+          fade("#arch-lane1", 0.6, 0.5);
+          // 1 data layer
+          fade("#arch-g1", 0.8);
+          CYL.slice(0, 4).forEach((c, i) => { pop("#" + c.id, 0.9 + i * 0.1, { x: -24 }); pop("#" + c.id + "-lab", 0.9 + i * 0.1, { x: -24 }); });
+          ["d1", "d2", "d3", "d4"].forEach((k, i) => draw(k, 1.4 + i * 0.05));
+          // 2 simulator orchestration
+          pop("#n-run", 1.7, { y: 20 });
+          // 3 the dispatch loop
+          tl.fromTo("#n-loop", { opacity: 0, scale: 0.97 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" }, 2.2);
+          draw("run", 2.4); fade("#wl-in", 2.6);
+          pop("#n-bag", 2.6, { y: 16 });
+          draw("bag", 3.0); fade("#wl-bags", 3.0);
+          tl.fromTo("#arch-diamond", { opacity: 0, scale: 0.6, svgOrigin: DX + " " + DY }, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" }, 3.1);
+          fade("#wl-pol", 3.2);
+          draw("on", 3.3); fade("#wl-on", 3.35);
+          pop("#n-match", 3.4, { y: 16 });
+          draw("off", 3.7); fade("#wl-off", 3.75);
+          pop("#n-fifo", 3.8, { y: 12 });
+          draw("pair", 4.0); draw("fifo", 4.1); fade("#wl-pair", 4.2);
+          pop("#n-trip", 4.3, { y: 16 });
+          draw("nh", 4.6); fade("#wl-nh", 4.65);
+          pop("#n-geo", 4.8, { x: 20 });
+          draw("back", 5.1); fade("#wl-back", 5.2);
+          // 4 outputs + run facts
+          draw("met", 5.4); fade("#wl-met", 5.5);
+          pop("#c-metrics", 5.6, { x: 20 }); pop("#c-metrics-lab", 5.6, { x: 20 });
+          pop("#n-nfr", 5.7, { x: 20 });
+          [1, 2, 3, 4, 5, 6].forEach((n, i) => fade("#nfr-" + n, 5.9 + i * 0.08, 0.3));
+          // 5 evaluation (batch, after every hub-day has run)
+          fade("#arch-lane2", 6.0, 0.5);
+          draw("pre", 6.1); fade("#wl-pre", 6.3);
+          pop("#n-pair", 6.3, { y: 16 });
+          draw("ev", 6.3); fade("#wl-ev", 6.4);
+          pop("#n-geval", 6.5, { y: 16 });
+          draw("bus", 6.5); draw("bus2", 6.9); draw("bus3", 6.9); fade("#wl-bus", 6.6);
+          pop("#n-ab", 6.7, { y: 16 });
+          pop("#n-abl", 6.85, { y: 16 });
+          pop("#n-ci", 7.0, { y: 16 });
+          draw("arm", 7.0); fade("#wl-arm", 7.1);
+          ["#f-pair", "#f-ab", "#f-geval", "#f-abl", "#f-ci"].forEach((f, i) => fade(f, 7.2 + i * 0.06, 0.3));
+          pop("#n-truth", 7.4, { x: 20 });
+
+          // ---------- data packets, in execution order
+          const packet = (k, start, opts) => {
+            const w = W[k], o = opts || {};
+            const speed = o.speed || 900, travel = Math.max(0.25, w.len / speed);
+            const c = el("circle", { r: o.r || 7, cx: w.pts[0][0], cy: w.pts[0][1], fill: COL[w.c], opacity: 0 });
+            const kf = [];
+            for (let i = 1; i < w.pts.length; i++) {
+              const seg = Math.hypot(w.pts[i][0] - w.pts[i - 1][0], w.pts[i][1] - w.pts[i - 1][1]);
+              kf.push({ attr: { cx: w.pts[i][0], cy: w.pts[i][1] }, duration: (travel * seg) / w.len, ease: "none" });
+            }
+            tl.fromTo(c, { attr: { opacity: 0 } }, { attr: { opacity: 1 }, duration: 0.08 }, start);
+            tl.to(c, { keyframes: kf }, start);
+            tl.to(c, { attr: { opacity: 0 }, duration: 0.1 }, start + travel);
+            return start + travel;
+          };
+          let t = 8.0;
+          // inputs once, then the two-minute loop turns twice, then the batch evaluation
+          ["d1", "d2", "d3", "d4"].forEach((k, i) => packet(k, t + i * 0.08));
+          t = packet("run", t + 0.45);
+          for (let lap = 0; lap < 2; lap++) {
+            t = packet("bag", t);
+            t = packet("on", t);
+            if (lap === 1) packet("off", t - 0.25, { r: 6 });
+            t = packet("pair", t);
+            t = packet("nh", t);
+            if (lap === 0) t = packet("back", t);
+          }
+          t = packet("met", t);
+          packet("ev", t - 0.3);
+          packet("pre", t - 0.2);
+          const tb = packet("bus", t, { speed: 1150 });
+          packet("bus3", t + 0.3, { speed: 900 });
+          packet("bus2", t + 0.55, { speed: 900 });
+          packet("arm", tb - 0.2);
+
+          // ---------- critical path, briefly highlighted
+          const CP = 12.9;
+          const dimSel = ["#c-hubs", "#c-riders", "#c-days", "#c-hubs-lab", "#c-riders-lab", "#c-days-lab", "#n-fifo", "#n-geo", "#n-nfr", "#n-pair",
+            "#n-geval", "#n-abl", "#n-ci", "#n-truth", "#arch-g1", "#arch-in .file", "#arch-in .wl"];
+          tl.to(dimSel, { opacity: 0.28, duration: 0.5, ease: "power2.out" }, CP);
+          Object.values(W).forEach((w) => {
+            if (w.crit) tl.to(w.path, { attr: { "stroke-width": 6, opacity: 1 }, duration: 0.5 }, CP);
+            else tl.to([w.path, w.head], { attr: { opacity: 0.18 }, duration: 0.5 }, CP);
+          });
+          tl.to(["#n-run", "#n-bag", "#n-match", "#n-trip", "#n-ab"], { boxShadow: "0 0 34px rgba(63,216,168,0.45)", duration: 0.5 }, CP);
+          tl.to("#arch-legend", { opacity: 0, duration: 0.3 }, CP);
+          tl.fromTo("#arch-crit", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, CP + 0.2);
+
+          tl.to("#arch-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          window.__timelines["arch"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #endcard-root { position: absolute; inset: 0; }
+        #endcard-root .endmap {
+          position: absolute; left: 1290px; top: 250px; width: 580px; height: 485px; opacity: 0.45;
+          -webkit-mask-image: radial-gradient(ellipse at center, #000 45%, transparent 72%);
+          mask-image: radial-gradient(ellipse at center, #000 45%, transparent 72%);
+        }
+        #endcard-root .end { position: absolute; left: 120px; top: 270px; width: 1680px; }
+        #endcard-root .kicker { font-family: var(--mono); font-size: 26px; letter-spacing: 0.16em; color: var(--c-opt); }
+        #endcard-root .name { margin-top: 18px; font-family: var(--mono); font-size: 124px; font-weight: 700; letter-spacing: -0.04em; color: var(--ink); }
+        #endcard-root .url { margin-top: 18px; font-family: var(--mono); font-size: 42px; color: var(--c-opt); }
+        #endcard-root .chips { display: flex; gap: 18px; margin-top: 52px; }
+        #endcard-root .chip { display: block; font-family: var(--mono); font-size: 30px; font-weight: 700; padding: 12px 26px; border-radius: 999px; color: var(--ink); }
+        #endcard-root .chip.opt { border: 2px solid rgba(63, 216, 168, 0.65); background: rgba(63, 216, 168, 0.1); }
+        #endcard-root .chip.mod { border: 2px solid rgba(185, 162, 255, 0.65); background: rgba(185, 162, 255, 0.1); }
+        #endcard-root .chip.dat { border: 2px solid rgba(127, 168, 255, 0.65); background: rgba(127, 168, 255, 0.1); }
+        #endcard-root .run { margin-top: 44px; font-family: var(--mono); font-size: 26px; color: var(--ink-mute); white-space: pre; }
+      </style>
+      <div id="endcard-root" data-composition-id="endcard" data-width="1920" data-height="1080">
+        <div class="scene" id="endcard-in">
+          <svg class="endmap" id="endcard-map" viewBox="0 0 580 485" width="580" height="485" aria-hidden="true"></svg>
+          <div class="end">
+            <div class="kicker" id="endcard-kicker">10 · OPEN SOURCE · MIT · RUNS ON A LAPTOP</div>
+            <div class="name" id="endcard-name">last-mile-dispatch</div>
+            <div class="url" id="endcard-url">github.com/kavya2693/last-mile-dispatch</div>
+            <div class="chips">
+              <span class="chip opt" id="endcard-c1">SciPy</span>
+              <span class="chip mod" id="endcard-c2">pandas</span>
+              <span class="chip mod" id="endcard-c3">NumPy</span>
+              <span class="chip dat" id="endcard-c4">Python</span>
+            </div>
+            <div class="run" id="endcard-run">$ make run   # 26 hubs, 4 weeks, ~3 min</div>
+          </div>
+        </div>
+      </div>
+      <script>
+        (() => {
+          /* SERIES:BEGIN */ const SERIES = {"daily":[{"date":"2026-02-02","dow":0,"weekend":false,"ramadan":false,"rain":false,"base":0.0175,"treat":0.0094},{"date":"2026-02-03","dow":1,"weekend":false,"ramadan":false,"rain":false,"base":0.0195,"treat":0.0083},{"date":"2026-02-04","dow":2,"weekend":false,"ramadan":false,"rain":false,"base":0.0213,"treat":0.0077},{"date":"2026-02-05","dow":3,"weekend":false,"ramadan":false,"rain":false,"base":0.0163,"treat":0.0075},{"date":"2026-02-06","dow":4,"weekend":false,"ramadan":false,"rain":false,"base":0.0145,"treat":0.0082},{"date":"2026-02-07","dow":5,"weekend":true,"ramadan":false,"rain":true,"base":0.4246,"treat":0.1399},{"date":"2026-02-08","dow":6,"weekend":true,"ramadan":false,"rain":false,"base":0.0412,"treat":0.0127},{"date":"2026-02-09","dow":0,"weekend":false,"ramadan":false,"rain":false,"base":0.0182,"treat":0.0075},{"date":"2026-02-10","dow":1,"weekend":false,"ramadan":false,"rain":false,"base":0.0114,"treat":0.0081},{"date":"2026-02-11","dow":2,"weekend":false,"ramadan":false,"rain":false,"base":0.0143,"treat":0.0075},{"date":"2026-02-12","dow":3,"weekend":false,"ramadan":false,"rain":false,"base":0.0122,"treat":0.0074},{"date":"2026-02-13","dow":4,"weekend":false,"ramadan":false,"rain":false,"base":0.0122,"treat":0.0086},{"date":"2026-02-14","dow":5,"weekend":true,"ramadan":false,"rain":false,"base":0.0517,"treat":0.015},{"date":"2026-02-15","dow":6,"weekend":true,"ramadan":false,"rain":false,"base":0.0524,"treat":0.0113},{"date":"2026-02-16","dow":0,"weekend":false,"ramadan":false,"rain":false,"base":0.013,"treat":0.0085},{"date":"2026-02-17","dow":1,"weekend":false,"ramadan":false,"rain":false,"base":0.0141,"treat":0.0072},{"date":"2026-02-18","dow":2,"weekend":false,"ramadan":true,"rain":false,"base":0.1648,"treat":0.0454},{"date":"2026-02-19","dow":3,"weekend":false,"ramadan":true,"rain":false,"base":0.1496,"treat":0.0442},{"date":"2026-02-20","dow":4,"weekend":false,"ramadan":true,"rain":false,"base":0.1605,"treat":0.0421},{"date":"2026-02-21","dow":5,"weekend":true,"ramadan":true,"rain":false,"base":0.2187,"treat":0.0589},{"date":"2026-02-22","dow":6,"weekend":true,"ramadan":true,"rain":false,"base":0.2265,"treat":0.0601},{"date":"2026-02-23","dow":0,"weekend":false,"ramadan":true,"rain":false,"base":0.1498,"treat":0.0443},{"date":"2026-02-24","dow":1,"weekend":false,"ramadan":true,"rain":false,"base":0.1628,"treat":0.0457},{"date":"2026-02-25","dow":2,"weekend":false,"ramadan":true,"rain":false,"base":0.1442,"treat":0.0384},{"date":"2026-02-26","dow":3,"weekend":false,"ramadan":true,"rain":false,"base":0.1491,"treat":0.037},{"date":"2026-02-27","dow":4,"weekend":false,"ramadan":true,"rain":false,"base":0.1565,"treat":0.0429},{"date":"2026-02-28","dow":5,"weekend":true,"ramadan":true,"rain":false,"base":0.2287,"treat":0.0591},{"date":"2026-03-01","dow":6,"weekend":true,"ramadan":true,"rain":false,"base":0.2265,"treat":0.062}],"stress":[{"day_type":"ordinary weekday","orders":125715,"cost_base":9.71,"cost_treat":9.36,"cost_chg_pct":-3.7,"cancel_base":0.0154,"cancel_treat":0.008},{"day_type":"weekend or Ramadan","orders":184449,"cost_base":9.65,"cost_treat":8.3,"cost_chg_pct":-14.0,"cancel_base":0.1543,"cancel_treat":0.0418},{"day_type":"rain day","orders":16817,"cost_base":10.42,"cost_treat":6.84,"cost_chg_pct":-34.4,"cancel_base":0.4246,"cancel_treat":0.1399}],"hubs":[{"hub":0,"x":-1.53,"y":7.25},{"hub":1,"x":-9.8,"y":-3.19},{"hub":2,"x":7.85,"y":8.58},{"hub":3,"x":-6.18,"y":-8.66},{"hub":4,"x":9.43,"y":17.86},{"hub":5,"x":-4.31,"y":-12.34},{"hub":6,"x":-12.7,"y":-14.91},{"hub":7,"x":2.93,"y":3.73},{"hub":8,"x":-10.55,"y":-8.33},{"hub":9,"x":-17.1,"y":-12.92},{"hub":10,"x":9.58,"y":11.57},{"hub":11,"x":10.18,"y":3.66},{"hub":12,"x":10.93,"y":9.96},{"hub":13,"x":-1.4,"y":-5.57},{"hub":14,"x":-8.96,"y":0.35},{"hub":15,"x":1.35,"y":5.52},{"hub":16,"x":-6.12,"y":-9.52},{"hub":17,"x":-9.72,"y":-7.81},{"hub":18,"x":7.71,"y":1.47},{"hub":19,"x":9.54,"y":12.87},{"hub":20,"x":10.37,"y":13.46},{"hub":21,"x":2.64,"y":4.63},{"hub":22,"x":-2.57,"y":-12.52},{"hub":23,"x":2.82,"y":-0.55},{"hub":24,"x":0.99,"y":-8.4},{"hub":25,"x":4.61,"y":3.84}],"totals":{"base":{"orders":326981,"cancelled":37530,"delivered":277885},"treat":{"orders":326981,"cancelled":11063,"delivered":307814}}}; /* SERIES:END */
+          // faded backdrop: the 26 real hub positions (data/hubs.csv) and their 4 km service radius
+          const NS = "http://www.w3.org/2000/svg", map = document.getElementById("endcard-map"), PX = 13;
+          (SERIES.hubs || []).forEach((h) => {
+            const x = 290 + h.x * PX, y = 242 - h.y * PX;
+            const c = document.createElementNS(NS, "circle");
+            c.setAttribute("cx", x.toFixed(1)); c.setAttribute("cy", y.toFixed(1)); c.setAttribute("r", 4 * PX);
+            c.setAttribute("fill", "rgba(63,216,168,0.06)"); c.setAttribute("stroke", "rgba(63,216,168,0.5)"); c.setAttribute("stroke-width", "2");
+            map.appendChild(c);
+            const d = document.createElementNS(NS, "rect");
+            d.setAttribute("x", (x - 5).toFixed(1)); d.setAttribute("y", (y - 5).toFixed(1)); d.setAttribute("width", 10); d.setAttribute("height", 10);
+            d.setAttribute("rx", 2); d.setAttribute("fill", "#7fa8ff");
+            map.appendChild(d);
+          });
+          const tl = gsap.timeline({ paused: true });
+          tl.fromTo("#endcard-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
+          tl.fromTo("#endcard-map", { opacity: 0, scale: 0.94 }, { opacity: 0.45, scale: 1, duration: 3.6, ease: "power2.out" }, 0);
+          tl.fromTo("#endcard-kicker", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.15);
+          tl.fromTo("#endcard-name", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.7, ease: "expo.out" }, 0.25);
+          tl.fromTo("#endcard-url", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.5);
+          [1, 2, 3, 4].forEach((n, i) =>
+            tl.fromTo("#endcard-c" + n, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.8 + i * 0.1));
+          tl.fromTo("#endcard-run", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 1.4);
+          window.__timelines["endcard"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

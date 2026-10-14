@@ -1,0 +1,479 @@
+# Audit facts for the last-mile-dispatch demo video.
+# Read by ~/Work/hyperframes/demos/tools/build_audit_report.py.
+#
+# Check expressions are Python, evaluated with these helpers (paths relative to the repo root;
+# a "demo:" prefix means relative to the demo project folder):
+#   R(path) -> pandas DataFrame from CSV      J(path) -> parsed JSON
+#   row(path, **eq) -> the single CSV row matching all equalities (a pandas Series)
+#   T(path) -> file text                      grep(path, regex) -> True/False
+# A check passes when fmt.format(value) == expect (or, with fmt "bool", when value is True).
+
+project:
+  name: last-mile-dispatch
+  title: "last-mile-dispatch: demo video audit report"
+  repo_url: https://github.com/kavya2693/last-mile-dispatch
+  repo_dir: ../../../..
+  demo_dir: ..
+  demo_display: docs/demo/source
+  out_dir: ../..
+  video: docs/demo/demo.mp4
+  video_duration_s: 84.6
+  outputs_dir: outputs
+  venv_python: .venv/bin/python
+  version_packages: [numpy, pandas, scipy]
+  regenerate:
+    - "make run                                   # data/ (seed 7) and outputs/*.csv, summary.json, run_log.txt (~3 min)"
+    - "python3 docs/demo/source/tools/export_series.py docs/demo/source/assets/run_series.json"
+    - "PYTHONPATH=src .venv/bin/python docs/demo/source/tools/export_rider_board.py docs/demo/source/assets/rider_board.json"
+    - "python3 docs/demo/source/tools/inject_sheet.py docs/demo/source/assets/rider_board.json docs/demo/source/compositions/value.html --name SHEET"
+    - "for f in s02-hook s04-routes s07-end; do python3 docs/demo/source/tools/inject_sheet.py docs/demo/source/assets/run_series.json docs/demo/source/compositions/$f.html --name SERIES; done"
+    - "cd docs/demo/source && npx --yes hyperframes@0.8.156 check && npx --yes hyperframes@0.8.156 render -f 30 -q looks -o renders/last-mile-dispatch-master.mp4 && cd -"
+    - "ffmpeg -y -i docs/demo/source/renders/last-mile-dispatch-master.mp4 -c:v libx264 -preset slow -crf 25 -pix_fmt yuv420p -movflags +faststart -an docs/demo/demo.mp4"
+    - "python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/facts.yaml   # stills, checks, MD/DOCX/PDF"
+  seeds: {data: 7, hub_assignment: 2026, rerandomisation: 2027, simulator: "hub_id * 10000 + day index (same for every policy)"}
+  run_time: "summary.json runtime_s = 179.8 s (about 3 min) for make run with 4 workers on the author's laptop"
+
+assumptions:
+  - id: A-01
+    statement: "All data is synthetic, produced by a seeded generator sized to the production problem (26 hubs, 473 riders, 42 days, 477,868 orders). Production dispatch data is proprietary."
+    source: "scripts/generate_data.py:9, :168 (seed 7); src/last_mile_dispatch/config.py:11-18; README 'The data'"
+    figures: [F-03, F-04, F-05, F-06]
+    all_figures: true
+    edit: ["scripts/generate_data.py", "src/last_mile_dispatch/config.py"]
+    rerun: ["make data", "make run"]
+  - id: A-02
+    statement: "The rider roster is fixed and sized for an ordinary weekday evening; every policy pays for the same riders. Cost savings therefore come mostly from cancelled orders turned into deliveries, and utilisation falls."
+    source: "scripts/generate_data.py:84-85 (make_riders); README 'Known limitations' (the biggest gap)"
+    figures: [F-04, F-33, F-34, F-35, F-36, F-37, F-44, F-45, F-53, F-54, F-55, F-56]
+    edit: ["scripts/generate_data.py:84-85"]
+    rerun: ["make data", "make run"]
+  - id: A-03
+    statement: "Travel is straight-line distance x 1.35 at an hour-dependent speed (bike 24 km/h, car 22 km/h; peaks x0.68-0.88, rain x0.6), not a road graph; riders return to the hub between trips."
+    source: "src/last_mile_dispatch/config.py:13, :36; geo.py:29-46; simulate.py:247-249; README 'Known limitations'"
+    figures: [F-32, F-33, F-34, F-35, F-36, F-37, F-39, F-44, F-45, F-46, F-47]
+    edit: ["src/last_mile_dispatch/config.py:13, :36", "src/last_mile_dispatch/geo.py:29-41"]
+    rerun: ["make run", "export_rider_board.py + inject_sheet.py"]
+  - id: A-04
+    statement: "Matching prices each rider-bag pair in AED: km cost of the vehicle, 1.0 per minute late, minus 1.4 per minute already waited, minus a 9.0 credit per order. The matcher is myopic (one 2-minute wave at a time)."
+    source: "src/last_mile_dispatch/config.py:74-76; assignment.py:46-58; README 'Known limitations'"
+    figures: [F-14, F-33, F-34, F-39, F-44, F-45, F-46, F-47, F-48]
+    edit: ["src/last_mile_dispatch/config.py:74-76"]
+    rerun: ["make run", "export_rider_board.py + inject_sheet.py"]
+  - id: A-05
+    statement: "Bagging limits: drops within 1 km and created within 12 minutes of the seed order, at most 3 stops, and the first customer may wait at most 9 extra minutes."
+    source: "src/last_mile_dispatch/config.py:37, :65-67; bagging.py:51-87"
+    figures: [F-15, F-16, F-17, F-39, F-41]
+    edit: ["src/last_mile_dispatch/config.py:37, :65-67"]
+    rerun: ["make run", "export_rider_board.py + inject_sheet.py"]
+  - id: A-06
+    statement: "Geofence rule: a 'customer unavailable' mark is flagged when fewer than 2 of the rider's last 6 GPS pings are within 150 m of the customer; flagged riders are sent back to the door (treatment) or the flag is only logged (baseline)."
+    source: "src/last_mile_dispatch/config.py:43, :79-80; geofence.py:31-39; simulate.py:218-230"
+    figures: [F-21, F-25, F-49, F-50]
+    edit: ["src/last_mile_dispatch/config.py:79-80"]
+    rerun: ["make run"]
+  - id: A-07
+    statement: "Fake marks: about 8% of riders (36 of 473 in the data) mark 'customer unavailable' without reaching the door on 22% of their stops; fakes are known by construction and riders do not change habit when flagged."
+    source: "src/last_mile_dispatch/config.py:40-41; scripts/generate_data.py:94; README 'Known limitations'"
+    figures: [F-10, F-21, F-49, F-50]
+    edit: ["src/last_mile_dispatch/config.py:40-41"]
+    rerun: ["make data", "make run"]
+  - id: A-08
+    statement: "Service promise 30 minutes from order creation; a customer cancels if nothing has left the hub after 45 minutes; the dispatcher wakes every 2 minutes; 2 minutes handover per stop."
+    source: "src/last_mile_dispatch/config.py:23, :27-29"
+    figures: [F-07, F-08, F-24, F-32, F-33, F-34, F-42, F-46, F-47, F-48]
+    edit: ["src/last_mile_dispatch/config.py:23-29"]
+    rerun: ["make run", "export_rider_board.py + inject_sheet.py"]
+  - id: A-09
+    statement: "Experiment design: hubs sorted by pre-period orders per day, paired, one coin flip per pair (seed 2026); one number per hub over four weeks; Welch t and hub-bootstrap 95% intervals; power from the pre-period between-hub spread."
+    source: "src/last_mile_dispatch/cli.py:22, :58-98; experiment.py:20-124"
+    figures: [F-27, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-52, F-53, F-54, F-55, F-56, F-57]
+    edit: ["src/last_mile_dispatch/cli.py:22", "src/last_mile_dispatch/experiment.py"]
+    rerun: ["make run"]
+  - id: A-10
+    statement: "Calendar: two pre-period weeks from 2026-01-19, then four experiment weeks 2026-02-02 to 2026-03-01; weekends are Saturday-Sunday; Ramadan from 2026-02-18; one rain day 2026-02-07 (35% more orders, 40% slower traffic)."
+    source: "src/last_mile_dispatch/config.py:16-18; scripts/generate_data.py:35-36; README 'The data'"
+    figures: [F-06, F-09, F-13, F-31, F-32, F-35, F-36, F-37, F-38, F-40]
+    edit: ["src/last_mile_dispatch/config.py:16-18", "scripts/generate_data.py:35-36"]
+    rerun: ["make data", "make run"]
+  - id: A-11
+    statement: "The rider board (slide 07) re-runs the repo's own simulator for hub 18 on 2026-02-14 under the treatment and records the 21:46 wave; drop ETAs replay the simulator's clock with geo.travel_min for riders who are honest and customers who are home."
+    source: "docs/demo/source/tools/export_rider_board.py; simulate.py:189-253"
+    figures: [F-39, F-40, F-41, F-42]
+    edit: ["docs/demo/source/tools/export_rider_board.py (hub, date, wave arguments)"]
+    rerun: ["export_rider_board.py + inject_sheet.py", "hyperframes render"]
+  - id: A-12
+    statement: "Video rounding: percentages to 1 decimal, AED to 2 decimals, utilisation and CI bounds to 3 decimals, counts with thousands separators; '~3 min' and '180 s' are rounded run times."
+    source: "this audit (display convention)"
+    figures: [F-16, F-17, F-23, F-32, F-34, F-35, F-36, F-37, F-44, F-45, F-46, F-47, F-48, F-49, F-50, F-53, F-54, F-55, F-59]
+    edit: ["the composition file named on each slide"]
+    rerun: ["hyperframes render"]
+  - id: A-13
+    statement: "Slide 01 (industries, everyday problems) is general delivery-operations knowledge used as context. It is not a result of this repo and carries no numbers."
+    source: "author's framing; README 'The problem' supports problems 1-4"
+    figures: [F-01, F-02]
+    edit: ["compositions/s01-context.html"]
+    rerun: ["hyperframes render"]
+
+figures:
+  # ---- slide 01
+  - {id: F-01, slides: ["01"], label: "Industries that relate: quick-commerce grocery, food & restaurant delivery, parcel & pharmacy couriers", shown: "3 industry chips", type: general-knowledge, source: "author's framing", key: "-", formula: "-", manual: "Context statement, not a repo output."}
+  - {id: F-02, slides: ["01"], label: "Four everyday problems (one order per trip by hand; peaks outrun riders; 'customer unavailable' from the road; before-and-after judging)", shown: "4 problem cards", type: general-knowledge, source: "README 'The problem', 'Insights and learning'", key: "README text", formula: "-",
+     check: {expr: "all(grep('README.md', p) for p in [r'one order\\s+per trip', r'orders pile up faster than riders', r'customer unavailable', r'before-and-after'])", fmt: bool}}
+  # ---- slide 02
+  - {id: F-03, slides: ["02", "05", "07"], label: "Hubs", shown: "26 hubs", type: direct, source: "outputs/summary.json; data/hubs.csv", key: "hubs; row count", formula: "-",
+     check: {expr: "J('outputs/summary.json')['hubs'] if len(R('data/hubs.csv')) == J('outputs/summary.json')['hubs'] else -1", fmt: "{:d}", expect: "26"}}
+  - {id: F-04, slides: ["02", "05"], label: "Riders", shown: "473 riders", type: direct, source: "data/riders.csv", key: "row count", formula: "-",
+     check: {expr: "len(R('data/riders.csv'))", fmt: "{:d}", expect: "473"}}
+  - {id: F-05, slides: ["02", "05"], label: "Orders in the dataset (pre-period + experiment)", shown: "477,868 orders", type: direct, source: "data/orders.csv.gz", key: "row count", formula: "-",
+     check: {expr: "len(R('data/orders.csv.gz'))", fmt: "{:,d}", expect: "477,868"}}
+  - {id: F-06, slides: ["02", "05"], label: "Length of the dataset", shown: "6 weeks / 42 days", type: derived, source: "data/days.csv", key: "row count = 42", formula: "42 / 7 = 6 weeks",
+     check: {expr: "len(R('data/days.csv'))", fmt: "{:d} days", expect: "42 days"}}
+  - {id: F-07, slides: ["02", "07"], label: "Delivery promise", shown: "30 minutes to each door / 30-minute promise", type: direct, source: "src/last_mile_dispatch/config.py:27", key: "SLA_MIN = 30", formula: "-",
+     check: {expr: "grep('src/last_mile_dispatch/config.py', r'^SLA_MIN = 30\\b')", fmt: bool}}
+  - {id: F-08, slides: ["02", "03", "05"], label: "Dispatch wave interval", shown: "a wave every 2 min / EVERY 2 MINUTES / dispatch wave 2 min", type: direct, source: "src/last_mile_dispatch/config.py:23", key: "WAVE_MIN = 2", formula: "-",
+     check: {expr: "grep('src/last_mile_dispatch/config.py', r'^WAVE_MIN = 2\\b')", fmt: bool}}
+  - {id: F-09, slides: ["02"], label: "Ramadan, weekends and a rain day are in the calendar", shown: "Ramadan · weekends · rain", type: direct, source: "data/days.csv", key: "ramadan, weekend, rain columns", formula: "any ramadan, any weekend, exactly one rain day",
+     check: {expr: "(lambda d: bool(d['ramadan'].any()) and bool(d['weekend'].any()) and int(d['rain'].sum()) == 1)(R('data/days.csv'))", fmt: bool}}
+  - {id: F-10, slides: ["02"], label: "Riders who sometimes mark 'not home' without reaching the door", shown: "36 riders sometimes skip doors", type: direct, source: "data/riders.csv", key: "remote_marker == True", formula: "count",
+     check: {expr: "int(R('data/riders.csv')['remote_marker'].sum())", fmt: "{:d}", expect: "36"}}
+  - {id: F-11, slides: ["02", "10"], label: "Background map: the 26 real hub positions with their 4 km service radius", shown: "hub dots + circles", type: direct, source: "data/hubs.csv; config.py:12 (SERVICE_RADIUS_KM = 4.0)", key: "lat/lon -> km from the centroid (demo assets/run_series.json)", formula: "-",
+     check: {expr: "grep('src/last_mile_dispatch/config.py', r'^SERVICE_RADIUS_KM = 4.0') and len(J('demo:assets/run_series.json')['hubs']) == 26 and series_injected('compositions/s02-hook.html') and series_injected('compositions/s07-end.html')", fmt: bool}}
+  # ---- slide 03
+  - {id: F-12, slides: ["03"], label: "Each flow block exists in the code (bag, match, door check, A/B test)", shown: "ORDERS → BAG → MATCH → DOOR CHECK → A/B TEST → VERDICT", type: direct, source: "src/last_mile_dispatch/", key: "functions", formula: "-",
+     check: {expr: "all(grep('src/last_mile_dispatch/' + f, p) for f, p in [('bagging.py', r'def make_bags'), ('assignment.py', r'def min_cost'), ('geofence.py', r'def flag_attempts'), ('experiment.py', r'def readout')])", fmt: bool}}
+  - {id: F-13, slides: ["03"], label: "The A/B test runs four weeks", shown: "4 WEEKS", type: derived, source: "outputs/summary.json", key: "experiment_days = 28", formula: "28 / 7 = 4",
+     check: {expr: "J('outputs/summary.json')['experiment_days'] // 7", fmt: "{:d} weeks", expect: "4 weeks"}}
+  - {id: F-14, slides: ["03"], label: "Verdict badges: cheaper orders, fewer cancels, fewer fake marks (treatment vs control, Welch 95% CI below zero)", shown: "cheaper orders / fewer cancels / fewer fake marks", type: derived, source: "outputs/ab_readout.csv", key: "welch_hi for cost_per_delivered, cancel_rate, fake_accepted_per_1k", formula: "welch_hi < 0 for all three",
+     check: {expr: "all(row('outputs/ab_readout.csv', metric=m)['welch_hi'] < 0 for m in ['cost_per_delivered', 'cancel_rate', 'fake_accepted_per_1k'])", fmt: bool}}
+  # ---- slide 04
+  - {id: F-15, slides: ["04", "05"], label: "Bag rule: oldest order seeds the bag; close drops created around the same time join; up to 3 stops; first customer barely waits longer", shown: "3 steps / ≤ 3 stops · 1 km", type: direct, source: "src/last_mile_dispatch/bagging.py:3-5, :51-87; config.py:37, :65-67", key: "BAG_CAPACITY = 3, BAG_MAX_DROP_GAP_KM = 1.0, BAG_MAX_CREATED_GAP_MIN = 12.0, BAG_MAX_EXTRA_MIN = 9.0", formula: "-",
+     check: {expr: "grep('src/last_mile_dispatch/bagging.py', r'Greedy by age') and all(grep('src/last_mile_dispatch/config.py', p) for p in [r'^BAG_CAPACITY = 3\\b', r'^BAG_MAX_DROP_GAP_KM = 1.0', r'^BAG_MAX_CREATED_GAP_MIN = 12.0', r'^BAG_MAX_EXTRA_MIN = 9.0'])", fmt: bool}}
+  - {id: F-16, slides: ["04"], label: "Cost per delivered order, FIFO baseline (ablation, all hubs, all experiment days)", shown: "9.71", type: direct, source: "outputs/ablation.csv", key: "policy=baseline, cost_per_delivered", formula: "-",
+     check: {expr: "R('outputs/ablation.csv').set_index('Unnamed: 0').at['baseline', 'cost_per_delivered']", fmt: "{:.2f}", expect: "9.71"}}
+  - {id: F-17, slides: ["04"], label: "Cost per delivered order, bagging only", shown: "8.95 AED", type: direct, source: "outputs/ablation.csv", key: "policy=bagging, cost_per_delivered", formula: "-",
+     check: {expr: "R('outputs/ablation.csv').set_index('Unnamed: 0').at['bagging', 'cost_per_delivered']", fmt: "{:.2f}", expect: "8.95"}}
+  # ---- slide 05
+  - {id: F-18, slides: ["05"], label: "Every architecture box names a real file/function", shown: "generate_data.py, runner.py run_all(), simulate.py simulate_hub_day(), bagging.py, assignment.py (min_cost, fifo), geo.py, geofence.py, experiment.py, report.py", type: direct, source: "src/last_mile_dispatch/, scripts/", key: "defs", formula: "-",
+     check: {expr: "all(grep(f, p) for f, p in [('scripts/generate_data.py', r'def main'), ('src/last_mile_dispatch/runner.py', r'def run_all'), ('src/last_mile_dispatch/simulate.py', r'def simulate_hub_day'), ('src/last_mile_dispatch/simulate.py', r'class Result'), ('src/last_mile_dispatch/bagging.py', r'def make_bags'), ('src/last_mile_dispatch/assignment.py', r'def min_cost'), ('src/last_mile_dispatch/assignment.py', r'def fifo'), ('src/last_mile_dispatch/assignment.py', r'linear_sum_assignment'), ('src/last_mile_dispatch/geo.py', r'def travel_min'), ('src/last_mile_dispatch/geofence.py', r'def flag_attempts'), ('src/last_mile_dispatch/geofence.py', r'def evaluate'), ('src/last_mile_dispatch/geofence.py', r'def radius_sweep'), ('src/last_mile_dispatch/experiment.py', r'def paired_stratified_assignment'), ('src/last_mile_dispatch/experiment.py', r'def readout'), ('src/last_mile_dispatch/experiment.py', r'def rerandomisation_check'), ('src/last_mile_dispatch/report.py', r'def pooled_by_policy'), ('src/last_mile_dispatch/report.py', r'def stress_split'), ('src/last_mile_dispatch/config.py', r'class Policy')])", fmt: bool}}
+  - {id: F-19, slides: ["05"], label: "Output files named under the evaluation boxes exist", shown: "power.csv, ab_readout.csv, geofence_eval.csv, ablation.csv, rerandomisation.csv, hub_day_metrics.csv", type: direct, source: "outputs/", key: "files", formula: "-",
+     check: {expr: "all(len(R('outputs/' + f)) > 0 for f in ['power.csv', 'ab_readout.csv', 'geofence_eval.csv', 'ablation.csv', 'rerandomisation.csv', 'hub_day_metrics.csv'])", fmt: bool}}
+  - {id: F-20, slides: ["05"], label: "Rows in hub_day_metrics.csv (26 hubs x 28 days x 5 policies)", shown: "3,640 rows", type: direct, source: "outputs/hub_day_metrics.csv", key: "row count", formula: "26 x 28 x 5",
+     check: {expr: "len(R('outputs/hub_day_metrics.csv'))", fmt: "{:,d}", expect: "3,640"}}
+  - {id: F-21, slides: ["05"], label: "'Not home' marks judged by the geofence evaluation (baseline arm)", shown: "11,566 marks", type: direct, source: "outputs/geofence_eval.csv", key: "slice=all, events", formula: "-",
+     check: {expr: "int(row('outputs/geofence_eval.csv', slice='all')['events'])", fmt: "{:,d}", expect: "11,566"}}
+  - {id: F-22, slides: ["05"], label: "Hub-day-policy runs simulated (pre-period baseline + all experiment policies)", shown: "hub-day runs 4,004", type: direct, source: "outputs/run_log.txt line 2", key: "'simulated 4,004 hub-day-policy runs'", formula: "26 x 14 + 26 x 28 x 5 = 4,004",
+     check: {expr: "grep('outputs/run_log.txt', r'simulated 4,004 hub-day-policy runs') and 26 * 14 + 26 * 28 * 5 == 4004", fmt: bool}}
+  - {id: F-23, slides: ["05"], label: "Full run time", shown: "full run, laptop 180 s", type: derived, source: "outputs/summary.json", key: "runtime_s = 179.8", formula: "rounded to whole seconds",
+     check: {expr: "round(J('outputs/summary.json')['runtime_s'])", fmt: "{:d} s", expect: "180 s"}}
+  - {id: F-24, slides: ["05"], label: "Cancel if nothing has left the hub", shown: "cancel if not out 45 min", type: direct, source: "src/last_mile_dispatch/config.py:28", key: "CANCEL_AFTER_MIN = 45", formula: "-",
+     check: {expr: "grep('src/last_mile_dispatch/config.py', r'^CANCEL_AFTER_MIN = 45\\b')", fmt: bool}}
+  - {id: F-25, slides: ["05"], label: "Geofence radius", shown: "150 m geofence", type: direct, source: "src/last_mile_dispatch/config.py:79", key: "GEOFENCE_RADIUS_M = 150.0", formula: "-",
+     check: {expr: "grep('src/last_mile_dispatch/config.py', r'^GEOFENCE_RADIUS_M = 150.0')", fmt: bool}}
+  - {id: F-26, slides: ["05"], label: "Re-randomisation draws", shown: "500 re-draws", type: direct, source: "outputs/rerandomisation.csv", key: "draws", formula: "-",
+     check: {expr: "int(R('outputs/rerandomisation.csv')['draws'].unique()[0]) if R('outputs/rerandomisation.csv')['draws'].nunique() == 1 else -1", fmt: "{:d}", expect: "500"}}
+  - {id: F-27, slides: ["05", "08", "09"], label: "Hubs per arm", shown: "13 vs 13 hubs", type: direct, source: "outputs/summary.json", key: "arms.treatment, arms.control", formula: "len of each list",
+     check: {expr: "'{} vs {}'.format(len(J('outputs/summary.json')['arms']['treatment']), len(J('outputs/summary.json')['arms']['control']))", fmt: "{}", expect: "13 vs 13"}}
+  - {id: F-28, slides: ["05"], label: "Worker processes, policies and shared seed", shown: "4 parallel workers · 5 policies, 1 seed", type: direct, source: "src/last_mile_dispatch/cli.py:29; runner.py:36-41; config.py:62", key: "--workers default 4; same seed for every policy; ALL_POLICIES", formula: "-",
+     check: {expr: "grep('src/last_mile_dispatch/cli.py', r'--workers\", type=int, default=4') and grep('src/last_mile_dispatch/runner.py', r'Same seed for every policy') and len(R('outputs/ablation.csv')) == 5", fmt: bool}}
+  - {id: F-29, slides: ["05"], label: "CI slice", shown: "CI slice 8 hubs × 7 d", type: direct, source: "src/last_mile_dispatch/cli.py:38, :40; .github/workflows/ci.yml", key: "hubs.head(8), experiment days head(7)", formula: "-",
+     check: {expr: "grep('src/last_mile_dispatch/cli.py', r'hubs\\.head\\(8\\)') and grep('src/last_mile_dispatch/cli.py', r'\\.head\\(7\\)') and grep('.github/workflows/ci.yml', r'dispatch --quick')", fmt: bool}}
+  - {id: F-30, slides: ["05"], label: "Generator seed", shown: "generate_data.py · seed 7", type: direct, source: "scripts/generate_data.py:168", key: "--seed default 7", formula: "-",
+     check: {expr: "grep('scripts/generate_data.py', r'\"--seed\", type=int, default=7')", fmt: bool}}
+  # ---- slide 06
+  - {id: F-31, slides: ["06"], label: "Daily cancellation rate, all hubs pooled, FIFO baseline vs treatment (28 points per line)", shown: "two lines, Feb 2 - Mar 1", type: derived, source: "outputs/hub_day_metrics.csv", key: "sum(cancelled) / sum(orders) by date and policy", formula: "injected SERIES block must equal the recomputation",
+     check: {expr: "series_daily_matches()", fmt: bool}}
+  - {id: F-32, slides: ["06"], label: "Rain day cancellation rate, baseline -> treatment", shown: "RAIN DAY · 42.5% → 14.0%", type: direct, source: "outputs/stress_split.csv", key: "day_type=rain day, cancel_rate", formula: "x 100",
+     check: {expr: "'{:.1f}% → {:.1f}%'.format(100 * row('outputs/stress_split.csv', day_type='rain day', policy='baseline')['cancel_rate'], 100 * row('outputs/stress_split.csv', day_type='rain day', policy='bagging+matching+geofence')['cancel_rate'])", fmt: "{}", expect: "42.5% → 14.0%"}}
+  - {id: F-33, slides: ["06"], label: "Orders cancelled over four weeks, FIFO vs treatment (all 26 hubs)", shown: "37,530 → 11,063", type: direct, source: "outputs/hub_day_metrics.csv", key: "sum(cancelled) by policy", formula: "-",
+     check: {expr: "(lambda g: '{:,d} → {:,d}'.format(int(g['baseline']), int(g['bagging+matching+geofence'])))(R('outputs/hub_day_metrics.csv').groupby('policy')['cancelled'].sum())", fmt: "{}", expect: "37,530 → 11,063"}}
+  - {id: F-34, slides: ["06"], label: "Change in cancelled orders", shown: "−70.5%", type: derived, source: "outputs/hub_day_metrics.csv", key: "F-33", formula: "(11,063 / 37,530 - 1) x 100 = -70.52%",
+     check: {expr: "(lambda g: (g['bagging+matching+geofence'] / g['baseline'] - 1) * 100)(R('outputs/hub_day_metrics.csv').groupby('policy')['cancelled'].sum())", fmt: "{:+.1f}%", expect: "-70.5%"}}
+  - {id: F-35, slides: ["06"], label: "Ordinary weekday: orders, cost per delivered order, change", shown: "125,715 orders · 9.71 → 9.36 · −3.7%", type: derived, source: "outputs/stress_split.csv", key: "day_type=ordinary weekday", formula: "cost_treat / cost_base - 1",
+     check: {expr: "stress_line('ordinary weekday')", fmt: "{}", expect: "125,715 · 9.71 → 9.36 · -3.7%"}}
+  - {id: F-36, slides: ["06"], label: "Weekend or Ramadan: orders, cost per delivered order, change", shown: "184,449 orders · 9.65 → 8.30 · −14.0%", type: derived, source: "outputs/stress_split.csv", key: "day_type=weekend or Ramadan", formula: "cost_treat / cost_base - 1",
+     check: {expr: "stress_line('weekend or Ramadan')", fmt: "{}", expect: "184,449 · 9.65 → 8.30 · -14.0%"}}
+  - {id: F-37, slides: ["06"], label: "Rain day: orders, cost per delivered order, change", shown: "16,817 orders · 10.42 → 6.84 · −34.4%", type: derived, source: "outputs/stress_split.csv", key: "day_type=rain day", formula: "cost_treat / cost_base - 1",
+     check: {expr: "stress_line('rain day')", fmt: "{}", expect: "16,817 · 10.42 → 6.84 · -34.4%"}}
+  - {id: F-38, slides: ["06"], label: "Ramadan band starts", shown: "RAMADAN band from Feb 18", type: direct, source: "data/days.csv", key: "first date with ramadan = True", formula: "-",
+     check: {expr: "R('data/days.csv').query('ramadan')['date'].min()", fmt: "{}", expect: "2026-02-18"}}
+  # ---- slide 07
+  - {id: F-39, slides: ["07"], label: "Five rider-board rows (orders, km, waited, leaves, first/last ETA, due, back) for hub 18, 2026-02-14, 21:46 wave", shown: "Rider 01-05 rows", type: direct, source: "demo assets/rider_board.json (re-run of the repo's simulator), injected into compositions/value.html", key: "rows", formula: "km = sum of road legs; waited = wave time - oldest order's creation; due = earliest creation + 30 min",
+     check: {expr: "sheet_rows_match()", fmt: bool}}
+  - {id: F-40, slides: ["07"], label: "Hub 18 on 2026-02-14: delivered / orders / cancelled under the treatment, and cancellations under FIFO", shown: "795 of 821 delivered, 7 cancelled · FIFO would cancel 59", type: direct, source: "outputs/hub_day_metrics.csv", key: "hub_id=18, date=2026-02-14, policy in {bagging+matching+geofence, baseline}", formula: "-",
+     check: {expr: "(lambda t, b: '{} of {} delivered, {} cancelled · FIFO {}'.format(int(t['delivered']), int(t['orders']), int(t['cancelled']), int(b['cancelled'])))(row('outputs/hub_day_metrics.csv', hub_id=18, date='2026-02-14', policy='bagging+matching+geofence'), row('outputs/hub_day_metrics.csv', hub_id=18, date='2026-02-14', policy='baseline'))", fmt: "{}", expect: "795 of 821 delivered, 7 cancelled · FIFO 59"}}
+  - {id: F-41, slides: ["07"], label: "Wave context: bags held, free riders, bags waiting", shown: "+ 3 bags held for the next wave · 5 free riders, 8 bags waiting", type: direct, source: "demo assets/rider_board.json", key: "bags_held, free_riders, bags_waiting_before", formula: "held = bags waiting - riders matched",
+     check: {expr: "(lambda d: '{} held · {} riders, {} bags'.format(d['bags_held'], d['free_riders'], d['bags_waiting_before']))(J('demo:assets/rider_board.json'))", fmt: "{}", expect: "3 held · 5 riders, 8 bags"}}
+  - {id: F-42, slides: ["07"], label: "All orders on the board land inside the 30-minute promise", shown: "All 9 inside the 30-minute promise.", type: direct, source: "demo assets/rider_board.json", key: "orders_dispatched; stops[].on_time", formula: "every stop ETA - creation <= 30 min",
+     check: {expr: "(lambda d: d['orders_dispatched'] == 9 and all(s['on_time'] for r in d['rows'] for s in r['stops']))(J('demo:assets/rider_board.json'))", fmt: bool}}
+  - {id: F-43, slides: ["07"], label: "Hub 18 is a treatment hub (so the treatment is what it runs)", shown: "HUB 18", type: direct, source: "outputs/summary.json", key: "arms.treatment", formula: "-",
+     check: {expr: "18 in J('outputs/summary.json')['arms']['treatment']", fmt: bool}}
+  # ---- slide 08
+  - {id: F-44, slides: ["08"], label: "Fleet cost per delivered order, treatment vs control (relative)", shown: "−10.6%", type: direct, source: "outputs/ab_readout.csv", key: "metric=cost_per_delivered, rel_diff", formula: "x 100",
+     check: {expr: "row('outputs/ab_readout.csv', metric='cost_per_delivered')['rel_diff'] * 100", fmt: "{:+.1f}%", expect: "-10.6%"}}
+  - {id: F-45, slides: ["08"], label: "Fleet cost per delivered order, control -> treatment", shown: "AED 9.79 → 8.75", type: direct, source: "outputs/ab_readout.csv", key: "metric=cost_per_delivered, control, treatment", formula: "-",
+     check: {expr: "(lambda r: '{:.2f} → {:.2f}'.format(r['control'], r['treatment']))(row('outputs/ab_readout.csv', metric='cost_per_delivered'))", fmt: "{}", expect: "9.79 → 8.75"}}
+  - {id: F-46, slides: ["08"], label: "Orders delivered within 30 min (share of all orders), difference in points", shown: "+28.3", type: direct, source: "outputs/ab_readout.csv", key: "metric=on_time_share_of_orders, diff", formula: "x 100",
+     check: {expr: "row('outputs/ab_readout.csv', metric='on_time_share_of_orders')['diff'] * 100", fmt: "{:+.1f}", expect: "+28.3"}}
+  - {id: F-47, slides: ["08"], label: "Orders delivered within 30 min, control -> treatment", shown: "58.0% → 86.2%", type: direct, source: "outputs/ab_readout.csv", key: "metric=on_time_share_of_orders, control, treatment", formula: "x 100",
+     check: {expr: "(lambda r: '{:.1f}% → {:.1f}%'.format(100 * r['control'], 100 * r['treatment']))(row('outputs/ab_readout.csv', metric='on_time_share_of_orders'))", fmt: "{}", expect: "58.0% → 86.2%"}}
+  - {id: F-48, slides: ["08"], label: "Cancellation rate, treated hubs (control shown in the footer)", shown: "3.7% · control 11.6%", type: direct, source: "outputs/ab_readout.csv", key: "metric=cancel_rate, treatment, control", formula: "x 100",
+     check: {expr: "(lambda r: '{:.1f}% · control {:.1f}%'.format(100 * r['treatment'], 100 * r['control']))(row('outputs/ab_readout.csv', metric='cancel_rate'))", fmt: "{}", expect: "3.7% · control 11.6%"}}
+  - {id: F-49, slides: ["08"], label: "Fake 'not home' marks accepted per 1,000 orders (relative)", shown: "−72.4%", type: direct, source: "outputs/ab_readout.csv", key: "metric=fake_accepted_per_1k, rel_diff", formula: "x 100",
+     check: {expr: "row('outputs/ab_readout.csv', metric='fake_accepted_per_1k')['rel_diff'] * 100", fmt: "{:+.1f}%", expect: "-72.4%"}}
+  - {id: F-50, slides: ["08"], label: "Fake marks accepted per 1,000 orders, control -> treatment", shown: "11.7 → 3.2 per 1,000", type: direct, source: "outputs/ab_readout.csv", key: "metric=fake_accepted_per_1k, control, treatment", formula: "-",
+     check: {expr: "(lambda r: '{:.1f} → {:.1f}'.format(r['control'], r['treatment']))(row('outputs/ab_readout.csv', metric='fake_accepted_per_1k'))", fmt: "{}", expect: "11.7 → 3.2"}}
+  - {id: F-51, slides: ["08"], label: "Orders in the four experiment weeks", shown: "326,981 orders", type: direct, source: "outputs/summary.json", key: "orders_in_experiment", formula: "-",
+     check: {expr: "J('outputs/summary.json')['orders_in_experiment']", fmt: "{:,d}", expect: "326,981"}}
+  - {id: F-52, slides: ["08"], label: "Welch 95% CIs exclude zero on all four headline metrics", shown: "Welch 95% CIs exclude zero on all four", type: derived, source: "outputs/ab_readout.csv", key: "welch_lo, welch_hi", formula: "lo > 0 or hi < 0 for cost, on-time, cancel, fake",
+     check: {expr: "all((lambda r: r['welch_lo'] > 0 or r['welch_hi'] < 0)(row('outputs/ab_readout.csv', metric=m)) for m in ['cost_per_delivered', 'on_time_share_of_orders', 'cancel_rate', 'fake_accepted_per_1k'])", fmt: bool}}
+  # ---- slide 09
+  - {id: F-53, slides: ["09"], label: "Rider utilisation, control vs treated hubs", shown: "0.667 / 0.650", type: direct, source: "outputs/ab_readout.csv", key: "metric=utilization, control, treatment", formula: "-",
+     check: {expr: "(lambda r: '{:.3f} / {:.3f}'.format(r['control'], r['treatment']))(row('outputs/ab_readout.csv', metric='utilization'))", fmt: "{}", expect: "0.667 / 0.650"}}
+  - {id: F-54, slides: ["09"], label: "Welch 95% CI of the utilisation difference", shown: "−0.040 to +0.007", type: direct, source: "outputs/ab_readout.csv", key: "metric=utilization, welch_lo, welch_hi", formula: "-",
+     check: {expr: "(lambda r: '{:+.3f} to {:+.3f}'.format(r['welch_lo'], r['welch_hi']))(row('outputs/ab_readout.csv', metric='utilization'))", fmt: "{}", expect: "-0.040 to +0.007"}}
+  - {id: F-55, slides: ["09"], label: "Welch p-value for utilisation", shown: "p = 0.16", type: direct, source: "outputs/ab_readout.csv", key: "metric=utilization, welch_p", formula: "-",
+     check: {expr: "row('outputs/ab_readout.csv', metric='utilization')['welch_p']", fmt: "{:.2f}", expect: "0.16"}}
+  - {id: F-56, slides: ["09"], label: "Hubs per arm needed to detect the utilisation effect at 80% power", shown: "27 hubs per arm", type: direct, source: "outputs/power.csv", key: "metric=utilization, hubs_per_arm_needed", formula: "-",
+     check: {expr: "int(row('outputs/power.csv', metric='utilization')['hubs_per_arm_needed'])", fmt: "{:d}", expect: "27"}}
+  - {id: F-57, slides: ["09"], label: "CI bar drawn to scale", shown: "axis −0.05..+0.05 = 1,000 px; bar 95 → 571 px, estimate at 333 px", type: derived, source: "compositions/s06-twist.html; outputs/ab_readout.csv", key: "welch_lo, welch_hi, diff", formula: "px = (v + 0.05) x 10,000",
+     check: {expr: "(lambda r: [round((r[k] + 0.05) * 10000) for k in ('welch_lo', 'welch_hi', 'diff')] == [95, 571, 333])(row('outputs/ab_readout.csv', metric='utilization')) and grep('demo:compositions/s06-twist.html', r'left: 95px; top: -9px; width: 476px')", fmt: bool}}
+  # ---- slide 10
+  - {id: F-58, slides: ["10"], label: "Licence", shown: "MIT", type: direct, source: "LICENSE line 1", key: "-", formula: "-",
+     check: {expr: "T('LICENSE').startswith('MIT License')", fmt: bool}}
+  - {id: F-59, slides: ["10"], label: "Full run time", shown: "~3 min", type: derived, source: "outputs/summary.json", key: "runtime_s = 179.8", formula: "179.8 / 60 = 3.0 min",
+     check: {expr: "round(J('outputs/summary.json')['runtime_s'] / 60)", fmt: "~{:d} min", expect: "~3 min"}}
+  - {id: F-60, slides: ["10"], label: "Stack chips are real dependencies", shown: "SciPy · pandas · NumPy · Python", type: direct, source: "pyproject.toml dependencies", key: "numpy, pandas, scipy", formula: "-",
+     check: {expr: "all(grep('pyproject.toml', p) for p in [r'\"scipy', r'\"pandas', r'\"numpy', r'requires-python'])", fmt: bool}}
+  - {id: F-61, slides: ["10"], label: "Run command and scope", shown: "$ make run   # 26 hubs, 4 weeks, ~3 min", type: direct, source: "Makefile; outputs/summary.json", key: "run target; hubs; experiment_days", formula: "-",
+     check: {expr: "grep('Makefile', r'^run:') and J('outputs/summary.json')['hubs'] == 26 and J('outputs/summary.json')['experiment_days'] == 28", fmt: bool}}
+
+slides:
+  - id: "01"
+    title: "The industry"
+    image: slides/slide-01.jpg
+    time: "0.0-7.2 s"
+    composition: "compositions/s01-context.html"
+    text:
+      - "01 · THE INDUSTRY"
+      - "Every few minutes, a hub decides who carries what."
+      - "WHO LIVES WITH THIS · Quick-commerce grocery · Food & restaurant delivery · Parcel & pharmacy couriers"
+      - "01 One order per trip, dispatched by hand — Two orders to one building leave with two riders"
+      - "02 Peaks outrun the riders — Weekends, holidays and bad weather turn queues into cancellations"
+      - "03 “Customer unavailable” marked from the road — Each one costs a refund and a customer"
+      - "04 Changes judged by a before-and-after chart — The calendar moves the numbers more than the change"
+      - "THIS PROJECT tackles all four, end to end · bag → match → check → measure"
+    assumptions: [A-13]
+    illustrative: ["The whole slide is context; no repo figures."]
+    change: "Edit the chips (#ctx-c1..3) and cards (#ctx-k1..4) in compositions/s01-context.html."
+  - id: "02"
+    title: "This project"
+    image: slides/slide-02.jpg
+    time: "6.8-11.6 s"
+    composition: "compositions/s02-hook.html (SERIES block injected by tools/inject_sheet.py)"
+    text:
+      - "02 · THIS PROJECT"
+      - "26 hubs, 473 riders. 477,868 orders in 6 weeks. 30 minutes to each door."
+      - "a wave every 2 min · Ramadan · weekends · rain · 36 riders sometimes skip doors"
+    assumptions: [A-01, A-07, A-08, A-10]
+    illustrative: ["The background is the 26 real hub positions with a 4 km service circle each (decoration, low opacity)."]
+    change: "Headline spans #hook-l1..l3 and chips #hook-f1..f3 in compositions/s02-hook.html; counts come from data/*.csv."
+  - id: "03"
+    title: "How it works (white chapter, slide A)"
+    image: slides/slide-03.jpg
+    time: "11.3-19.3 s"
+    composition: "compositions/explainer.html (CONFIG.blocks, CONFIG.groups, CONFIG.loop)"
+    text:
+      - "03 · HOW IT WORKS"
+      - "From orders to riders"
+      - "ORDERS picked, waiting at the hub → [EVERY 2 MINUTES: BAG close drops ride together → MATCH best rider for each bag] → DOOR CHECK was the rider really there? → [4 WEEKS: A/B TEST half the hubs try it first] → VERDICT ✓ cheaper orders ✓ fewer cancels ✓ fewer fake marks"
+      - "again, every wave (loop over MATCH)"
+    assumptions: [A-05, A-06, A-08, A-09]
+    illustrative: ["Icons and colours are a visual language, not data."]
+    change: "Edit CONFIG in compositions/explainer.html; badge truth comes from ab_readout.csv (F-14)."
+  - id: "04"
+    title: "The key idea (white chapter, slide B)"
+    image: slides/slide-04.jpg
+    time: "19.3-26.3 s"
+    composition: "compositions/explainer.html (#ex-b ...)"
+    text:
+      - "04 · THE KEY IDEA"
+      - "One trip, three doors"
+      - "The oldest waiting order starts a bag — so no customer is left at the back of the queue"
+      - "Close drops, ordered around the same time, join it — up to three stops on one trip"
+      - "Only if the first customer barely waits longer — the bag must not break their promise"
+      - "ONE ORDER PER TRIP · 3 RIDERS → BAGGED · 1 RIDER (HUB, A, B, C). One rider, three doors. Two riders stay free."
+      - "Ablation, all hubs: bagging alone cuts cost per delivered order from 9.71 to 8.95 AED."
+    assumptions: [A-02, A-05, A-12]
+    illustrative: ["The HUB/A/B/C demo is schematic: it shows the rule in bagging.make_bags, not a real bag."]
+    change: "Markup under #ex-b in compositions/explainer.html; the footnote figures are F-16 and F-17."
+  - id: "05"
+    title: "Architecture"
+    image: slides/slide-05a.jpg
+    image2: slides/slide-05b.jpg
+    time: "26.0-41.0 s"
+    composition: "compositions/s03-architecture.html"
+    text:
+      - "05 · ARCHITECTURE"
+      - "A two-minute dispatch loop, scored by a hub-level A/B test."
+      - "Legend: data · simulator · dispatch · door check · evaluation · per wave (solid) · batch (dashed) · fallback (dotted)"
+      - "DISPATCH LOOP · EVERY 2 MIN · PER HUB-DAY — generate_data.py · seed 7: hubs.csv 26 hubs, riders.csv 473 riders, days.csv 42 days, orders.csv.gz 477,868 orders"
+      - "runner.py run_all(): 4 parallel workers, 5 policies, 1 seed → orders, riders →"
+      - "simulate.py · simulate_hub_day(): bagging.py Bag orders (≤ 3 stops · 1 km) → bags → matching? → on → assignment.py Min-cost match (Hungarian · SciPy); off → fifo() FIFO · baseline → rider + bag → geo.py Play each trip (traffic · rain · GPS) → not home → geofence.py Door check (150 m geofence · enforce | log) → trip done: rider free, next wave"
+      - "metrics → hub_day_metrics.csv 3,640 rows · BUDGETS & FACTS: dispatch wave 2 min, delivery promise 30 min, cancel if not out 45 min, hub-day runs 4,004, full run, laptop 180 s, CI slice 8 hubs × 7 d"
+      - "EVALUATION · BATCH: experiment.py Pair hubs (pre-period size, coin flip / pair) → arm → experiment.py A/B readout (13 vs 13 hubs, Welch + bootstrap) → ab_readout.csv; geofence.py Geofence eval (precision, recall, radius sweep) ← 11,566 marks → geofence_eval.csv; report.py Ablation (5 policies, by day type) → ablation.csv; experiment.py CI check (500 re-draws, coverage, A/A) → rerandomisation.csv; → power.csv; GROUND TRUTH: true effect known: every policy runs on every hub-day"
+      - "CRITICAL PATH · orders → bag → match → trip → metrics → A/B readout"
+    assumptions: [A-01, A-03, A-04, A-05, A-06, A-08, A-09]
+    illustrative: ["Packets moving along the wires are decoration in execution order (the dispatch loop turns twice).", "'per wave' (solid) vs 'batch' (dashed) marks what runs inside each 2-minute wave and what runs after all hub-days.", "The '?' diamond is the decision point Policy.matching (config.py); the dotted path is the FIFO fallback used by the baseline.", "The critical-path highlight is the chain that produces the headline A/B numbers."]
+    change: "Node boxes (#n-*), cylinders (CYL) and the W wires object in compositions/s03-architecture.html."
+  - id: "06"
+    title: "The system running"
+    image: slides/slide-06a.jpg
+    image2: slides/slide-06b.jpg
+    time: "40.6-53.2 s"
+    composition: "compositions/s04-routes.html (SERIES block injected by tools/inject_sheet.py from tools/export_series.py)"
+    text:
+      - "06 · THE SYSTEM RUNNING"
+      - "Four weeks, 26 hubs, same orders, two dispatchers."
+      - "Share of orders cancelled, per day, all hubs · FIFO, one order per trip vs bag + match + geofence · RAMADAN band · RAIN DAY · 42.5% → 14.0%"
+      - "CANCELLED · 4 WEEKS: FIFO 37,530 · bag+match+geofence 11,063 · −70.5%"
+      - "WHERE THE SAVING COMES FROM · COST PER DELIVERED ORDER, AED: Ordinary weekday (125,715 orders) 9.71 → 9.36 −3.7% · Weekend or Ramadan (184,449 orders) 9.65 → 8.30 −14.0% · Rain day (16,817 orders) 10.42 → 6.84 −34.4%"
+    assumptions: [A-02, A-03, A-08, A-10]
+    illustrative: ["Chart and bars are drawn from the injected numbers (no hand-typed data points); bars are to scale from zero."]
+    change: "Re-run tools/export_series.py and inject it (--name SERIES); layout in compositions/s04-routes.html."
+  - id: "07"
+    title: "End-user value (white)"
+    image: slides/slide-07.jpg
+    time: "52.9-65.9 s"
+    composition: "compositions/value.html (SHEET block injected by tools/inject_sheet.py from tools/export_rider_board.py)"
+    text:
+      - "07 · END-USER VALUE"
+      - "What the hub lead gets"
+      - "RIDER BOARD · HUB 18 · SAT 2026-02-14 · 21:46 WAVE — columns RIDER, ORDERS, KM, WAITED, LEAVES, FIRST, LAST, DUE, BACK"
+      - "Rider 01 2 5.1 13 min 21:46 21:50 21:55 22:03 22:02 ✓"
+      - "Rider 02 1 1.9 8 min 21:46 21:48 21:48 22:08 21:52 ✓"
+      - "Rider 03 3 2.8 10 min 21:46 21:46 21:53 22:06 21:59 ✓"
+      - "Rider 04 1 10.8 14 min 21:46 21:59 21:59 22:02 22:15 ✓"
+      - "Rider 05 2 5.4 15 min 21:46 21:50 21:54 22:01 22:03 ✓"
+      - "+ 3 bags held for the next wave · 5 free riders, 8 bags waiting"
+      - "✓ Hub 18 today: 795 of 821 delivered, 7 cancelled · FIFO would cancel 59"
+      - "HUB · RIDER BAY · THIS WAVE'S DROPS · held"
+      - "Who rides, with which orders, and when each door gets them. All 9 inside the 30-minute promise."
+    assumptions: [A-03, A-04, A-05, A-08, A-11]
+    illustrative: ["Rider 01-05 are placeholders (no real people); all five are on bikes.", "The hub-lead figure, rider bay, scooter drawings and driving speed are illustrative; drop positions and stop order are real, scaled to fit the panel (uniform scale).", "Grey circles are the drops of the 3 bags held for the next wave."]
+    change: "Re-run tools/export_rider_board.py (hub, date, wave arguments), then tools/inject_sheet.py --name SHEET; layout in compositions/value.html."
+  - id: "08"
+    title: "Results"
+    image: slides/slide-08.jpg
+    time: "65.6-74.4 s"
+    composition: "compositions/s05-results.html (stats array)"
+    text:
+      - "08 · RESULTS · HUB-LEVEL A/B, 4 WEEKS"
+      - "13 treated hubs vs 13 control hubs: cheaper and faster."
+      - "COST −10.6% fleet cost per delivered order · AED 9.79 → 8.75"
+      - "PROMISE +28.3 points more orders inside 30 min · 58.0% → 86.2%"
+      - "CANCELLATIONS 3.7% cancellation rate, treated hubs · control 11.6%"
+      - "DOOR CHECK −72.4% fake \"not home\" marks accepted · 11.7 → 3.2 per 1,000"
+      - "326,981 orders · Welch 95% CIs exclude zero on all four · true effect known from the simulator"
+    assumptions: [A-02, A-03, A-04, A-06, A-09, A-12]
+    illustrative: ["Mini bars under each number are drawn to the same ratio (treatment / control)."]
+    change: "The stats array and card text in compositions/s05-results.html."
+  - id: "09"
+    title: "What didn't win"
+    image: slides/slide-09.jpg
+    time: "74.0-80.6 s"
+    composition: "compositions/s06-twist.html"
+    text:
+      - "09 · WHAT DIDN'T WIN"
+      - "Riders got less busy, and the A/B test can't even see it."
+      - "Rider utilisation (busy ÷ paid time), the one metric that moved the wrong way"
+      - "Control hubs (FIFO, one order per trip) 0.667 · Treated hubs (bag + match + geofence) 0.650"
+      - "Welch 95% CI of the difference · p = 0.16 · −0.040 to +0.007 (axis −0.05 … 0 … +0.05)"
+      - "To see a change this size: 27 hubs per arm. The test had 13."
+      - "Why: bagging makes fewer trips on the same paid roster. Raising utilisation needs a smaller roster, which this test did not try."
+    assumptions: [A-02, A-09, A-12]
+    illustrative: ["Utilisation bars: 1,000 px track = 1.0 (from zero)."]
+    change: "Rows #twist-r1..r2 and the CI strip (#twist-ci) in compositions/s06-twist.html."
+  - id: "10"
+    title: "End card"
+    image: slides/slide-10.jpg
+    time: "80.2-84.6 s"
+    composition: "compositions/s07-end.html"
+    text:
+      - "10 · OPEN SOURCE · MIT · RUNS ON A LAPTOP"
+      - "last-mile-dispatch"
+      - "github.com/kavya2693/last-mile-dispatch"
+      - "SciPy · pandas · NumPy · Python"
+      - "$ make run   # 26 hubs, 4 weeks, ~3 min"
+    assumptions: [A-12]
+    illustrative: ["Faded background: the 26 real hub positions with 4 km circles."]
+    change: "Text in compositions/s07-end.html."
+
+caveats:
+  - "Everything is simulated (A-01). The A/B readout is what an experimenter would see; the 'true effect' is known only because every policy ran on every hub-day with the same random draws."
+  - "The cost saving is mostly cancellations turned into deliveries on a fixed, paid roster (A-02); slide 06 shows it is under 4% on an ordinary weekday and 34% on the rain day."
+  - "Slide 07's ETAs are reconstructed with the repo's travel function for one wave; they equal the simulator's delivery times because the five riders are honest and all nine customers are home (asserted in export_rider_board.py)."
+  - "Slide 08 uses hub-level means (13 vs 13); the ablation numbers on slide 04 pool every hub and every day, so they differ slightly from the A/B means."
+  - "'36 riders sometimes skip doors' is a generator setting (8% of riders, 22% of their stops), not an observed behaviour (A-07)."
+  - "Slide 01 statements are general industry knowledge (A-13)."
+  - "Rider names on slide 07 are placeholders."
+
+stills:
+  master: renders/last-mile-dispatch-master.mp4   # relative to demo_dir
+  width: 1600
+  times: {"01": 6.4, "02": 11.1, "03": 18.9, "04": 25.5, "05a": 38.4, "05b": 40.2, "06a": 46.2, "06b": 52.4, "07": 64.9, "08": 73.8, "09": 79.9, "10": 84.4}
+
+# Extra check helpers (Python), available to check expressions.
+helpers: |
+  import re as _re
+  def _block(path, name):
+      html = T('demo:' + path)
+      m = _re.search(r"const " + name + r" = (\{.*?\}); /\* " + name + r":END", html, _re.S)
+      return json.loads(m.group(1)) if m else None
+  def series_injected(path):
+      """The SERIES block in a composition must equal the exported run_series.json."""
+      return _block(path, 'SERIES') == J('demo:assets/run_series.json')
+  def series_daily_matches():
+      """Recompute the daily cancellation rates from hub_day_metrics.csv and compare with the injected chart data."""
+      if not series_injected('compositions/s04-routes.html'):
+          return False
+      m = R('outputs/hub_day_metrics.csv')
+      g = m.groupby(['date', 'policy'])[['orders', 'cancelled']].sum()
+      d = J('demo:assets/run_series.json')['daily']
+      exp = R('data/days.csv').query("period == 'experiment'")['date'].tolist()
+      if [x['date'] for x in d] != exp:
+          return False
+      for x in d:
+          for k, p in (('base', 'baseline'), ('treat', 'bagging+matching+geofence')):
+              if round(g.at[(x['date'], p), 'cancelled'] / g.at[(x['date'], p), 'orders'], 4) != x[k]:
+                  return False
+      return True
+  def stress_line(day_type):
+      b = row('outputs/stress_split.csv', day_type=day_type, policy='baseline')
+      t = row('outputs/stress_split.csv', day_type=day_type, policy='bagging+matching+geofence')
+      s = J('demo:assets/run_series.json')['stress']
+      if not series_injected('compositions/s04-routes.html'):
+          return 'not injected'
+      chg = (t['cost_per_delivered'] / b['cost_per_delivered'] - 1) * 100
+      shown = next(r for r in s if r['day_type'] == day_type)
+      if round(chg, 1) != shown['cost_chg_pct']:
+          return 'export mismatch'
+      return '{:,d} · {:.2f} → {:.2f} · {:+.1f}%'.format(int(b['orders']), b['cost_per_delivered'], t['cost_per_delivered'], chg)
+  def sheet_rows_match():
+      """The SHEET block injected in value.html must equal the exported rider board, and the board's
+      hub-day totals must equal outputs/hub_day_metrics.csv."""
+      sheet = _block('compositions/value.html', 'SHEET')
+      src = J('demo:assets/rider_board.json')
+      if sheet != src:
+          return False
+      for p, v in src['day'].items():
+          r = row('outputs/hub_day_metrics.csv', hub_id=src['hub'], date=src['date'], policy=p)
+          if any(int(r[k]) != v[k] for k in ('orders', 'delivered', 'cancelled', 'on_time')):
+              return False
+      shown = [(r['rider'], r['orders'], f"{r['km']:.1f}", round(r['waited_min']), r['leaves'], r['first_eta'], r['last_eta'], r['due'], r['back']) for r in src['rows']]
+      return shown == [
+          ('Rider 01', 2, '5.1', 13, '21:46', '21:50', '21:55', '22:03', '22:02'),
+          ('Rider 02', 1, '1.9', 8, '21:46', '21:48', '21:48', '22:08', '21:52'),
+          ('Rider 03', 3, '2.8', 10, '21:46', '21:46', '21:53', '22:06', '21:59'),
+          ('Rider 04', 1, '10.8', 14, '21:46', '21:59', '21:59', '22:02', '22:15'),
+          ('Rider 05', 2, '5.4', 15, '21:46', '21:50', '21:54', '22:01', '22:03'),
+      ]

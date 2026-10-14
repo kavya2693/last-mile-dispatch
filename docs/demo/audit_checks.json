@@ -1,0 +1,494 @@
+{
+ "generated": "2026-10-14 14:19",
+ "commit": "c7de8a6ad78ef3961f773e55ae9af197085c3f9c",
+ "checks": [
+  {
+   "id": "F-01",
+   "shown": "3 industry chips",
+   "type": "general-knowledge",
+   "status": "manual",
+   "computed": "-",
+   "reason": "Context statement, not a repo output."
+  },
+  {
+   "id": "F-02",
+   "shown": "4 problem cards",
+   "type": "general-knowledge",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-03",
+   "shown": "26 hubs",
+   "type": "direct",
+   "computed": "26",
+   "expect": "26",
+   "status": "pass"
+  },
+  {
+   "id": "F-04",
+   "shown": "473 riders",
+   "type": "direct",
+   "computed": "473",
+   "expect": "473",
+   "status": "pass"
+  },
+  {
+   "id": "F-05",
+   "shown": "477,868 orders",
+   "type": "direct",
+   "computed": "477,868",
+   "expect": "477,868",
+   "status": "pass"
+  },
+  {
+   "id": "F-06",
+   "shown": "6 weeks / 42 days",
+   "type": "derived",
+   "computed": "42 days",
+   "expect": "42 days",
+   "status": "pass"
+  },
+  {
+   "id": "F-07",
+   "shown": "30 minutes to each door / 30-minute promise",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-08",
+   "shown": "a wave every 2 min / EVERY 2 MINUTES / dispatch wave 2 min",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-09",
+   "shown": "Ramadan \u00b7 weekends \u00b7 rain",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-10",
+   "shown": "36 riders sometimes skip doors",
+   "type": "direct",
+   "computed": "36",
+   "expect": "36",
+   "status": "pass"
+  },
+  {
+   "id": "F-11",
+   "shown": "hub dots + circles",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-12",
+   "shown": "ORDERS \u2192 BAG \u2192 MATCH \u2192 DOOR CHECK \u2192 A/B TEST \u2192 VERDICT",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-13",
+   "shown": "4 WEEKS",
+   "type": "derived",
+   "computed": "4 weeks",
+   "expect": "4 weeks",
+   "status": "pass"
+  },
+  {
+   "id": "F-14",
+   "shown": "cheaper orders / fewer cancels / fewer fake marks",
+   "type": "derived",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-15",
+   "shown": "3 steps / \u2264 3 stops \u00b7 1 km",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-16",
+   "shown": "9.71",
+   "type": "direct",
+   "computed": "9.71",
+   "expect": "9.71",
+   "status": "pass"
+  },
+  {
+   "id": "F-17",
+   "shown": "8.95 AED",
+   "type": "direct",
+   "computed": "8.95",
+   "expect": "8.95",
+   "status": "pass"
+  },
+  {
+   "id": "F-18",
+   "shown": "generate_data.py, runner.py run_all(), simulate.py simulate_hub_day(), bagging.py, assignment.py (min_cost, fifo), geo.py, geofence.py, experiment.py, report.py",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-19",
+   "shown": "power.csv, ab_readout.csv, geofence_eval.csv, ablation.csv, rerandomisation.csv, hub_day_metrics.csv",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-20",
+   "shown": "3,640 rows",
+   "type": "direct",
+   "computed": "3,640",
+   "expect": "3,640",
+   "status": "pass"
+  },
+  {
+   "id": "F-21",
+   "shown": "11,566 marks",
+   "type": "direct",
+   "computed": "11,566",
+   "expect": "11,566",
+   "status": "pass"
+  },
+  {
+   "id": "F-22",
+   "shown": "hub-day runs 4,004",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-23",
+   "shown": "full run, laptop 180 s",
+   "type": "derived",
+   "computed": "180 s",
+   "expect": "180 s",
+   "status": "pass"
+  },
+  {
+   "id": "F-24",
+   "shown": "cancel if not out 45 min",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-25",
+   "shown": "150 m geofence",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-26",
+   "shown": "500 re-draws",
+   "type": "direct",
+   "computed": "500",
+   "expect": "500",
+   "status": "pass"
+  },
+  {
+   "id": "F-27",
+   "shown": "13 vs 13 hubs",
+   "type": "direct",
+   "computed": "13 vs 13",
+   "expect": "13 vs 13",
+   "status": "pass"
+  },
+  {
+   "id": "F-28",
+   "shown": "4 parallel workers \u00b7 5 policies, 1 seed",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-29",
+   "shown": "CI slice 8 hubs \u00d7 7 d",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-30",
+   "shown": "generate_data.py \u00b7 seed 7",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-31",
+   "shown": "two lines, Feb 2 - Mar 1",
+   "type": "derived",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-32",
+   "shown": "RAIN DAY \u00b7 42.5% \u2192 14.0%",
+   "type": "direct",
+   "computed": "42.5% \u2192 14.0%",
+   "expect": "42.5% \u2192 14.0%",
+   "status": "pass"
+  },
+  {
+   "id": "F-33",
+   "shown": "37,530 \u2192 11,063",
+   "type": "direct",
+   "computed": "37,530 \u2192 11,063",
+   "expect": "37,530 \u2192 11,063",
+   "status": "pass"
+  },
+  {
+   "id": "F-34",
+   "shown": "\u221270.5%",
+   "type": "derived",
+   "computed": "-70.5%",
+   "expect": "-70.5%",
+   "status": "pass"
+  },
+  {
+   "id": "F-35",
+   "shown": "125,715 orders \u00b7 9.71 \u2192 9.36 \u00b7 \u22123.7%",
+   "type": "derived",
+   "computed": "125,715 \u00b7 9.71 \u2192 9.36 \u00b7 -3.7%",
+   "expect": "125,715 \u00b7 9.71 \u2192 9.36 \u00b7 -3.7%",
+   "status": "pass"
+  },
+  {
+   "id": "F-36",
+   "shown": "184,449 orders \u00b7 9.65 \u2192 8.30 \u00b7 \u221214.0%",
+   "type": "derived",
+   "computed": "184,449 \u00b7 9.65 \u2192 8.30 \u00b7 -14.0%",
+   "expect": "184,449 \u00b7 9.65 \u2192 8.30 \u00b7 -14.0%",
+   "status": "pass"
+  },
+  {
+   "id": "F-37",
+   "shown": "16,817 orders \u00b7 10.42 \u2192 6.84 \u00b7 \u221234.4%",
+   "type": "derived",
+   "computed": "16,817 \u00b7 10.42 \u2192 6.84 \u00b7 -34.4%",
+   "expect": "16,817 \u00b7 10.42 \u2192 6.84 \u00b7 -34.4%",
+   "status": "pass"
+  },
+  {
+   "id": "F-38",
+   "shown": "RAMADAN band from Feb 18",
+   "type": "direct",
+   "computed": "2026-02-18",
+   "expect": "2026-02-18",
+   "status": "pass"
+  },
+  {
+   "id": "F-39",
+   "shown": "Rider 01-05 rows",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-40",
+   "shown": "795 of 821 delivered, 7 cancelled \u00b7 FIFO would cancel 59",
+   "type": "direct",
+   "computed": "795 of 821 delivered, 7 cancelled \u00b7 FIFO 59",
+   "expect": "795 of 821 delivered, 7 cancelled \u00b7 FIFO 59",
+   "status": "pass"
+  },
+  {
+   "id": "F-41",
+   "shown": "+ 3 bags held for the next wave \u00b7 5 free riders, 8 bags waiting",
+   "type": "direct",
+   "computed": "3 held \u00b7 5 riders, 8 bags",
+   "expect": "3 held \u00b7 5 riders, 8 bags",
+   "status": "pass"
+  },
+  {
+   "id": "F-42",
+   "shown": "All 9 inside the 30-minute promise.",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-43",
+   "shown": "HUB 18",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-44",
+   "shown": "\u221210.6%",
+   "type": "direct",
+   "computed": "-10.6%",
+   "expect": "-10.6%",
+   "status": "pass"
+  },
+  {
+   "id": "F-45",
+   "shown": "AED 9.79 \u2192 8.75",
+   "type": "direct",
+   "computed": "9.79 \u2192 8.75",
+   "expect": "9.79 \u2192 8.75",
+   "status": "pass"
+  },
+  {
+   "id": "F-46",
+   "shown": "+28.3",
+   "type": "direct",
+   "computed": "+28.3",
+   "expect": "+28.3",
+   "status": "pass"
+  },
+  {
+   "id": "F-47",
+   "shown": "58.0% \u2192 86.2%",
+   "type": "direct",
+   "computed": "58.0% \u2192 86.2%",
+   "expect": "58.0% \u2192 86.2%",
+   "status": "pass"
+  },
+  {
+   "id": "F-48",
+   "shown": "3.7% \u00b7 control 11.6%",
+   "type": "direct",
+   "computed": "3.7% \u00b7 control 11.6%",
+   "expect": "3.7% \u00b7 control 11.6%",
+   "status": "pass"
+  },
+  {
+   "id": "F-49",
+   "shown": "\u221272.4%",
+   "type": "direct",
+   "computed": "-72.4%",
+   "expect": "-72.4%",
+   "status": "pass"
+  },
+  {
+   "id": "F-50",
+   "shown": "11.7 \u2192 3.2 per 1,000",
+   "type": "direct",
+   "computed": "11.7 \u2192 3.2",
+   "expect": "11.7 \u2192 3.2",
+   "status": "pass"
+  },
+  {
+   "id": "F-51",
+   "shown": "326,981 orders",
+   "type": "direct",
+   "computed": "326,981",
+   "expect": "326,981",
+   "status": "pass"
+  },
+  {
+   "id": "F-52",
+   "shown": "Welch 95% CIs exclude zero on all four",
+   "type": "derived",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-53",
+   "shown": "0.667 / 0.650",
+   "type": "direct",
+   "computed": "0.667 / 0.650",
+   "expect": "0.667 / 0.650",
+   "status": "pass"
+  },
+  {
+   "id": "F-54",
+   "shown": "\u22120.040 to +0.007",
+   "type": "direct",
+   "computed": "-0.040 to +0.007",
+   "expect": "-0.040 to +0.007",
+   "status": "pass"
+  },
+  {
+   "id": "F-55",
+   "shown": "p = 0.16",
+   "type": "direct",
+   "computed": "0.16",
+   "expect": "0.16",
+   "status": "pass"
+  },
+  {
+   "id": "F-56",
+   "shown": "27 hubs per arm",
+   "type": "direct",
+   "computed": "27",
+   "expect": "27",
+   "status": "pass"
+  },
+  {
+   "id": "F-57",
+   "shown": "axis \u22120.05..+0.05 = 1,000 px; bar 95 \u2192 571 px, estimate at 333 px",
+   "type": "derived",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-58",
+   "shown": "MIT",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-59",
+   "shown": "~3 min",
+   "type": "derived",
+   "computed": "~3 min",
+   "expect": "~3 min",
+   "status": "pass"
+  },
+  {
+   "id": "F-60",
+   "shown": "SciPy \u00b7 pandas \u00b7 NumPy \u00b7 Python",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-61",
+   "shown": "$ make run   # 26 hubs, 4 weeks, ~3 min",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  }
+ ]
+}
